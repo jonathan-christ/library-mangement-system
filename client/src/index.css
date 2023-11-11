@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+form {
+    margin: auto;
+    margin-top: 10%;
+    width: 50%;
+}
