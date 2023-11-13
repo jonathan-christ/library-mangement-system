@@ -1,45 +1,145 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import validator from 'validator'
+import axios from 'axios'
 
-import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
+import { useForm } from 'react-hook-form'
+import { Link } from 'react-router-dom'
+import { DevTool } from '@hookform/devtools'
+
+import { Button, Label, TextInput } from 'flowbite-react'
+import { emptyMsg, notEmail, passNotMatch } from '../assets/formErrorMsg'
 
 function SignUpForm() {
-  return (
-    <form className="flex max-w-md flex-col gap-4">
-            <div>
-                <div className="mb-2 block">
-                <Label htmlFor="email2" value="Your email" />
+    const {
+        register,
+        handleSubmit,
+        watch,
+        reset,
+        control,
+        formState: { errors },
+    } = useForm({ mode: 'onTouched' });
+
+    async function signupUser(data) {
+        delete data.rePass
+        await axios.post("/api/users/create", { data })
+            .then(() => {
+                reset()
+            })
+    }
+
+    async function userExists(email) {
+        let exists = false
+        await axios.post("/api/users/find/email", { email: email })
+            .then(res => {
+                if (res.data.status === 'found') {
+                    exists = true
+                }
+            })
+
+        return exists
+    }
+
+    return (
+        <div>
+            <form onSubmit={handleSubmit(signupUser)} className="flex max-w-md flex-col gap-4" noValidate>
+                <div>
+                    <div>
+                        <div className="mb-2 block">
+                            <Label htmlFor="fname" value="First Name" />
+                        </div>
+                        <TextInput id="fname" type="text" {...register('fname', {
+                            required: emptyMsg('first name')
+                        })} shadow />
+                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.fname?.message}</p>
+                    </div>
+                    <div>
+                        <div className="mb-2 block">
+                            <Label htmlFor="mname" value="Middle Name" />
+                        </div>
+                        <TextInput id="mname" type="text" {...register('mname')} shadow />
+                    </div>
+                    <div>
+                        <div className="mb-2 block">
+                            <Label htmlFor="lname" value="Last Name" />
+                        </div>
+                        <TextInput id="lname" type="text" {...register('lname', {
+                            required: emptyMsg('last name')
+                        })} shadow />
+                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.lname?.message}</p>
+                    </div>
+                    <div>
+                        <div className="mb-2 block">
+                            <Label htmlFor="suffix" value="Suffix" />
+                        </div>
+                        <TextInput id="suffix" type="text" {...register('suffix')} shadow />
+                    </div>
+                    <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">Sex</h3>
+                    <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                            <div className="flex items-center ps-3">
+                                <input id="male" type="radio" value="male" {...register('sex', {
+                                    required: emptyMsg('sex')
+                                })} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
+                                <label htmlFor="male" className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Male </label>
+                            </div>
+                        </li>
+                        <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                            <div className="flex items-center ps-3">
+                                <input id="female" type="radio" value="female" {...register('sex', {
+                                    required: emptyMsg('sex')
+                                })} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
+                                <label htmlFor="female" className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Female</label>
+                            </div>
+                        </li>
+                    </ul>
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.sex?.message}</p>
                 </div>
-                <TextInput id="email2" type="email" placeholder="name@flowbite.com" required shadow />
-            </div>
-            <div>
-                <div className="mb-2 block">
-                <Label htmlFor="password2" value="Your password" />
+
+                <div>
+                    <div>
+                        <div className="mb-2 block">
+                            <Label htmlFor="email2" value="Your email" />
+                        </div>
+                        <TextInput id="email2" type="email" placeholder="name@flowbite.com" {...register('email', {
+                            required: emptyMsg('email'),
+                            validate: {
+                                format: val => validator.isEmail(val) || notEmail(),
+                                exists: async (val) => await userExists(val) == false || "User exists!"
+                            }
+                        })} shadow />
+                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.email?.message}</p>
+                    </div>
+                    <div>
+                        <div className="mb-2 block">
+                            <Label htmlFor="password2" value="Your password" />
+                        </div>
+                        <TextInput id="password2" type="password" {...register('password', {
+                            required: emptyMsg('Password')
+                        })} required shadow />
+                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.password?.message}</p>
+                    </div>
+                    <div>
+                        <div className="mb-2 block">
+                            <Label htmlFor="repeat-password" value="Repeat password" />
+                        </div>
+                        <TextInput id="repeat-password" type="password" {...register('rePass', {
+                            required: "You need to retype password",
+                            validate: {
+                                unmatching: val => validator.equals(val, watch('password')) || passNotMatch()
+                            }
+                        })} required shadow />
+                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.rePass?.message}</p>
+                    </div>
                 </div>
-                <TextInput id="password2" type="password" required shadow />
-            </div>
-            <div>
-                <div className="mb-2 block">
-                <Label htmlFor="repeat-password" value="Repeat password" />
-                </div>
-                <TextInput id="repeat-password" type="password" required shadow />
-            </div>
-            <div className="flex items-center gap-2">
-                <Checkbox id="agree" />
-                <Label htmlFor="agree" className="flex">
-                I agree with the&nbsp;
-                <Link href="#" className="text-cyan-600 hover:underline dark:text-cyan-500">
-                    terms and conditions
-                </Link>
-                </Label>
-            </div>
-            <Button type="submit">Register new account</Button>
-            <span>
-                Already have an account? <Link to="/login">Login here</Link><br/>
-                <Link to="/home">Browse as Guest</Link>
-            </span>
-        </form>
-  )
+                <Button type="submit">Register new account</Button>
+                <span>
+                    Already have an account? <Link to="/login">Login here</Link><br />
+                    <Link to="/home">Browse as Guest</Link>
+                </span>
+            </form>
+            <DevTool control={control} />
+        </div>
+    )
 }
 
 export default SignUpForm

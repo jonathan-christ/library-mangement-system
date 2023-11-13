@@ -1,44 +1,64 @@
 import React from 'react'
+import axios from 'axios';
 
-import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { emptyMsg, notEmail } from '../assets/formErrorMsg'
+import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
 
 function LoginForm() {
-    const [email, setEmail] = useState("")
-    const [pass, setPass] = useState("")
-    const [err, setErr] = useState("")
+    const [formErr, setFormErr] = useState("")
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors }
+    } = useForm()
 
-    const loginUser = (e) => {
-        e.preventDefault()
+    const loginUser = (data) => {
 
-        if (email.trim().length * pass.trim().length === 0) {
-            setErr("Fields must not be left blank")
-        }else{
-            setErr("")
-        }
-        alert("["+ email.trim().length + "] " + pass + " " + err)
+        axios.post("/api/users/login", { email: data.email, password: data.password })
+            .then(res => {
+                let status = res.data.status
+                if(status === 'pass_match'){
+                    reset()
+                    setFormErr("")
+                }else{
+                    setFormErr('User not found or credential mismatch')
+                }
+            })
+
     }
 
     return (
-        <form className="flex max-w-md flex-col gap-4">
-            <div>
-                <div className="mb-2 block">
-                    <Label htmlFor="email1" value="Your email" />
+        <div>
+            <form onSubmit={handleSubmit(loginUser)} className="flex max-w-md flex-col gap-4">
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="email1" value="Your email" />
+                    </div>
+                    <TextInput id="email1" type="email" placeholder="name@flowbite.com" {...register('email', {
+                        required: emptyMsg('email')
+                    })} shadow />
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.email?.message}</p>
                 </div>
-                <TextInput id="email1" type="email" placeholder="name@flowbite.com" onChange={(e) => { setEmail(e.target.value) }} required />
-            </div>
-            <div>
-                <div className="mb-2 block">
-                    <Label htmlFor="password1" value="Your password" />
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="password1" value="Your password" />
+                    </div>
+                    <TextInput id="password1" type="password"{...register('password', {
+                        required: emptyMsg('email')
+                    })} shadow />
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.password?.message}</p>
                 </div>
-                <TextInput id="password1" type="password" onChange={(e) => { setPass(e.target.value) }} required />
-            </div>
-            <div className="flex items-center gap-2">
-                <Checkbox id="remember" />
-                <Label htmlFor="remember">Remember me</Label>
-            </div>
-            <Button type="submit" onClick={loginUser}>Login</Button>
-        </form>
+                <div className="flex items-center gap-2">
+                    <Checkbox id="remember" />
+                    <Label htmlFor="remember">Remember me</Label>
+                </div>
+                <Button type="submit">Login</Button>
+            </form>
+            <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{formErr}</p>
+        </div>
     )
 }
 

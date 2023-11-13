@@ -17,8 +17,8 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 })
 
 const db = {
-  Sequelize: Sequelize,
-  sequelize: sequelize
+  sequelize: sequelize,
+  Sequelize: Sequelize
 }
 
 // connect to all models

@@ -1,21 +1,19 @@
-const db = require("../models");
+const db = require("../models")
+const bcrypt = require("bcryptjs")
 const Op = db.Sequelize.Op
 const User = db.user
 
-//testing only for now
-
-exports.create = (req, res) => {
-    let body = req.body
-
+exports.create = async (req, res) => {
+    const data = req.body.data
     const user = {
         typeID: 1,
-        firstName: "Cock And",
-        middleName: "Ball",
-        lastName: "Torture",
-        suffix: "",
-        sex: "male",
-        email: "rufgier@gmail.com",
-        password: '12345'
+        firstName: data.fname,
+        middleName: data.mname,
+        lastName: data.lname,
+        suffix: data.suffix,
+        sex: data.sex,
+        email: data.email,
+        password: await bcrypt.hash(data.password, 10)
     }
 
     User.create(user)
@@ -30,10 +28,7 @@ exports.create = (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    let email = req.query.email
-    let condition = email ? { email: { [Op.like]: `%${email}` } } : null
-
-    User.findAll({ where: condition })
+    User.findAll()
         .then(data => {
             res.send(data)
         })
@@ -45,15 +40,21 @@ exports.findAll = (req, res) => {
 
 exports.findOne = (req, res) => {
     //options
-    let id = req.params.id
+    let email = req.body.email
+    let condition = email ? { email: { [Op.eq]: email } } : null
 
-    User.findByPk(id)
+    User.findAll({ where: condition })
         .then(data => {
-            if (data) {
-                res.send(data)
+            if (data.length == 1) {
+                res.send({
+                    status: 'found',
+                    data: data
+                })
             } else {
-                res.status(404)
-                    .send({ message: "Cannot find user" })
+                res.send({
+                    status: 'not found',
+                    data: null
+                })
             }
         })
         .catch(err => {
@@ -79,6 +80,36 @@ exports.deleteAll = (req, res) => {
 // Find all published Tutorials
 exports.findAllPublished = (req, res) => {
 
+}
+
+exports.login = async (req, res) => {
+    let email = req.body.email
+    let pass = req.body.password
+    let condition = email ? { email: { [Op.eq]: email } } : null
+
+    User.findAll({where: condition})
+        .then(data => {
+            if (data.length == 1) {
+                let userData = data[0].dataValues
+                let hash = Buffer.from(userData.password).toString()
+                bcrypt.compare(pass, hash).then(match=>{
+                    if(match){
+                        res.send({
+                            status: 'pass_match'
+                        })
+                    }else {
+                        res.send({
+                            status: 'pass_mismatch'
+                        })
+                    }
+                })
+
+            } else {
+                res.send({
+                    status: 'not found'
+                })
+            }
+        })
 }
 
 

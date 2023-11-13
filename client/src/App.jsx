@@ -4,8 +4,6 @@ import SignUp from './pages/signup'
 import Login from './pages/login'
 import NotFound from './pages/NotFound'
 
-// import axios from 'axios'
-
 // function App() {
 //   const [users, setUsers] = useState([{}])
 
@@ -35,6 +33,7 @@ function App() {
         {/* GENERAL ACCESS */}
         <Route path="/" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
+        {/* Route frame with children as homepage */}
 
         <Route path="*" element={<NotFound/>}/>
 

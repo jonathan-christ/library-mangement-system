@@ -2,7 +2,7 @@
   "name": "library-mangement-system",
   "private": true,
   "version": "0.1.0",
-  "proxy": "http://localhost:5000",
+  "proxy": "http://192.168.191.92:5000",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,16 +11,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "@mapbox/node-pre-gyp": "^1.0.11",
+    "axios": "^1.6.1",
     "flowbite": "^2.1.1",
     "flowbite-react": "^0.6.4",
+    "node-addon-api": "^7.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.2",
     "react-icons": "^4.11.0",
     "react-router-dom": "^6.18.0",
     "validator": "^13.11.0"
   },
   "devDependencies": {
+    "@hookform/devtools": "^4.3.1",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.3",
@@ -30,6 +34,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "postcss": "^8.4.31",
+    "rollup-plugin-polyfill-node": "^0.12.0",
     "tailwindcss": "^3.3.5",
     "vite": "^4.4.5"
   }
