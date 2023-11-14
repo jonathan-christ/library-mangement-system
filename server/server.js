@@ -19,9 +19,9 @@ db.sequelize.sync()
     })
 
 app.use(express.json())
+
 //main function routes
 require('./routes/user.routes')(app)
-
 
 //unknown get request
 app.get('*', (req, res) => {

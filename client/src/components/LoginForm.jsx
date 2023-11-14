@@ -2,12 +2,14 @@ import React from 'react'
 import axios from 'axios';
 
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form'
-import { emptyMsg, notEmail } from '../assets/formErrorMsg'
+import { emptyMsg } from '../assets/formErrorMsg'
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
 
 function LoginForm() {
     const [formErr, setFormErr] = useState("")
+    const navigate = useNavigate()
     const {
         register,
         handleSubmit,
@@ -20,10 +22,11 @@ function LoginForm() {
         axios.post("/api/users/login", { email: data.email, password: data.password })
             .then(res => {
                 let status = res.data.status
-                if(status === 'pass_match'){
+                if (status === 'pass_match') {
                     reset()
                     setFormErr("")
-                }else{
+                    navigate('../home')
+                } else {
                     setFormErr('User not found or credential mismatch')
                 }
             })
@@ -47,7 +50,7 @@ function LoginForm() {
                         <Label htmlFor="password1" value="Your password" />
                     </div>
                     <TextInput id="password1" type="password"{...register('password', {
-                        required: emptyMsg('email')
+                        required: emptyMsg('password')
                     })} shadow />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.password?.message}</p>
                 </div>
@@ -56,8 +59,8 @@ function LoginForm() {
                     <Label htmlFor="remember">Remember me</Label>
                 </div>
                 <Button type="submit">Login</Button>
+                <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{formErr}</p>
             </form>
-            <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{formErr}</p>
         </div>
     )
 }

@@ -4,6 +4,8 @@ import SignUp from './pages/signup'
 import Login from './pages/login'
 import NotFound from './pages/NotFound'
 
+import Navigation from './components/NavigationBar'
+
 // function App() {
 //   const [users, setUsers] = useState([{}])
 
@@ -30,12 +32,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* GENERAL ACCESS */}
-        <Route path="/" element={<SignUp />} />
+        {/* GENERAL ACCESS DAPAT PAGES!!!*/}
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         {/* Route frame with children as homepage */}
-
-        <Route path="*" element={<NotFound/>}/>
+        <Route path="/home" element={<Navigation />} />
+        <Route path="*" element={<NotFound />} />
 
 
       </Routes>

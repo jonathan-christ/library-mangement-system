@@ -9,3 +9,7 @@ export const notEmail = () => {
 export const passNotMatch = () => {
     return "Passwords do not match"
 }
+
+export const exceedCharLimit = (maxLength) =>{
+    return "Input exceeds maximum character limit of " + maxLength
+}
