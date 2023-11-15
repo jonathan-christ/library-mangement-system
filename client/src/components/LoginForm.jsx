@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios';
 
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form'
 import { emptyMsg } from '../assets/formErrorMsg'
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
@@ -60,6 +60,10 @@ function LoginForm() {
                 </div>
                 <Button type="submit">Login</Button>
                 <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{formErr}</p>
+                <span className='text-sm'>
+                    Aren't a member yet? <Link to="/signup"><u>Sign up here</u></Link><br />
+                    <Link to="/home"><u>Browse as Guest</u></Link>
+                </span>
             </form>
         </div>
     )

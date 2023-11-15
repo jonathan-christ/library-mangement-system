@@ -15,7 +15,7 @@ import History from './pages/user/History'
 
 function App() {
   return (
-    <BrowserRouter basename='/app'>
+    <BrowserRouter>
       <Routes>
         {/* GENERAL ACCESS DAPAT PAGES!!!*/}
         <Route path="/signup" element={<SignUp />} />
@@ -23,7 +23,7 @@ function App() {
         {/* Route frame with children as homepage */}
         <Route path='/' element={<AppLayout />}>
           <Route path="home" element={<Home />} />
-          <Route path="reservation" element={<Reservations />} />
+          <Route path="reservations" element={<Reservations />} />
           <Route path="history" element={<History />} />
         </Route>
         <Route path="*" element={<NotFound />} />

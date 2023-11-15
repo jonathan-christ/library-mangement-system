@@ -13,7 +13,6 @@ import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinCh
 
 function SignUpForm() {
     const [formStatus, setFormStatus] = useState(0)
-    const navigate = useNavigate()
     const {
         register,
         handleSubmit,
@@ -186,9 +185,9 @@ function SignUpForm() {
                     </div>
                 </div>
                 <Button type="submit">Register new account</Button>
-                <span>
+                <span  className='text-sm'>
                     Already have an account? <Link to="/login"><u>Login here</u></Link><br />
-                    <Link to="/home">Browse as Guest</Link>
+                    <Link to="/home"><u>Browse as Guest</u></Link>
                 </span>
             </form>
             <DevTool control={control} />
