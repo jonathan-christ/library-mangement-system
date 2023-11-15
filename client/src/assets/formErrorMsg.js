@@ -13,3 +13,11 @@ export const passNotMatch = () => {
 export const exceedCharLimit = (maxLength) =>{
     return "Input exceeds maximum character limit of " + maxLength
 }
+
+export const belowMinChar = (fieldName, minLength) => {
+    return fieldName + " needs at least " + minLength + " characters"
+} 
+
+export const charOnly = () => {
+    return "Input must be character only"
+}

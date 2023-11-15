@@ -1,42 +1,31 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import '@fontsource-variable/inter'
 
-import SignUp from './pages/signup'
-import Login from './pages/login'
-import NotFound from './pages/NotFound'
+import AppLayout from './components/AppLayout'
 
-import Navigation from './components/NavigationBar'
+// GENERAL
+import SignUp from './pages/general/signup'
+import Login from './pages/general/Login'
+import NotFound from './pages/general/NotFound'
 
-// function App() {
-//   const [users, setUsers] = useState([{}])
-
-//   useEffect(() => {
-//     axios("/api").then(
-//       response => setUsers(response.data)
-//     )
-//   }, [])
-
-//   return (
-//     <div>
-//       {typeof users.users === 'undefined'?(
-//         <p>Loading...</p>
-//       ) : (
-//         users.users.map((user, i)=>{
-//           return <p key={i}>{user}</p>
-//         })
-//       )}
-//     </div>
-//   )
-// }
+// USERS
+import Home from './pages/user/Home'
+import Reservations from './pages/user/Reservations'
+import History from './pages/user/History'
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename='/app'>
       <Routes>
         {/* GENERAL ACCESS DAPAT PAGES!!!*/}
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         {/* Route frame with children as homepage */}
-        <Route path="/home" element={<Navigation />} />
+        <Route path='/' element={<AppLayout />}>
+          <Route path="home" element={<Home />} />
+          <Route path="reservation" element={<Reservations />} />
+          <Route path="history" element={<History />} />
+        </Route>
         <Route path="*" element={<NotFound />} />
 
 

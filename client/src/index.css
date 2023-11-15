@@ -6,3 +6,7 @@ form {
     margin: auto;
     width: 50%;
 }
+
+* {
+    font-family: 'Inter Variable', sans-serif;
+}

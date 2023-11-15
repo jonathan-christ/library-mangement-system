@@ -2,15 +2,17 @@ import React from 'react'
 import validator from 'validator'
 import axios from 'axios'
 
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { DevTool } from '@hookform/devtools'
 
-import { Button, Label, TextInput } from 'flowbite-react'
-import { maxNameLen, maxSuffixLen } from '../assets/constants'
-import { emptyMsg, exceedCharLimit, notEmail, passNotMatch } from '../assets/formErrorMsg'
+import { Button, Label, TextInput, Alert } from 'flowbite-react'
+import { maxNameLen, maxSuffixLen, minPassLen } from '../assets/constants'
+import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../assets/formErrorMsg'
 
 function SignUpForm() {
+    const [formStatus, setFormStatus] = useState(0)
     const navigate = useNavigate()
     const {
         register,
@@ -26,9 +28,10 @@ function SignUpForm() {
         await axios.post("/api/users/create", { data })
             .then(() => {
                 reset()
-                alert("Account created! Email: " + data.email + " Password: " + data.password)
-                navigate('/login')
+                setFormStatus(200)
+                // alert("Account created! Email: " + formStatus)
             }).catch(() => {
+                setFormStatus(404)
                 alert("Error signing up. Try again in a few minutes")
             })
     }
@@ -49,6 +52,16 @@ function SignUpForm() {
 
     return (
         <div>
+            {formStatus == 200 &&
+                <Alert color="success" onDismiss={()=>setFormStatus(0)} rounded>
+                    <span className="font-medium text-center">Successfully Registered!</span> You may now proceed to the login page.
+                </Alert>
+            }
+            {formStatus == 404 &&
+                <Alert color="danger" onDismiss={()=>setFormStatus(0)} rounded>
+                    <span className="font-medium">Server Error!</span> Server errors have occurred, try again later.
+                </Alert>
+            }
             <form onSubmit={handleSubmit(signupUser)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div>
                     <div>
@@ -60,6 +73,9 @@ function SignUpForm() {
                             maxLength: {
                                 value: maxNameLen,
                                 message: exceedCharLimit(maxNameLen)
+                            },
+                            validate: {
+                                format: val=>validator.isAlpha(val) || charOnly()
                             }
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.fname?.message}</p>
@@ -72,6 +88,9 @@ function SignUpForm() {
                             maxLength: {
                                 value: maxNameLen,
                                 message: exceedCharLimit(maxNameLen)
+                            },
+                            validate: {
+                                format: val=>validator.isEmpty(val)?0:validator.isAlpha(val) || charOnly()
                             }
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.mname?.message}</p>
@@ -81,7 +100,14 @@ function SignUpForm() {
                             <Label htmlFor="lname" value="Last Name" />
                         </div>
                         <TextInput id="lname" type="text" {...register('lname', {
-                            required: emptyMsg('last name')
+                            required: emptyMsg('last name'),
+                            maxLength: {
+                                value: maxNameLen,
+                                message: exceedCharLimit(maxNameLen)
+                            },
+                            validate: {
+                                format: val=>validator.isAlpha(val) || "Input must be characters only!"
+                            }
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.lname?.message}</p>
                     </div>
@@ -138,7 +164,11 @@ function SignUpForm() {
                             <Label htmlFor="password2" value="Your password" />
                         </div>
                         <TextInput id="password2" type="password" {...register('password', {
-                            required: emptyMsg('password')
+                            required: emptyMsg('password'),
+                            minLength: {
+                                value: minPassLen,
+                                message: belowMinChar('Password', minPassLen)
+                            },
                         })} required shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.password?.message}</p>
                     </div>

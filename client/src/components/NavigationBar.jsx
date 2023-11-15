@@ -1,5 +1,7 @@
 import React from 'react'
 import ViteLogo from '../assets/vite.svg'
+
+import { useMatch } from 'react-router-dom'
 import { Avatar, Dropdown, Navbar } from 'flowbite-react'
 
 function Navigation() {
@@ -9,7 +11,7 @@ function Navigation() {
             <Navbar.Brand href="#">
                 <img src={ViteLogo} className="mr-3 h-6 sm:h-9" alt="PSHS-ZRC Logo" />
                 <div>
-                    <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">PSHS-ZRC LIBRARY</span>
+                    <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">ISCP LMS</span>
                 </div>
             </Navbar.Brand>
             <div className="flex md:order-2">
@@ -17,29 +19,30 @@ function Navigation() {
                     arrowIcon={false}
                     inline
                     label={
-                        <Avatar alt="User settings" img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" rounded />
+                        <Avatar placeholderInitials={"NS"} rounded />
                     }
                 >
                     <Dropdown.Header>
-                        <span className="block text-sm">Bonnie Green</span>
-                        <span className="block truncate text-sm font-medium">name@flowbite.com</span>
+                        <span className="block text-sm font-semibold text-gray-900 dark:text-white">Neil sims</span>
+                        <span className="block text-sm text-gray-500 truncate dark:text-gray-400 font-medium ">name@flowbite.com</span>
+                        <span className="block truncate text-xs text-gray-500 font-medium ">Student</span>
                     </Dropdown.Header>
-                    <Dropdown.Item>Dashboard</Dropdown.Item>
-                    <Dropdown.Item>Settings</Dropdown.Item>
-                    <Dropdown.Item>Earnings</Dropdown.Item>
+                    <Dropdown.Item>Profile</Dropdown.Item>
                     <Dropdown.Divider />
-                    <Dropdown.Item>Sign out</Dropdown.Item>
+                    <Dropdown.Item><span className="text-red-600">Sign out</span></Dropdown.Item>
                 </Dropdown>
                 <Navbar.Toggle />
             </div>
             <Navbar.Collapse>
-                <Navbar.Link href="#" active>
-                    Home
+                <Navbar.Link href='./home' active={Boolean(useMatch('/home')) ? true : undefined}>
+                    <span className="text-base">HOME</span>
                 </Navbar.Link>
-                <Navbar.Link href="#">About</Navbar.Link>
-                <Navbar.Link href="#">Services</Navbar.Link>
-                <Navbar.Link href="#">Pricing</Navbar.Link>
-                <Navbar.Link href="#">Contact</Navbar.Link>
+                <Navbar.Link href='./reservations'>
+                    <span className="text-base">RESERVATIONS</span>
+                </Navbar.Link>
+                <Navbar.Link href='./history'>
+                    <span className="text-base">HISTORY</span>
+                </Navbar.Link>
             </Navbar.Collapse>
         </Navbar>
     )
