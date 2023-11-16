@@ -1,43 +1,30 @@
 import React from 'react'
 import axios from 'axios';
-import ls from 'localstorage-slim'
 
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form'
-import { emptyMsg } from '../assets/formErrorMsg'
+import { emptyMsg } from '../../assets/formErrorMsg';
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
 
-function LoginForm() {
-    const [formErr, setFormErr] = useState("")
-    const navigate = useNavigate()
+function AddBookForm() {
+    const [formStatus, setFormStatus] = useState(0)
     const {
         register,
         handleSubmit,
+        watch,
         reset,
-        formState: { errors }
-    } = useForm()
+        control,
+        formState: { errors },
+    } = useForm({ mode: 'onTouched' });
 
-    const loginUser = (data) => {
-
-        axios.post("/api/users/login", { email: data.email, password: data.password })
-            .then(res => {
-                let status = res.data.status
-                if (status === 'pass_match') {
-                    ls.set("userData", JSON.stringify(res.data.data), { ttl: 3600, encrypt: true })
-                    reset()
-                    setFormErr("")
-                    navigate('../home')
-                } else {
-                    setFormErr('User not found or credential mismatch')
-                }
-            })
+    const addBook = async (data) => {
 
     }
 
     return (
         <div>
-            <form onSubmit={handleSubmit(loginUser)} className="flex max-w-md flex-col gap-4">
+            <form onSubmit={handleSubmit(addBook)} className="flex max-w-md flex-col gap-4">
                 <div>
                     <div className="mb-2 block">
                         <Label htmlFor="email1" value="Your email" />
@@ -71,4 +58,4 @@ function LoginForm() {
     )
 }
 
-export default LoginForm
+export default AddBookForm

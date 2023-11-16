@@ -32,8 +32,8 @@ function App() {
         <Route element={<UserFrame />}>
           {/* USERS */}
           <Route path="home" element={<UserGuard element={<Home />} />} />
-          <Route path="reservations" element={<UserGuard element={<Reservations />} />} />
           <Route path="history" element={<UserGuard element={<History />} />} />
+          <Route path="reservations" element={<UserGuard element={<Reservations />} />} />
           {/* STAFF */}
           <Route path="dashboard" element={<StaffGuard element={<StaffDashboard />} />} />
           {/* ADMINS */}

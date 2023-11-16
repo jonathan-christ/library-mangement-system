@@ -8,9 +8,9 @@ import { Link } from 'react-router-dom'
 import { DevTool } from '@hookform/devtools'
 
 import { Banner, Button, Label, TextInput, Alert } from 'flowbite-react'
-import { maxNameLen, maxSuffixLen, minPassLen } from '../assets/constants'
-import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../assets/formErrorMsg'
-import SuccessBanner from './banners/SuccessBanner'
+import { maxNameLen, maxSuffixLen, minPassLen } from '../../assets/constants'
+import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../assets/formErrorMsg'
+import SuccessBanner from '../banners/SuccessBanner'
 
 function SignUpForm() {
     const [formStatus, setFormStatus] = useState(0)
