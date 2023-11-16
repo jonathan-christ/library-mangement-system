@@ -87,17 +87,18 @@ exports.login = async (req, res) => {
     let pass = req.body.password
     let condition = email ? { email: { [Op.eq]: email } } : null
 
-    User.findAll({where: condition})
+    User.findAll({ where: condition })
         .then(data => {
             if (data.length == 1) {
                 let userData = data[0].dataValues
                 let hash = Buffer.from(userData.password).toString()
-                bcrypt.compare(pass, hash).then(match=>{
-                    if(match){
+                bcrypt.compare(pass, hash).then(match => {
+                    if (match) {
                         res.send({
-                            status: 'pass_match'
+                            status: 'pass_match',
+                            data: userData
                         })
-                    }else {
+                    } else {
                         res.send({
                             status: 'pass_mismatch'
                         })

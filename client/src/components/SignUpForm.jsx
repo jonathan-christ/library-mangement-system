@@ -4,12 +4,13 @@ import axios from 'axios'
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { DevTool } from '@hookform/devtools'
 
-import { Button, Label, TextInput, Alert } from 'flowbite-react'
+import { Banner, Button, Label, TextInput, Alert } from 'flowbite-react'
 import { maxNameLen, maxSuffixLen, minPassLen } from '../assets/constants'
 import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../assets/formErrorMsg'
+import SuccessBanner from './banners/SuccessBanner'
 
 function SignUpForm() {
     const [formStatus, setFormStatus] = useState(0)
@@ -22,16 +23,19 @@ function SignUpForm() {
         formState: { errors },
     } = useForm({ mode: 'onTouched' });
 
-    async function signupUser(data) {
+    const setStatus = (val) => {
+        setFormStatus(val)
+        window.scrollTo(0, 0)
+    }
+
+    const signupUser = async (data) => {
         delete data.rePass
         await axios.post("/api/users/create", { data })
             .then(() => {
                 reset()
-                setFormStatus(200)
-                // alert("Account created! Email: " + formStatus)
+                setStatus(200)
             }).catch(() => {
-                setFormStatus(404)
-                alert("Error signing up. Try again in a few minutes")
+                setStatus(404)
             })
     }
 
@@ -43,7 +47,7 @@ function SignUpForm() {
                     exists = true
                 }
             }).catch(() => {
-                alert("Error verifying user. Try again in a few minutes")
+                setStatus(402)
             })
 
         return exists
@@ -52,14 +56,30 @@ function SignUpForm() {
     return (
         <div>
             {formStatus == 200 &&
-                <Alert color="success" onDismiss={()=>setFormStatus(0)} rounded>
-                    <span className="font-medium text-center">Successfully Registered!</span> You may now proceed to the login page.
-                </Alert>
+                // <SuccessBanner />
+                <Banner>
+                    <Alert color="success" onDismiss={() => setFormStatus(0)} rounded>
+                        <span className="font-medium">Successfully Registered!</span> You may now proceed to the login page.
+                    </Alert>
+                </Banner>
             }
             {formStatus == 404 &&
-                <Alert color="danger" onDismiss={()=>setFormStatus(0)} rounded>
-                    <span className="font-medium">Server Error!</span> Server errors have occurred, try again later.
-                </Alert>
+                // <SuccessBanner />
+                <Banner>
+                    <Alert color="failure" onDismiss={() => setFormStatus(0)} rounded>
+                        <span className="font-medium">Server Error!</span> Server errors have occurred, try again later.
+                    </Alert>
+                </Banner>
+
+            }
+            {formStatus == 402 &&
+                // <SuccessBanner />
+                <Banner>
+                    <Alert color="failure" onDismiss={() => setFormStatus(0)} rounded>
+                        <span className="font-medium">Server Error!</span> Cannot verify user, try again later.
+                    </Alert>
+                </Banner>
+
             }
             <form onSubmit={handleSubmit(signupUser)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div>
@@ -72,9 +92,6 @@ function SignUpForm() {
                             maxLength: {
                                 value: maxNameLen,
                                 message: exceedCharLimit(maxNameLen)
-                            },
-                            validate: {
-                                format: val=>validator.isAlpha(val) || charOnly()
                             }
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.fname?.message}</p>
@@ -87,9 +104,6 @@ function SignUpForm() {
                             maxLength: {
                                 value: maxNameLen,
                                 message: exceedCharLimit(maxNameLen)
-                            },
-                            validate: {
-                                format: val=>validator.isEmpty(val)?0:validator.isAlpha(val) || charOnly()
                             }
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.mname?.message}</p>
@@ -103,9 +117,6 @@ function SignUpForm() {
                             maxLength: {
                                 value: maxNameLen,
                                 message: exceedCharLimit(maxNameLen)
-                            },
-                            validate: {
-                                format: val=>validator.isAlpha(val) || "Input must be characters only!"
                             }
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.lname?.message}</p>
@@ -166,8 +177,11 @@ function SignUpForm() {
                             required: emptyMsg('password'),
                             minLength: {
                                 value: minPassLen,
-                                message: belowMinChar('Password', minPassLen)
+                                message: belowMinChar('Password', minPassLen),
                             },
+                            validate: {
+                                format: val => validator.isStrongPassword(val, {returnScore: true})>30 || "Password needs 1 of each: uppercase, lowercase, symbol"
+                            }
                         })} required shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.password?.message}</p>
                     </div>
@@ -185,7 +199,7 @@ function SignUpForm() {
                     </div>
                 </div>
                 <Button type="submit">Register new account</Button>
-                <span  className='text-sm'>
+                <span className='text-sm'>
                     Already have an account? <Link to="/login"><u>Login here</u></Link><br />
                     <Link to="/home"><u>Browse as Guest</u></Link>
                 </span>

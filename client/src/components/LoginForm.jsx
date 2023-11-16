@@ -1,5 +1,6 @@
 import React from 'react'
 import axios from 'axios';
+import ls from 'localstorage-slim'
 
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
@@ -23,6 +24,7 @@ function LoginForm() {
             .then(res => {
                 let status = res.data.status
                 if (status === 'pass_match') {
+                    ls.set("userData", JSON.stringify(res.data.data), { ttl: 3600, encrypt: true })
                     reset()
                     setFormErr("")
                     navigate('../home')
