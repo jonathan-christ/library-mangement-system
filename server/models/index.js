@@ -22,11 +22,29 @@ const db = {
 }
 
 // connect to all models
-db.user = require("./user.model.js")(sequelize, Sequelize)
-db.userType = require("./userType.model")(sequelize, Sequelize)
+db.user = require("./user/user.model.js")(sequelize, Sequelize)
+db.userType = require("./user/userType.model")(sequelize, Sequelize)
+
+db.book = require('./book/book.model')(sequelize, Sequelize)
+db.bookCopy = require('./book/bookCopy.model')(sequelize, Sequelize)
+db.bookImg = require('./book/bookImg.model')(sequelize, Sequelize)
+
+db.author = require('./book/author/author.model')(sequelize, Sequelize)
+db.authorList = require('./book/author/authorList.model')(sequelize, Sequelize)
+
+db.genre = require('./book/genre/genre.model')(sequelize, Sequelize)
+db.genreList = require('./book/genre/genreList.model')(sequelize, Sequelize)
+
+db.rating = require('./book/rating/rating.model')(sequelize, Sequelize)
 
 //relations
 db.user.hasMany(db.userType)
 
+db.book.hasMany(db.bookImg)
+db.book.hasMany(db.bookCopy)
+db.book.hasMany(db.rating)
+
+db.author.belongsToMany(db.book, {through: db.authorList})
+db.genre.belongsToMany(db.book, {through: db.genreList})
 
 module.exports = db

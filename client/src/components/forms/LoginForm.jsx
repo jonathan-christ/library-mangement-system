@@ -24,7 +24,7 @@ function LoginForm() {
             .then(res => {
                 let status = res.data.status
                 if (status === 'pass_match') {
-                    ls.set("userData", JSON.stringify(res.data.data), { ttl: 5, encrypt: true })
+                    ls.set("userData", JSON.stringify(res.data.data), { ttl: 300, encrypt: true })
                     reset()
                     setFormErr("")
                     navigate('../home')

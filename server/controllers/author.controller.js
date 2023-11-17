@@ -1,22 +1,17 @@
 const db = require("../models")
-const bcrypt = require("bcryptjs")
 const Op = db.Sequelize.Op
-const User = db.user
+const Author = db.author
+const AuthorList = db.authorList
 
 exports.create = async (req, res) => {
     const data = req.body.data
-    const user = {
-        typeID: 1,
+    const author = {
         firstName: data.fname,
-        middleName: data.mname,
         lastName: data.lname,
-        suffix: data.suffix,
-        sex: data.sex,
-        email: data.email,
-        password: await bcrypt.hash(data.password, 10)
+        bio: data.bio
     }
 
-    User.create(user)
+    Author.create(author)
         .then(data => {
             res.send(data)
         })
@@ -28,7 +23,7 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    User.findAll()
+    Author.findAll()
         .then(data => {
             res.send(data)
         })
@@ -39,11 +34,12 @@ exports.findAll = (req, res) => {
 }
 
 exports.findOne = (req, res) => {
-    //options
-    let email = req.body.email
-    let condition = email ? { email: { [Op.eq]: email } } : null
+    //conditional
+    let value = req.body.value
+    let searchCon = req.body.condition
+    let condition = value ? { searchCon: { [Op.eq]: value } } : null
 
-    User.findOne({ where: condition })
+    Author.findOne({ where: condition })
         .then(data => {
             if (data) {
                 res.send({
@@ -67,7 +63,7 @@ exports.findOneID = (req, res) => {
     //options
     let id = req.body.id
 
-    User.findByPk(id)
+    Author.findByPk(id)
         .then(data => {
             if (data) {
                 res.send({
@@ -87,6 +83,10 @@ exports.findOneID = (req, res) => {
         })
 }
 
+exports.findBooksOf = (req, res) => {
+
+}
+
 exports.update = (req, res) => {
 
 }
@@ -98,37 +98,3 @@ exports.delete = (req, res) => {
 exports.deleteAll = (req, res) => {
 
 }
-
-
-exports.login = async (req, res) => {
-    let email = req.body.email
-    let pass = req.body.password
-    let condition = email ? { email: { [Op.eq]: email } } : null
-
-    User.findAll({ where: condition })
-        .then(data => {
-            if (data.length == 1) {
-                let userData = data[0].dataValues
-                let hash = Buffer.from(userData.password).toString()
-                bcrypt.compare(pass, hash).then(match => {
-                    if (match) {
-                        res.send({
-                            status: 'pass_match',
-                            data: userData
-                        })
-                    } else {
-                        res.send({
-                            status: 'pass_mismatch'
-                        })
-                    }
-                })
-
-            } else {
-                res.send({
-                    status: 'not found'
-                })
-            }
-        })
-}
-
-
