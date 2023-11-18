@@ -107,7 +107,7 @@ function AddBookForm() {
                         },
                         validate: {
                             format: val => validator.isNumeric(val) || "ISBN should be digits",
-                            exists: async (val) => await bookExists(val) == false || "User exists!",
+                            exists: async (val) => await bookExists(val) == false || "Book exists!",
                         },
                     })} shadow />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.isbn?.message}</p>

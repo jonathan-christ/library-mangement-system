@@ -44,4 +44,12 @@ exports.addBook = async (req, res) => {
             return nestedError;
         }
     }
-};
+}
+
+exports.findBook = (req, res) => {
+
+}
+
+exports.findAllBooks = (req, res) => {
+    
+}
