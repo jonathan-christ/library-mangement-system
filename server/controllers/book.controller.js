@@ -1,24 +1,30 @@
-const db = require("../models")
-const Op = db.Sequelize.Op
-const Book = db.book
+const db = require("../models");
+const Op = db.Sequelize.Op;
+const Book = db.book;
 
-exports.create = async (req, res) => {
-    const data = req.body.data
-    const book = {
-        isbn: data.isbn, //
-        title: data.title,
-        description: data.desc,
-        publisherID: data.publisherID, //gotta validate
-        publishDate: data.publishDate,
+exports.create = async (req, res, transaction) => {
+    try {
+        const data = req.body ? req.body.data : req.data;
+        const book = {
+            isbn: data.isbn,
+            title: data.title,
+            description: data.desc,
+            publisherID: data.publisherID,
+            publishDate: data.publishDate,
+        };
+
+        const createdBook = await Book.create(book, transaction )
+        return { data: createdBook }
+    } catch (error) {
+        console.error(error.message)
+
+        try {
+            res.status(500).send({ message: error.message })
+        } catch (nestedError) {
+            console.log("Error sending response: ", nestedError.message)
+            return { message: error.message }
+        }
     }
-
-    Book.create(book, { transaction: t }).then(data => {
-        res.send(data)
-    })
-        .catch(err => {
-            res.status(500)
-                .send({ message: err.message })
-        })
 
 }
 
@@ -36,11 +42,9 @@ exports.findAll = (req, res) => {
 
 exports.findOne = (req, res) => {
     //conditional
-    let value = req.body.value
-    let searchCon = req.body.condition
-    let condition = value ? { searchCon: { [Op.eq]: value } } : null
+    let isbn = req.body.isbn
 
-    Book.findOne({ where: condition })
+    Book.findOne({ where: {isbn: isbn} })
         .then(data => {
             if (data) {
                 res.send({

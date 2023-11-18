@@ -1,6 +1,7 @@
 const db = require("../models")
 const Op = db.Sequelize.Op
 const Author = db.author
+const AuthorList = db.authorList
 
 exports.create = async (req, res) => {
     const data = req.body.data
@@ -83,6 +84,28 @@ exports.findOneID = (req, res) => {
 
 exports.findBooksOf = (req, res) => {
 
+}
+
+exports.assignToBook = async (req, res, transaction) => {
+    try {
+        let data = req.body ? req.body.data : req.data
+
+        const createdAuthorList = await AuthorList.create(
+            { authorID: data.authorID, bookID: data.bookID },
+            transaction
+        )
+
+        return createdAuthorList
+    } catch (error) {
+        console.error(error.message)
+
+        try {
+            res.status(500).send({ message: error.message })
+        } catch (nestedError) {
+            console.log("Error sending response: ", nestedError.message)
+            return nestedError
+        }
+    }
 }
 
 exports.update = (req, res) => {

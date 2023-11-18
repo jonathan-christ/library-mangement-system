@@ -1,6 +1,7 @@
+export const hourtoMins = 60
 export const minToSecs = 60
 export const secToMilli = 10000
-export const ttl = 5*minToSecs//seconds
+export const ttl = hourtoMins*minToSecs//seconds
 export const ttlCheck = minToSecs * secToMilli
 
 export const maxNameLen = 50

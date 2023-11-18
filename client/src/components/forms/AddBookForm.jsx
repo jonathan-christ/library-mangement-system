@@ -1,14 +1,15 @@
 import React from 'react'
 import axios from 'axios';
 import Select from 'react-select'
+import validator from 'validator'
 
-import { DevTool } from '@hookform/devtools';
+import { DevTool } from '@hookform/devtools'
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
 import { maxBookLen, maxISBNLen, maxNameLen, minISBNLen } from '../../assets/constants'
 import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../assets/formErrorMsg'
-import { Button, Label, Textarea, TextInput, Datepicker } from 'flowbite-react';
+import { Button, Label, Textarea, TextInput, Datepicker } from 'flowbite-react'
 
 function AddBookForm() {
     const [formStatus, setFormStatus] = useState(0)
@@ -20,6 +21,7 @@ function AddBookForm() {
         handleSubmit,
         watch,
         reset,
+        resetField,
         control,
         formState: { errors },
     } = useForm({ mode: 'onTouched' });
@@ -28,6 +30,7 @@ function AddBookForm() {
     useEffect(() => {
         getPublishers()
         getAuthors()
+        getGenres()
     }, [])
 
     const getAuthors = async () => {
@@ -51,11 +54,38 @@ function AddBookForm() {
             })
     }
 
-    const addBook = async (data) => {
-        await axios.post("api/books/create", { data })
-            .then(res=>{
-                reset()
+    const getGenres = async () => {
+        await axios.get("api/genres/find")
+            .then(res => {
+                setGenres(res.data.map((genre) => {
+                    return { value: genre.id, label: genre.name }
+                }))
+            }).catch(() => {
+                setFormStatus(402)
             })
+    }
+
+    const addBook = async (data) => {
+        await axios.post("api/library/books/add", { data })
+            .then(res => {
+                reset()
+                resetField("publisherID")
+            })
+    }
+
+    const bookExists = async (isbn) => {
+        let exists = false
+        await axios.post("api/books/find/indiv", {isbn: isbn})
+            .then(res => {
+                if (res.data.status === 'found') {
+                    exists = true
+                }
+            }).catch(() => {
+                setStatus(402)
+            })
+
+            console.log("ASDASD")
+        return exists
     }
 
     return (
@@ -65,16 +95,20 @@ function AddBookForm() {
                     <div className="mb-2 block">
                         <Label htmlFor="isbn" value="Book ISBN" />
                     </div>
-                    <TextInput id="isbn" type="number" {...register('isbn', {
+                    <TextInput id="isbn" type="text" {...register('isbn', {
                         required: emptyMsg('book\'s ISBN'),
+                        minLength: {
+                            value: minISBNLen,
+                            message: belowMinChar('book\'s ISBN', minISBNLen)
+                        },
                         maxLength: {
                             value: maxISBNLen,
                             message: exceedCharLimit(maxISBNLen)
                         },
-                        minLength: {
-                            value: minISBNLen,
-                            message: belowMinChar('book\'s ISBN', minISBNLen)
-                        }
+                        validate: {
+                            format: val => validator.isNumeric(val) || "ISBN should be digits",
+                            exists: async (val) => await bookExists(val) == false || "User exists!",
+                        },
                     })} shadow />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.isbn?.message}</p>
                 </div>
@@ -99,19 +133,43 @@ function AddBookForm() {
                         id="bauth"
                         name="authors"
                         control={control}
-                        render={({ field: { onChange }, value, ref }) => (
+                        render={({ field: { onChange }, value, reset }) => (
                             <Select
                                 isMulti
                                 options={authors}
-                                value={value}
+                                value={value || watch('authors') ? value : []}
                                 onChange={(authors) => onChange(authors.map((author) => {
                                     return author.value
                                 }))}
+                                isClearable
                             />
                         )}
                         rules={{ required: emptyMsg('book\'s author/s') }}
                     />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.authors?.message}</p>
+                </div>
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="genres" value="Book Genre/s" />
+                    </div>
+                    <Controller
+                        id="genres"
+                        name="genres"
+                        control={control}
+                        render={({ field: { onChange }, value, ref }) => (
+                            <Select
+                                isMulti
+                                options={genres}
+                                value={value || watch('genres') ? value : []}
+                                onChange={(genres) => onChange(genres.map((genre) => {
+                                    return genre.value
+                                }))}
+                                isClearable
+                            />
+                        )}
+                        rules={{ required: emptyMsg('book\'s genres/s') }}
+                    />
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.genres?.message}</p>
                 </div>
                 <div>
                     <div className="mb-2 block">
@@ -124,7 +182,7 @@ function AddBookForm() {
                         render={({ field: { onChange }, value, ref }) => (
                             <Select
                                 options={publishers}
-                                value={publishers.find((c) => c.value === value)}
+                                value={publishers.find((c) => c.value === value) || watch('publisherID') ? value : []}
                                 onChange={(elem) => onChange(elem.value)}
                             />
                         )}
@@ -163,7 +221,5 @@ function AddBookForm() {
         </div>
     )
 }
-
-
 
 export default AddBookForm
