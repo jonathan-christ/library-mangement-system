@@ -1,16 +1,14 @@
 const db = require("../models")
 const Op = db.Sequelize.Op
-const Author = db.author
+const Genre = db.genre
 
 exports.create = async (req, res) => {
-    const data = req.body.data
-    const author = {
-        firstName: data.fname,
-        lastName: data.lname,
-        bio: data.bio
+    const genre = {
+        name: req.body.name,
+        description: req.body.desc,
     }
 
-    Author.create(author)
+    Genre.create(genre)
         .then(data => {
             res.send(data)
         })
@@ -22,7 +20,7 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    Author.findAll()
+    Genre.findAll()
         .then(data => {
             res.send(data)
         })
@@ -34,10 +32,9 @@ exports.findAll = (req, res) => {
 
 exports.findOne = (req, res) => {
     //conditional
-    let fname = req.body.fname
-    let lname = req.body.lname
+    let name = req.body.name
 
-    Author.findOne({ where: { firstName: fname, lastName: lname } })
+    Genre.findOne({ where: { name: name } })
         .then(data => {
             if (data) {
                 res.send({
@@ -61,7 +58,7 @@ exports.findOneID = (req, res) => {
     //options
     let id = req.body.id
 
-    Author.findByPk(id)
+    Genre.findByPk(id)
         .then(data => {
             if (data) {
                 res.send({
@@ -79,10 +76,6 @@ exports.findOneID = (req, res) => {
             res.status(500)
                 .send({ message: err.message })
         })
-}
-
-exports.findBooksOf = (req, res) => {
-
 }
 
 exports.update = (req, res) => {

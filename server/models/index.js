@@ -35,15 +35,18 @@ db.authorList = require('./book/author/authorList.model')(sequelize, Sequelize)
 db.genre = require('./book/genre/genre.model')(sequelize, Sequelize)
 db.genreList = require('./book/genre/genreList.model')(sequelize, Sequelize)
 
+db.publisher = require('./book/publisher/publisher.model')(sequelize, Sequelize)
 db.rating = require('./book/rating/rating.model')(sequelize, Sequelize)
 
 //relations
 db.user.hasMany(db.userType)
+db.user.hasMany(db.rating)
 
 db.book.hasMany(db.bookImg)
 db.book.hasMany(db.bookCopy)
 db.book.hasMany(db.rating)
 
+db.publisher.hasMany(db.book)
 db.author.belongsToMany(db.book, {through: db.authorList})
 db.genre.belongsToMany(db.book, {through: db.genreList})
 

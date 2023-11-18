@@ -6,14 +6,22 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import UserNavigation from './navbars/UserNavigation'
+import { ttl, ttlCheck } from '../assets/constants'
 
 function AppFrame() {
   const [sessionData, setSessionData] = useState(undefined)
+  const navigate = useNavigate()
+  let NavigationBar
+
   useEffect(() => {
     setSessionData(JSON.parse(ls.get('userData', { decrypt: true })))
-  }, [])
 
-  const navigate = useNavigate()
+    const intervalId = setInterval(() => {
+      checkTTL();
+    }, ttlCheck)
+
+    return () => clearInterval(intervalId)
+  }, [])
 
   const getInitials = (fname, lname) => {
     let firstNameIn = fname[0].charAt(0).toUpperCase()
@@ -21,9 +29,16 @@ function AppFrame() {
     return firstNameIn + lastNameIn
   }
 
+  const checkTTL = () => {
+    if (!JSON.parse(ls.get('userData', { decrypt: true }))) {
+      signOut()
+    }
+  }
+
   const signOut = () => {
     ls.clear()
     setSessionData(undefined)
+    navigate('/')
   }
 
   const translateUserType = (type) => {
@@ -41,14 +56,14 @@ function AppFrame() {
     translateUserType
   }
 
-  let NavigationBar
   switch (permsVal()) {
-    case 1:
-    case 2:
-      NavigationBar = <UserNavigation data={sessionData} functions={commonFunctions} />
-    case 3:
-      NavigationBar = <UserNavigation data={sessionData} functions={commonFunctions} />
     case 4:
+      NavigationBar = <UserNavigation data={sessionData} functions={commonFunctions} />
+      break
+    case 5:
+      NavigationBar = <UserNavigation data={sessionData} functions={commonFunctions} />
+      break
+    default:
       NavigationBar = <UserNavigation data={sessionData} functions={commonFunctions} />
   }
 

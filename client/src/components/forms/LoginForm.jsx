@@ -2,10 +2,11 @@ import React from 'react'
 import axios from 'axios';
 import ls from 'localstorage-slim'
 
+import { ttl } from '../../assets/constants';
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form'
 import { emptyMsg } from '../../assets/formErrorMsg';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
 
 function LoginForm() {
@@ -24,7 +25,7 @@ function LoginForm() {
             .then(res => {
                 let status = res.data.status
                 if (status === 'pass_match') {
-                    ls.set("userData", JSON.stringify(res.data.data), { ttl: 300, encrypt: true })
+                    ls.set("userData", JSON.stringify(res.data.data), { ttl: ttl, encrypt: true })
                     reset()
                     setFormErr("")
                     navigate('../home')

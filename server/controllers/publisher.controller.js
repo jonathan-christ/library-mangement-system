@@ -1,16 +1,15 @@
 const db = require("../models")
 const Op = db.Sequelize.Op
-const Author = db.author
+const Publisher = db.publisher
 
 exports.create = async (req, res) => {
     const data = req.body.data
-    const author = {
-        firstName: data.fname,
-        lastName: data.lname,
-        bio: data.bio
+    const publisher = {
+        name: data.name,
+        address: data.address
     }
 
-    Author.create(author)
+    Publisher.create(publisher)
         .then(data => {
             res.send(data)
         })
@@ -22,7 +21,7 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    Author.findAll()
+    Publisher.findAll()
         .then(data => {
             res.send(data)
         })
@@ -34,10 +33,9 @@ exports.findAll = (req, res) => {
 
 exports.findOne = (req, res) => {
     //conditional
-    let fname = req.body.fname
-    let lname = req.body.lname
+    let name = req.body.name
 
-    Author.findOne({ where: { firstName: fname, lastName: lname } })
+    Publisher.findOne({ where: { name: name } })
         .then(data => {
             if (data) {
                 res.send({
@@ -61,7 +59,7 @@ exports.findOneID = (req, res) => {
     //options
     let id = req.body.id
 
-    Author.findByPk(id)
+    Publisher.findByPk(id)
         .then(data => {
             if (data) {
                 res.send({

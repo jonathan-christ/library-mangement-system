@@ -12,14 +12,14 @@ exports.create = async (req, res) => {
         publishDate: data.publishDate,
     }
 
-    Book.create(book)
-        .then(data => {
-            res.send(data)
-        })
+    Book.create(book, { transaction: t }).then(data => {
+        res.send(data)
+    })
         .catch(err => {
             res.status(500)
                 .send({ message: err.message })
         })
+
 }
 
 exports.findAll = (req, res) => {

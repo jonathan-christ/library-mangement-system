@@ -17,6 +17,9 @@ import History from './pages/user/History'
 // STAFF
 import StaffGuard from './pages/staff/StaffGuard'
 import StaffDashboard from './pages/staff/StaffDashboard'
+import Authors from './pages/staff/Authors'
+import Publishers from './pages/staff/Publishers'
+import BookOverseer from './pages/staff/BookOverseer'
 
 // ADMIN
 import AdminGuard from './pages/admin/AdminGuard'
@@ -38,7 +41,10 @@ function App() {
 
           {/* STAFF */}
           <Route path="dashboard" element={<StaffGuard element={<StaffDashboard />} />} />
-          
+          <Route path="authors" element={<StaffGuard element={<Authors />} />} />
+          <Route path="publishers" element={<StaffGuard element={<Publishers />} />} />
+          <Route path="books" element={<StaffGuard element={<BookOverseer />} />} />
+
           {/* ADMINS */}
           <Route path="admindash" element={<AdminGuard element={<AdminDashboard />} />} />
         </Route>
