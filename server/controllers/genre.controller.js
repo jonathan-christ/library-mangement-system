@@ -87,7 +87,7 @@ exports.assignToBook = async (req, res, transaction) => {
         const createdGenreList = await GenreList.create(
             { genreID: data.genreID, bookID: data.bookID },
             transaction
-        );
+        )
 
         return createdGenreList
     } catch (error) {

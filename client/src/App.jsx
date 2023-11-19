@@ -24,6 +24,7 @@ import BookOverseer from './pages/staff/BookOverseer'
 // ADMIN
 import AdminGuard from './pages/admin/AdminGuard'
 import AdminDashboard from './pages/admin/AdminDashboard'
+import Book from './pages/user/Book'
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Route element={<UserFrame />}>
           {/* USERS */}
           <Route path="home" element={<UserGuard element={<Home />} />} />
+          <Route path="book" element={<UserGuard element={<Book />} />} />
           <Route path="history" element={<UserGuard element={<History />} />} />
           <Route path="reservations" element={<UserGuard element={<Reservations />} />} />
 

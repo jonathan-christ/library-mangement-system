@@ -74,18 +74,14 @@ function AddBookForm() {
     }
 
     const bookExists = async (isbn) => {
-        let exists = false
-        await axios.post("api/books/find/indiv", {isbn: isbn})
+        const result = await axios.post("api/books/find", { isbn })
             .then(res => {
-                if (res.data.status === 'found') {
-                    exists = true
-                }
+                return res.data.status === 'found' ? true : false
             }).catch(() => {
                 setStatus(402)
             })
 
-            console.log("ASDASD")
-        return exists
+        return result
     }
 
     return (
@@ -107,7 +103,7 @@ function AddBookForm() {
                         },
                         validate: {
                             format: val => validator.isNumeric(val) || "ISBN should be digits",
-                            exists: async (val) => await bookExists(val) == false || "Book exists!",
+                            exists: async (val) => await bookExists(val) === false || "Book exists!",
                         },
                     })} shadow />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.isbn?.message}</p>

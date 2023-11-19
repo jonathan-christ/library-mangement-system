@@ -46,7 +46,7 @@ function AddAuthorForm() {
 
     const authorExists = async (data) => {
         let retVal
-        await axios.post("/api/authors/find/indiv", { fname: data.fname, lname: data.lname })
+        await axios.post("/api/authors/find", { fname: data.fname, lname: data.lname })
             .then((res) => {
                 retVal =  res.data.status === 'found'
             }).catch(() => {

@@ -13,7 +13,7 @@ exports.create = async (req, res, transaction) => {
             publishDate: data.publishDate,
         };
 
-        const createdBook = await Book.create(book, transaction )
+        const createdBook = await Book.create(book, transaction)
         return { data: createdBook }
     } catch (error) {
         console.error(error.message)
@@ -28,23 +28,25 @@ exports.create = async (req, res, transaction) => {
 
 }
 
-exports.findAll = (req, res) => {
-    //search options
-    Book.findAll()
-        .then(data => {
-            res.send(data)
-        })
-        .catch(err => {
-            res.status(500)
-                .send({ message: err.message })
-        })
+exports.findAll = async (req, res) => {
+    try {
+        const books = await Book.findAll()
+        return books
+    } catch (error) {
+        try {
+            res.status(500).send({ message: error.message })
+        } catch (nestedError) {
+            console.log("Error sending response: ", nestedError.message)
+            return { message: error.message }
+        }
+    }
 }
 
 exports.findOne = (req, res) => {
     //conditional
     let isbn = req.body.isbn
-
-    Book.findOne({ where: {isbn: isbn} })
+    console.log(isbn)
+    Book.findOne({ where: { isbn: isbn } })
         .then(data => {
             if (data) {
                 res.send({

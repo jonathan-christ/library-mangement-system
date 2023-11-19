@@ -1,11 +1,15 @@
 const db = require("../models");
-const Book = require('./book.controller');
-const Author = require('./author.controller');
-const Genre = require('./genre.controller');
+const BookContr = require('./book.controller');
+const AuthorContr = require('./author.controller');
+const GenreContr = require('./genre.controller');
+
+const Book = db.book
+const Author = db.author
+const Genre = db.genre
 
 exports.addBook = async (req, res) => {
-    let data = req.body.data;
-    let bookID, authorList, genreList;
+    let data = req.body.data
+    let bookID, authorList, genreList
 
     try {
         const result = await db.sequelize.transaction(async (t) => {
@@ -17,20 +21,20 @@ exports.addBook = async (req, res) => {
                 publishDate: data.publishDate,
             };
 
-            const createdBook = await Book.create({ data: book }, res, { transaction: t });
+            const createdBook = await BookContr.create({ data: book }, res, { transaction: t });
             bookID = createdBook.data.id
 
             await Promise.all(data.authors.map(async (authID) => {
                 authorList = { authorID: authID, bookID: bookID }
-                await Author.assignToBook({ data: authorList }, res, { transaction: t });
+                await AuthorContr.assignToBook({ data: authorList }, res, { transaction: t });
             }))
 
             await Promise.all(data.genres.map(async (genreID) => {
                 genreList = { genreID: genreID, bookID: bookID };
-                await Genre.assignToBook({ data: genreList }, res, { transaction: t });
+                await GenreContr.assignToBook({ data: genreList }, res, { transaction: t });
             }))
 
-            return { message: "Book has been added successfully!" };
+            return { message: "BookContr has been added successfully!" };
         });
 
         res.status(200).send(result)
@@ -46,10 +50,25 @@ exports.addBook = async (req, res) => {
     }
 }
 
-exports.findBook = (req, res) => {
-
+exports.findAllBooks = async (req, res) => {
+    try {
+        const result = await Book.findAll({
+            include: [Author, Genre]
+        })
+        res.send(result)
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
 }
 
-exports.findAllBooks = (req, res) => {
-    
+exports.findBook = async (req, res) => {
+    try {
+        const result = await Book.findOne({
+            where: { isbn: req.body.isbn },
+            include: [Author, Genre]
+        })
+        res.send(result)
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
 }

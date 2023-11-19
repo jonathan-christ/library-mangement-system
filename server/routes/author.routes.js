@@ -4,8 +4,8 @@ module.exports = (app) => {
 
     router.post("/create", author.create)
 
-    router.get("/find", author.findAll)
-    router.post("/find/indiv", author.findOne)
+    router.get("/", author.findAll)
+    router.post("/find", author.findOne)
 
     app.use('/api/authors', router)
 }
