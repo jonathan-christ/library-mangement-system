@@ -4,8 +4,8 @@ function GenreList({ genres }) {
     return (
         <>
             {genres.map((genre, idx) => {
-                let sep = idx < genre.length - 1 ? ', ' : ' '
-                return <span className='genrelist flex flex-row' key={idx}>{`${genre.name}${sep}`}</span>
+                let sep = idx < genres.length - 1 ? ', ' : ' '
+                return <span key={idx}>{`${genre.name}${sep}`}</span>
             })}
         </>
     )

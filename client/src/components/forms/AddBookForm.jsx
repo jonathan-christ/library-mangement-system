@@ -34,7 +34,7 @@ function AddBookForm() {
     }, [])
 
     const getAuthors = async () => {
-        await axios.get("api/authors/find")
+        await axios.get("api/authors/")
             .then(res => {
                 setAuthors(res.data.map((auth) => {
                     let name = auth.firstName + " " + auth.lastName

@@ -4,9 +4,10 @@ import ls from 'localstorage-slim'
 import { Outlet } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ttl, ttlCheck } from '../assets/constants'
 
 import UserNavigation from './navbars/UserNavigation'
-import { ttl, ttlCheck } from '../assets/constants'
+import StaffNavigation from './navbars/StaffNavigation'
 
 function AppFrame() {
   const [sessionData, setSessionData] = useState(undefined)
@@ -58,7 +59,7 @@ function AppFrame() {
 
   switch (permsVal()) {
     case 4:
-      NavigationBar = <UserNavigation data={sessionData} functions={commonFunctions} />
+      NavigationBar = <StaffNavigation data={sessionData} functions={commonFunctions} />
       break
     case 5:
       NavigationBar = <UserNavigation data={sessionData} functions={commonFunctions} />
