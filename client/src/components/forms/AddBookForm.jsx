@@ -10,9 +10,11 @@ import { useForm, Controller } from 'react-hook-form'
 import { maxBookLen, maxISBNLen, maxNameLen, minISBNLen } from '../../assets/constants'
 import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../assets/formErrorMsg'
 import { Button, Label, Textarea, TextInput, Datepicker } from 'flowbite-react'
+import StatusHandler from '../misc/StatusHandler';
 
 function AddBookForm() {
     const [formStatus, setFormStatus] = useState(0)
+
     const [authors, setAuthors] = useState([])
     const [genres, setGenres] = useState([])
     const [publishers, setPublishers] = useState([])
@@ -33,6 +35,7 @@ function AddBookForm() {
         getGenres()
     }, [])
 
+
     const getAuthors = async () => {
         await axios.get("api/authors/")
             .then(res => {
@@ -40,6 +43,8 @@ function AddBookForm() {
                     let name = auth.firstName + " " + auth.lastName
                     return { value: auth.id, label: name }
                 }))
+            }).catch((err) => {
+                setFormStatus(400)
             })
     }
 
@@ -50,7 +55,7 @@ function AddBookForm() {
                     return { value: pub.id, label: pub.name }
                 }))
             }).catch(() => {
-                setFormStatus(402)
+                setFormStatus(400)
             })
     }
 
@@ -61,7 +66,7 @@ function AddBookForm() {
                     return { value: genre.id, label: genre.name }
                 }))
             }).catch(() => {
-                setFormStatus(402)
+                setFormStatus(404)
             })
     }
 
@@ -69,16 +74,20 @@ function AddBookForm() {
         await axios.post("api/library/books/add", { data })
             .then(res => {
                 reset()
-                resetField("publisherID")
+                setFormStatus(200)
+            }).catch((err) => {
+                console.log(err)
+                setFormStatus(404)
             })
     }
 
     const bookExists = async (isbn) => {
         const result = await axios.post("api/books/find", { isbn })
             .then(res => {
+                setFormStatus(200)
                 return res.data.status === 'found' ? true : false
             }).catch(() => {
-                setStatus(402)
+                setFormStatus(402)
             })
 
         return result
@@ -86,6 +95,7 @@ function AddBookForm() {
 
     return (
         <div>
+            <StatusHandler subject={"Book"} code={formStatus} dismiss={setFormStatus}/>
             <form onSubmit={handleSubmit(addBook)} className="flex max-w-md flex-col gap-4">
                 <div>
                     <div className="mb-2 block">

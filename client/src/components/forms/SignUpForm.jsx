@@ -10,9 +10,10 @@ import { DevTool } from '@hookform/devtools'
 import { Banner, Button, Label, TextInput, Alert } from 'flowbite-react'
 import { maxNameLen, maxSuffixLen, minPassLen } from '../../assets/constants'
 import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../assets/formErrorMsg'
-import SuccessBanner from '../banners/SuccessBanner'
+import StatusHandler from '../misc/StatusHandler'
 
 function SignUpForm() {
+    const [alertMsg, setAlertMsg] = useState('')
     const [formStatus, setFormStatus] = useState(0)
     const {
         register,
@@ -21,19 +22,14 @@ function SignUpForm() {
         reset,
         control,
         formState: { errors },
-    } = useForm({ mode: 'onTouched' });
-
-    const setStatus = (val) => {
-        setFormStatus(val)
-        window.scrollTo(0, 0)
-    }
+    } = useForm({ mode: 'onTouched' })
 
     const signupUser = async (data) => {
         delete data.rePass
         await axios.post("/api/users/create", { data })
             .then(() => {
                 reset()
-                setStatus(200)
+                setStatus(201)
             }).catch(() => {
                 setStatus(404)
             })
@@ -55,32 +51,7 @@ function SignUpForm() {
 
     return (
         <div>
-            {formStatus == 200 &&
-                // <SuccessBanner />
-                <Banner>
-                    <Alert color="success" onDismiss={() => setFormStatus(0)} rounded>
-                        <span className="font-medium">Successfully Registered!</span> You may now proceed to the login page.
-                    </Alert>
-                </Banner>
-            }
-            {formStatus == 404 &&
-                // <SuccessBanner />
-                <Banner>
-                    <Alert color="failure" onDismiss={() => setFormStatus(0)} rounded>
-                        <span className="font-medium">Server Error!</span> Server errors have occurred, try again later.
-                    </Alert>
-                </Banner>
-
-            }
-            {formStatus == 402 &&
-                // <SuccessBanner />
-                <Banner>
-                    <Alert color="failure" onDismiss={() => setFormStatus(0)} rounded>
-                        <span className="font-medium">Server Error!</span> Cannot verify user, try again later.
-                    </Alert>
-                </Banner>
-
-            }
+            <StatusHandler subject={"User"} code={formStatus} dismiss={setFormStatus} />
             <form onSubmit={handleSubmit(signupUser)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div>
                     <div>
@@ -180,7 +151,7 @@ function SignUpForm() {
                                 message: belowMinChar('Password', minPassLen),
                             },
                             validate: {
-                                format: val => validator.isStrongPassword(val, {returnScore: true})>30 || "Password needs 1 of each: uppercase, lowercase, symbol"
+                                format: val => validator.isStrongPassword(val, { returnScore: true }) > 30 || "Password needs 1 of each: uppercase, lowercase, symbol"
                             }
                         })} required shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.password?.message}</p>

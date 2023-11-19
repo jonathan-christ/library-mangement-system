@@ -10,7 +10,7 @@ import { DevTool } from '@hookform/devtools'
 import { Banner, Button, Label, TextInput, Alert, Textarea } from 'flowbite-react'
 import { maxNameLen } from '../../assets/constants'
 import { emptyMsg, exceedCharLimit } from '../../assets/formErrorMsg'
-import SuccessBanner from '../banners/SuccessBanner'
+import StatusHandler from '../misc/StatusHandler'
 
 function AddPublisherForm() {
     const [formStatus, setFormStatus] = useState(0)
@@ -24,11 +24,6 @@ function AddPublisherForm() {
         formState: { errors },
     } = useForm({ mode: 'onTouched' });
 
-    const setStatus = (val) => {
-        setFormStatus(val)
-        window.scrollTo(0, 0)
-    }
-
     const addPublisher = async (data) => {
         let exists = await publisherExists(data)
         console.log(exists)
@@ -38,9 +33,10 @@ function AddPublisherForm() {
                     reset()
                 }).catch((err) => {
                     console.log(err)
+                    setFormStatus(404)
                 })
         } else {
-            setStatus(402)
+            setFormStatus(402)
         }
 
     }
@@ -52,21 +48,14 @@ function AddPublisherForm() {
                 retVal = res.data.status === 'found'
             }).catch(() => {
                 retVal = false
+                setFormStatus(400)
             })
         return retVal
     }
 
     return (
         <div>
-            {formStatus == 402 &&
-                // <SuccessBanner />
-                <Banner>
-                    <Alert color="failure" onDismiss={() => setFormStatus(0)} rounded>
-                        <span className="font-medium">Adding Failed!</span> Publisher already exists!.
-                    </Alert>
-                </Banner>
-
-            }
+            <StatusHandler subject={"Publisher"} code={formStatus} dismiss={setFormStatus} />
             <form onSubmit={handleSubmit(addPublisher)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div>
                     <div>
