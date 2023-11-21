@@ -1,51 +1,65 @@
 import axios from 'axios'
 import ViteLogo from '../../assets/vite.svg'
+import validator from 'validator'
+import ls from 'localstorage-slim'
 import React, { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import AuthorList from '../../components/misc/AuthorList'
 import GenreList from '../../components/misc/GenreList'
+import RatingForm from '../../components/forms/RatingForm'
+import Placeholder from '../../components/loading/Placeholder'
 
-function Book({ id }) {
+function Book() {
+  const navigate = useNavigate()
+
+  const user = (JSON.parse(ls.get('userData', { decrypt: true })))
+  const { isbn } = useParams()
   const [book, setBook] = useState({
+    id: -1,
     title: '',
     authors: [],
     genres: []
   })
 
   useEffect(() => {
-    getBook()
+    if (isbn === undefined || validator.isAlpha(isbn)) {
+      navigate('/catalog')
+    } else {
+      getBook()
+    }
   }, [])
 
   const getBook = async () => {
-    await axios.post("api/library/books/find", {isbn : '6969696969699'}).then((res) => {
+    await axios.post("/api/library/books/find", { isbn: isbn }).then((res) => {
       setBook(res.data)
-      console.log(res)
     }).catch((err) => {
-      console.log("Server error!")
+      console.log("Server error! " + err)
     })
   }
+
+
   return (
-    <div className='flex flex-col min-w-full p-5'>
-      <div className="title flex flex-col text-center">
-        <span className="text-5xl font-semibold">{book.title}</span>
-        <div className="authlist">
-          <span>By: </span>
-          <AuthorList authors={book.authors} />
-        </div>
-      </div>
-      <div className='main flex flex-row min-w-full'>
-        <div className="otherDetails flex flex-col">
-          <img src={ViteLogo} alt="" className='w-full h-1/2'/>
-          <div className='text-base'>
-            <span className='font-semibold text-lg'>Genres </span>
-            <GenreList genres={book.genres} />
+    <div className='flex flex-col min-w-full p-5  gap-10'>
+      <div className="title flex flex-col text-center gap-5 content-center flex-wrap">
+        
+        <div>
+          <span className="text-5xl font-semibold">{book.title}</span>
+          <div className="rating flex flex-wrap content-center">
+            <RatingForm bookID={book.id} userID={user ? user.id : null} />
           </div>
         </div>
-        <div className="rating">
-
+        <div className="authlist flex flex-col w-1/2">
+          <div><AuthorList authors={book.authors} /></div>
+          <div><GenreList genres={book.genres} /></div>
         </div>
-        <div className="desc">
-
+      </div>
+      <div className="otherDetails flex flex-col flex-wrap w-full content-center">
+        <img src={ViteLogo} alt="" width={250} height={300} />
+      </div>
+      <div className='flex flex-col flex-wrap w-full content-center'>
+        <div className="desc flex flex-wrap text-justify">
+          {book.description}
         </div>
       </div>
     </div>

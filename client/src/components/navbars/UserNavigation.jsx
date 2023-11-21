@@ -3,11 +3,14 @@ import ViteLogo from '../../assets/vite.svg'
 import SearchBar from '../misc/SearchBar'
 
 import { useState, useEffect } from 'react'
-import { Link, useMatch, useNavigate } from 'react-router-dom'
+import { Link, matchPath, useMatch, useLocation } from 'react-router-dom'
 import { Avatar, Dropdown, Navbar, Button } from 'flowbite-react'
 
 function UserNavigation({ data, functions }) {
+    const routePath = ['/catalog/:isbn', '/reservations', '/history']
+
     return (
+        // className='bg-primary-base text-gray-200'
         <Navbar fluid rounded>
             <Navbar.Brand href="#">
                 <img src={ViteLogo} className="mr-3 h-6 sm:h-9" alt="PSHS-ZRC Logo" />
@@ -47,19 +50,19 @@ function UserNavigation({ data, functions }) {
             <Navbar.Collapse>
                 {data &&
                     <>
-                        <Link to='./home' className={Boolean(useMatch('/home')) ? 'text-blue-600' : ''}>
-                            <span className="text-base">HOME</span>
+                        <Link to='./catalog' className={useMatch('/catalog') ? 'text-blue-600' : ''}>
+                            <span className="text-base">CATALOG</span>
                         </Link>
-                        <Link to='./reservations' className={Boolean(useMatch('/reservations')) ? 'text-blue-600' : ''}>
+                        <Link to='./reservations' className={useMatch('/reservations') ? 'text-blue-600' : ''}>
                             <span className="text-base">RESERVATIONS</span>
                         </Link>
-                        <Link to='./history' className={Boolean(useMatch('/history')) ? 'text-blue-600' : ''}>
+                        <Link to='./history' className={useMatch('/history') ? 'text-blue-600' : ''}>
                             <span className="text-base">HISTORY</span>
                         </Link>
                     </>
                 }
                 {!data &&
-                    <SearchBar/>
+                    <SearchBar />
                 }
             </Navbar.Collapse>
         </Navbar>

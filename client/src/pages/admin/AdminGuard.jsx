@@ -7,7 +7,7 @@ function AdminGuard({ element }) {
     const type = userData ? userData.typeID : 1
 
     if (type != 5) {
-        return (<Navigate to={type == 4 ? "/dashboard" : "/home"} />)
+        return (<Navigate to={type == 4 ? "/dashboard" : "/catalog"} />)
     }
 
     return element

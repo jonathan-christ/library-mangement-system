@@ -6,12 +6,14 @@ import { Rating } from 'flowbite-react'
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form'
-import { emptyMsg } from '../../assets/formErrorMsg';
-import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
+import StatusHandler from '../misc/StatusHandler';
 
 function RatingForm({ bookID, userID }) {
-    const [rating, setRating] = useState()
-    const numbersArray = Array.from({ length: 5 }, (_, index) => index + 1)
+    const [formStatus, setFormStatus] = useState(0)
+    const [userRating, setUserRating] = useState(0)
+    const [revCount, setRevCount] = useState(0)
+    const [rating, setRating] = useState(0)
+    const numbersArray = [1, 2, 3, 4, 5]
     const {
         register,
         handleSubmit,
@@ -22,42 +24,56 @@ function RatingForm({ bookID, userID }) {
 
     useEffect(() => {
         getRating()
+        if (!userID) getUserRating()
     }, [])
 
     const getRating = () => {
-        axios.get("/api/rating/find/indiv", { bookID: bookID, userID: userID })
+        axios.post("/api/ratings/find", { bookID: bookID })
             .then(res => {
-                console.log(data)
+                let data = res.data
+            }).catch(() => {
+                set
+            })
+    }
+
+    const getUserRating = () => {
+        axios.post("/api/ratings/find/user", { bookID: bookID, userID: userID })
+            .then(res => {
                 let data = res.data
                 setRating(data.status === 'found' ? data.data.value : 0)
             })
     }
 
     const postRating = (data) => {
-        axios.post("/api/rating/create", { userID: userID, bookID: bookID, value: data.value })
+        axios.post("/api/ratings/create", { userID: userID, bookID: bookID, value: data.value })
             .then(() => {
-                getRating()
+                getUserRating()
             })
     }
 
     return (
-        <form onSubmit={handleSubmit(postRating)} className="flex max-w-md flex-col gap-4">
-            <Rating>
-                <ul>
-                    {numbersArray.map((num) => {
-                        let filled = rating <= num
-                        return (
-                            <li key={num}>
-                                <div className="flex items-center ps-3">
-                                    <input id={"star" + num} type="radio" value={num} {...register('star')} className="invisible" checked={rating === num ? true : undefined} />
-                                    <label htmlFor={"star" + num}><Rating.Star filled={filled} /></label>
-                                </div>
-                            </li>
-                        )
-                    })}
-                </ul>
-            </Rating>
-        </form>
+        <>
+            <StatusHandler subject={"Book"} code={formStatus} dismiss={setFormStatus} />
+            <form onSubmit={handleSubmit(postRating)}>
+                <Rating size={"md"} className="justify-center">
+                    <ul className='flex flex-row'>
+                        {numbersArray.map((num) => {
+                            return (
+                                <li key={num}>
+                                    <div>
+                                        <input id={"star" + num} type="radio" value={num} {...register('star')} className="invisible" checked={rating === num ? true : undefined} />
+                                        <label htmlFor={"star" + num}><Rating.Star filled={userRating < num ? null : true} /></label>
+                                    </div>
+                                </li>
+                            )
+                        })}
+                        <li>
+                            {userRating === 0}
+                        </li>
+                    </ul>
+                </Rating>
+            </form>
+        </>
     )
 }
 

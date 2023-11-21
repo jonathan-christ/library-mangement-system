@@ -43,7 +43,7 @@ function AddPublisherForm() {
 
     const publisherExists = async (data) => {
         let retVal
-        await axios.post("/api/publishers/find/indiv", { name: data.name })
+        await axios.post("/api/publishers/find", { name: data.name })
             .then((res) => {
                 retVal = res.data.status === 'found'
             }).catch(() => {

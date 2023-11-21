@@ -36,8 +36,8 @@ function App() {
 
         <Route element={<UserFrame />}>
           {/* USERS */}
-          <Route path="home" element={<UserGuard element={<Home />} />} />
-          <Route path="book" element={<UserGuard element={<Book />} />} />
+          <Route path="catalog" element={<UserGuard element={<Home />} />} />
+          <Route path="catalog/:isbn" element={<UserGuard element={<Book />} />} />
           <Route path="history" element={<UserGuard element={<History />} />} />
           <Route path="reservations" element={<UserGuard element={<Reservations />} />} />
 

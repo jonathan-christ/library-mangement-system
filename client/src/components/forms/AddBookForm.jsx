@@ -49,7 +49,7 @@ function AddBookForm() {
     }
 
     const getPublishers = async () => {
-        await axios.get("api/publishers/find")
+        await axios.get("api/publishers")
             .then(res => {
                 setPublishers(res.data.map((pub) => {
                     return { value: pub.id, label: pub.name }
@@ -60,7 +60,7 @@ function AddBookForm() {
     }
 
     const getGenres = async () => {
-        await axios.get("api/genres/find")
+        await axios.get("api/genres")
             .then(res => {
                 setGenres(res.data.map((genre) => {
                     return { value: genre.id, label: genre.name }
@@ -84,7 +84,6 @@ function AddBookForm() {
     const bookExists = async (isbn) => {
         const result = await axios.post("api/books/find", { isbn })
             .then(res => {
-                setFormStatus(200)
                 return res.data.status === 'found' ? true : false
             }).catch(() => {
                 setFormStatus(402)

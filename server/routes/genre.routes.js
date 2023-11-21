@@ -4,8 +4,8 @@ module.exports = (app) => {
 
     router.post("/create", genre.create)
 
-    router.get("/find", genre.findAll)
-    router.post("/find/indiv", genre.findOne)
+    router.get("/", genre.findAll)
+    router.post("/find", genre.findOne)
 
     app.use('/api/genres', router)
 }

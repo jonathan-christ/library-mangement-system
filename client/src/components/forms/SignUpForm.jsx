@@ -13,7 +13,6 @@ import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinCh
 import StatusHandler from '../misc/StatusHandler'
 
 function SignUpForm() {
-    const [alertMsg, setAlertMsg] = useState('')
     const [formStatus, setFormStatus] = useState(0)
     const {
         register,
@@ -29,21 +28,21 @@ function SignUpForm() {
         await axios.post("/api/users/create", { data })
             .then(() => {
                 reset()
-                setStatus(201)
+                setFormStatus(200)
             }).catch(() => {
-                setStatus(404)
+                setFormStatus(404)
             })
     }
 
     async function userExists(email) {
         let exists = false
-        await axios.post("/api/users/find/email", { email: email })
+        await axios.post("/api/users/find", { email: email })
             .then(res => {
                 if (res.data.status === 'found') {
                     exists = true
                 }
             }).catch(() => {
-                setStatus(402)
+                setFormStatus(402)
             })
 
         return exists

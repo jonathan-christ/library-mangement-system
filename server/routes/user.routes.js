@@ -5,8 +5,8 @@ module.exports = (app) => {
     router.post("/create", user.create)
     router.post("/login", user.login)
 
-    router.get("/find", user.findAll)
-    router.post("/find/email", user.findOne)
+    router.get("/", user.findAll)
+    router.post("/find", user.findOne)
 
     app.use('/api/users', router)
 }

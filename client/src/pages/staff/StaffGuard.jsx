@@ -7,7 +7,7 @@ function StaffGuard({ element }) {
     const type = userData ? userData.typeID : 1
 
     if (type != 4) {
-        return (<Navigate to={type == 5 ? "/admindash" : "/home"} />)
+        return (<Navigate to={type == 5 ? "/admindash" : "/catalog"} />)
     }
 
     return element

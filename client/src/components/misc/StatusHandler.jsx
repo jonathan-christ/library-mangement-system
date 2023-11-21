@@ -29,6 +29,8 @@ function StatusHandler({ subject, code, dismiss }) {
         default:
             break
     }
+
+    window.scrollTo(0,0)
     return (
         <>
             <p>

@@ -20,9 +20,8 @@ exports.create = async (req, res) => {
         })
 }
 
-exports.findAll = (req, res) => {
-    //search options
-    Rating.findAll()
+exports.findBookRating = (req, res) => {
+    Rating.findAll({ where: { bookID: req.body.bookID } })
         .then(data => {
             res.send(data)
         })
@@ -36,17 +35,10 @@ exports.findUserBookRating = (req, res) => {
 
     Rating.findOne({ where: { userID: req.body.userID, bookID: req.body.bookID } })
         .then(data => {
-            if (data) {
-                res.send({
-                    status: 'found',
-                    data: data
-                })
-            } else {
-                res.send({
-                    status: 'not found',
-                    data: null
-                })
-            }
+            res.send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
         }).catch(err => {
             res.status(500)
                 .send({ message: err.message })

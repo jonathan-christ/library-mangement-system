@@ -6,7 +6,7 @@ function NotFound() {
   const navigate = useNavigate()
 
   useEffect(()=>{
-    navigate('home')
+    navigate('catalog')
   }, [])
   return (
     <span>
