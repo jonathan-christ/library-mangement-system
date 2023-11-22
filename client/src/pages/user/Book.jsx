@@ -40,7 +40,7 @@ function Book() {
 
 
   return (
-    <div className='flex flex-col min-w-full p-5  gap-10'>
+    <div className='flex flex-col min-w-full p-5  gap-10 '>
       <div className="title flex flex-col text-center gap-5 content-center flex-wrap">
         
         <div>

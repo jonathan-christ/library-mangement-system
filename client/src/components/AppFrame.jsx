@@ -69,10 +69,10 @@ function AppFrame() {
   }
 
   return (
-    <>
+    <div className='bg-gray-100'>
       {NavigationBar}
       <Outlet />
-    </>
+    </div>
   )
 }
 

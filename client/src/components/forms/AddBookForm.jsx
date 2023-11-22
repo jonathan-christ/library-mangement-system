@@ -100,7 +100,7 @@ function AddBookForm() {
                     <div className="mb-2 block">
                         <Label htmlFor="isbn" value="Book ISBN" />
                     </div>
-                    <TextInput id="isbn" type="text" {...register('isbn', {
+                    <TextInput id="isbn" type="text" {...register('book.isbn', {
                         required: emptyMsg('book\'s ISBN'),
                         minLength: {
                             value: minISBNLen,
@@ -115,20 +115,20 @@ function AddBookForm() {
                             exists: async (val) => await bookExists(val) === false || "Book exists!",
                         },
                     })} shadow />
-                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.isbn?.message}</p>
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.book?.isbn?.message}</p>
                 </div>
                 <div>
                     <div className="mb-2 block">
                         <Label htmlFor="title" value="Book Title" />
                     </div>
-                    <TextInput id="title" type="text" {...register('title', {
+                    <TextInput id="title" type="text" {...register('book.title', {
                         required: emptyMsg('book\'s title'),
                         maxLength: {
                             value: maxBookLen,
                             message: exceedCharLimit(maxBookLen)
                         }
                     })} shadow />
-                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.title?.message}</p>
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.book?.title?.message}</p>
                 </div>
                 <div>
                     <div className="mb-2 block">
@@ -182,7 +182,7 @@ function AddBookForm() {
                     </div>
                     <Controller
                         id="bpub"
-                        name="publisherID"
+                        name="book.publisherID"
                         control={control}
                         render={({ field: { onChange }, value, ref }) => (
                             <Select
@@ -193,7 +193,7 @@ function AddBookForm() {
                         )}
                         rules={{ required: emptyMsg('book\'s publisher') }}
                     />
-                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.publisherID?.message}</p>
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.book?.publisherID?.message}</p>
                 </div>
                 <div>
                     <div className="mb-2 block">
@@ -201,7 +201,7 @@ function AddBookForm() {
                     </div>
                     <Controller
                         id="pdate"
-                        name="publishDate"
+                        name="book.publishDate"
                         control={control}
                         render={({ field: { onChange }, value, ref }) => (
                             <Datepicker
@@ -212,13 +212,13 @@ function AddBookForm() {
                         )}
                         rules={{ required: emptyMsg('book\'s publish date') }}
                     />
-                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.publishDate?.message}</p>
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.book?.publishDate?.message}</p>
                 </div>
                 <div>
                     <div className="mb-2 block">
                         <Label htmlFor="desc" value="Book Description" />
                     </div>
-                    <Textarea id="desc" {...register('desc')} shadow />
+                    <Textarea id="desc" {...register('book.desc')} shadow />
                 </div>
                 <Button type="submit">Add New Book</Button>
             </form>

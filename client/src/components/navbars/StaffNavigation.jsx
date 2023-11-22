@@ -8,7 +8,7 @@ import { Avatar, Dropdown, Navbar, Button } from 'flowbite-react'
 
 function StaffNavigation({ data, functions }) {
     return (
-        <Navbar fluid rounded>
+        <Navbar fluid rounded className='shadow-md z-10'>
             <Navbar.Brand href="#">
                 <img src={ViteLogo} className="mr-3 h-6 sm:h-9" alt="PSHS-ZRC Logo" />
                 <div>

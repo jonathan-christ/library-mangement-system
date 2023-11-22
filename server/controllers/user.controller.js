@@ -45,17 +45,10 @@ exports.findOne = (req, res) => {
 
     User.findOne({ where: condition })
         .then(data => {
-            if (data) {
-                res.send({
-                    status: 'found',
-                    data: data
-                })
-            } else {
-                res.send({
-                    status: 'not found',
-                    data: null
-                })
-            }
+            res.status(200).send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
         })
         .catch(err => {
             res.status(500)
@@ -69,17 +62,10 @@ exports.findOneID = (req, res) => {
 
     User.findByPk(id)
         .then(data => {
-            if (data) {
-                res.send({
-                    status: 'found',
-                    data: data
-                })
-            } else {
-                res.send({
-                    status: 'not found',
-                    data: null
-                })
-            }
+            res.status(200).send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
         })
         .catch(err => {
             res.status(500)
@@ -111,23 +97,19 @@ exports.login = async (req, res) => {
                 let userData = data[0].dataValues
                 let hash = Buffer.from(userData.password).toString()
                 bcrypt.compare(pass, hash).then(match => {
-                    if (match) {
-                        res.send({
-                            status: 'pass_match',
-                            data: userData
-                        })
-                    } else {
-                        res.send({
-                            status: 'pass_mismatch'
-                        })
-                    }
+                    res.status(200).send({
+                        status: match ? 'pass_match' : 'pass_mismatch',
+                        data: match ? userData : undefined
+                    })
                 })
 
             } else {
-                res.send({
-                    status: 'not found'
+                res.status(200).send({
+                    status: 'user not found'
                 })
             }
+        }).catch((err)=>{
+            res.status(500).send(err)
         })
 }
 

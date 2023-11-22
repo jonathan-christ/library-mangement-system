@@ -21,8 +21,8 @@ module.exports = (sequelize, Sequelize) => {
                 key: "id"
             }
         },
-        value: {
-            type: Sequelize.INTEGER,
+        rating: {
+            type: Sequelize.ENUM('like', 'dislike'),
             allowNull: false,
         }
     })

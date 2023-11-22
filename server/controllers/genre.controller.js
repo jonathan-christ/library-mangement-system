@@ -80,28 +80,6 @@ exports.findOneID = (req, res) => {
         })
 }
 
-exports.assignToBook = async (req, res, transaction) => {
-    try {
-        let data = req.body ? req.body.data : req.data
-
-        const createdGenreList = await GenreList.create(
-            { genreID: data.genreID, bookID: data.bookID },
-            transaction
-        )
-
-        return createdGenreList
-    } catch (error) {
-        console.error(error.message)
-
-        try {
-            res.status(500).send({ message: error.message })
-        } catch (nestedError) {
-            console.log("Error sending response: ", nestedError.message)
-            return nestedError
-        }
-    }
-}
-
 exports.update = (req, res) => {
 
 }

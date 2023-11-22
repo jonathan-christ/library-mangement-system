@@ -11,7 +11,7 @@ function UserNavigation({ data, functions }) {
 
     return (
         // className='bg-primary-base text-gray-200'
-        <Navbar fluid rounded>
+        <Navbar fluid className='shadow-md'>
             <Navbar.Brand href="#">
                 <img src={ViteLogo} className="mr-3 h-6 sm:h-9" alt="PSHS-ZRC Logo" />
                 <div>

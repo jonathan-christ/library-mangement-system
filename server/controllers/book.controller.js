@@ -11,19 +11,13 @@ exports.create = async (req, res, transaction) => {
             description: data.desc,
             publisherID: data.publisherID,
             publishDate: data.publishDate,
-        };
+        }
 
         const createdBook = await Book.create(book, transaction)
-        return { data: createdBook }
+        let result = { data: createdBook }
+        return (req.transact ?? true) ? result : res.status(200).send(result)
     } catch (error) {
-        console.error(error.message)
-
-        try {
-            res.status(500).send({ message: error.message })
-        } catch (nestedError) {
-            console.log("Error sending response: ", nestedError.message)
-            return { message: error.message }
-        }
+        res.status(500).send({ message: error.message })
     }
 
 }
@@ -31,14 +25,9 @@ exports.create = async (req, res, transaction) => {
 exports.findAll = async (req, res) => {
     try {
         const books = await Book.findAll()
-        return books
+        res.send(books);
     } catch (error) {
-        try {
-            res.status(500).send({ message: error.message })
-        } catch (nestedError) {
-            console.log("Error sending response: ", nestedError.message)
-            return { message: error.message }
-        }
+        res.status(500).send({ message: error.message })
     }
 }
 
@@ -48,17 +37,10 @@ exports.findOne = (req, res) => {
     console.log(isbn)
     Book.findOne({ where: { isbn: isbn } })
         .then(data => {
-            if (data) {
-                res.send({
-                    status: 'found',
-                    data: data
-                })
-            } else {
-                res.send({
-                    status: 'not found',
-                    data: null
-                })
-            }
+            res.send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
         })
         .catch(err => {
             res.status(500)
@@ -72,17 +54,10 @@ exports.findOneID = (req, res) => {
 
     Book.findByPk(id)
         .then(data => {
-            if (data) {
-                res.send({
-                    status: 'found',
-                    data: data
-                })
-            } else {
-                res.send({
-                    status: 'not found',
-                    data: null
-                })
-            }
+            res.send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
         })
         .catch(err => {
             res.status(500)

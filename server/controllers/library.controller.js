@@ -1,52 +1,33 @@
 const db = require("../models");
-const BookContr = require('./book.controller');
-const AuthorContr = require('./author.controller');
-const GenreContr = require('./genre.controller');
+const Op = db.Sequelize.Op
 
 const Book = db.book
 const Author = db.author
+const AuthorList = db.authorList
 const Genre = db.genre
+const GenreList = db.genreList
 
 exports.addBook = async (req, res) => {
-    let data = req.body.data
-    let bookID, authorList, genreList
-
+    const data = req.body.data
     try {
-        const result = await db.sequelize.transaction(async (t) => {
-            const book = {
-                isbn: data.isbn,
-                title: data.title,
-                desc: data.desc,
-                publisherID: data.publisherID,
-                publishDate: data.publishDate,
-            };
+        db.sequelize.transaction(async (t) => {
+            let book = await Book.create(data.book, { transaction: t })
 
-            const createdBook = await BookContr.create({ data: book }, res, { transaction: t });
-            bookID = createdBook.data.id
+            let authors = data.authors.map((author) => {
+                return { authorID: author, bookID: book.id }
+            })
 
-            await Promise.all(data.authors.map(async (authID) => {
-                authorList = { authorID: authID, bookID: bookID }
-                await AuthorContr.assignToBook({ data: authorList }, res, { transaction: t });
-            }))
+            let genres = data.genres.map((genre) => {
+                return { genreID: genre, bookID: book.id }
+            })
 
-            await Promise.all(data.genres.map(async (genreID) => {
-                genreList = { genreID: genreID, bookID: bookID };
-                await GenreContr.assignToBook({ data: genreList }, res, { transaction: t });
-            }))
+            await AuthorList.bulkCreate(authors, { transaction: t })
+            await GenreList.bulkCreate(genres, { transaction: t })
+        })
 
-            return { message: "BookContr has been added successfully!" };
-        });
-
-        res.status(200).send(result)
+        res.status(200).send({ message: "Book has been added successfully!" })
     } catch (error) {
-        console.error(error)
-
-        try {
-            res.status(500).send({ message: error.message });
-        } catch (nestedError) {
-            console.log("Error sending response: ", nestedError.message);
-            return nestedError;
-        }
+        res.status(500).send({ message: error.message })
     }
 }
 
@@ -55,7 +36,8 @@ exports.findAllBooks = async (req, res) => {
         const result = await Book.findAll({
             include: [Author, Genre]
         })
-        res.send(result)
+
+        res.status(200).send(result)
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
@@ -67,8 +49,64 @@ exports.findBook = async (req, res) => {
             where: { isbn: req.body.isbn },
             include: [Author, Genre]
         })
-        res.send(result)
+
+        res.status(result ? 200 : 404).send(result ? result : "Book details not found")
     } catch (error) {
-        res.status(500).send({ message: error.message });
+        res.status(500).send({ message: error.message })
     }
+}
+
+exports.updateBook = async (req, res) => {
+    // check changes
+    let data = req.body.data
+    try {
+        const result = db.sequelize.transaction(async (t) => {
+            const book = await Book.findByPk(req.body.id, { transaction: t })
+            await Book.update(data.book, { transaction: t }) //INCOMPLETE should be separated from authors 
+            //OYOYOYO use react form hook (..register("book.___"))
+
+            //authors filtering
+            const authors = await AuthorList.findAll({ where: { bookID: book.id } }, { transaction: t })
+
+            const removedAuth = authors.filter((author) =>
+                !data.authors.includes(author.id)
+            )
+            let temp = data.authors.filter((authID) =>
+                !authors.some((currAuth) => currAuth.id === authID)
+            )
+            const newAuth = temp.map((author) => {
+                return { authorID: author, bookID: book.id }
+            })
+
+            //author updating
+            AuthorList.destroy({ where: { id: removedAuth } }, { transaction: t })
+            AuthorList.createBulk(newAuth, { validate: true, transaction: t })
+
+            //genres (repeat of authors)
+            const genres = await GenreList.findAll({ where: { bookID: book.id } }, { transaction: t })
+            const removedGenres = genres.filter((genre) =>
+                !data.genres.includes(genre.id)
+            )
+            temp = data.genres.filter((genreID) =>
+                !authors.some((currGenres) => currGenres.id === genreID)
+            )
+            const newGenres = temp.map((genre) => {
+                return { genreID: genre, bookID: book.id }
+            })
+
+            //genre updating
+            GenreList.destroy({ where: { id: removedGenres } }, { transaction: t })
+            GenreList.createBulk(newGenres, { validate: true, transaction: t })
+        })
+
+        res.status(200).send("Book has been updated!")
+    } catch (error) {
+        res.status(500).send("Error in updating book! " + error.message)
+    }
+
+
+    // in array of author ids, check existing book records, 
+    // delete old, add new
+    // replicate for genres
+
 }

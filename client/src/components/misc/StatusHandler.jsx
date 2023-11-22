@@ -30,14 +30,12 @@ function StatusHandler({ subject, code, dismiss }) {
             break
     }
 
-    window.scrollTo(0,0)
+    window.scrollTo(0, 0)
     return (
         <>
-            <p>
-                {!!code &&
-                    <Alert color={color} icon={icon} onDismiss={() => dismiss(0)}> {msg} </Alert >
-                }
-            </p>
+            {!!code &&
+                <Alert color={color} icon={icon} onDismiss={() => dismiss(0)}> {msg} </Alert >
+            }
         </>
     )
 }
