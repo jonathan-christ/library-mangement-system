@@ -6,7 +6,7 @@ import { Rating } from 'flowbite-react'
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form'
-import StatusHandler from '../misc/StatusHandler';
+import StatusHandler from '../../misc/StatusHandler';
 
 function RatingForm({ bookID, userID }) {
     const [formStatus, setFormStatus] = useState(0)

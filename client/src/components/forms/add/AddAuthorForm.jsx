@@ -8,9 +8,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { DevTool } from '@hookform/devtools'
 
 import { Banner, Button, Label, TextInput, Alert, Textarea } from 'flowbite-react'
-import { maxNameLen, maxSuffixLen, minPassLen } from '../../assets/constants'
-import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../assets/formErrorMsg'
-import StatusHandler from '../misc/StatusHandler'
+import { maxNameLen, maxSuffixLen, minPassLen } from '../../../assets/constants'
+import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../../assets/formErrorMsg'
+import StatusHandler from '../../misc/StatusHandler'
 
 function AddAuthorForm() {
     const [formStatus, setFormStatus] = useState(0)

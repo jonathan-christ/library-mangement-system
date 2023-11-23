@@ -1,5 +1,5 @@
 import React from 'react'
-import AddAuthorForm from '../../components/forms/AddAuthorForm'
+import AddAuthorForm from '../../components/forms/add/AddAuthorForm'
 
 function Authors() {
   return (

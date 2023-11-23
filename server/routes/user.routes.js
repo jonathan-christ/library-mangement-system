@@ -4,6 +4,7 @@ module.exports = (app) => {
 
     router.post("/create", user.create)
     router.post("/login", user.login)
+    router.put("/update", user.update)
 
     router.get("/", user.findAll)
     router.post("/find", user.findOne)

@@ -1,6 +1,9 @@
 import React from 'react'
 import validator from 'validator'
 import axios from 'axios'
+import ls from 'localstorage-slim'
+import { ttl } from '../../../assets/constants'
+import StatusHandler from '../../misc/StatusHandler'
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -8,33 +11,55 @@ import { Link } from 'react-router-dom'
 import { DevTool } from '@hookform/devtools'
 
 import { Banner, Button, Label, TextInput, Alert } from 'flowbite-react'
-import { maxNameLen, maxSuffixLen, minPassLen } from '../../assets/constants'
-import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../assets/formErrorMsg'
-import StatusHandler from '../misc/StatusHandler'
+import { maxNameLen, maxSuffixLen, minPassLen } from '../../../assets/constants'
+import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../../assets/formErrorMsg'
 
-function SignUpForm() {
+import { getSession, updateSession } from '../../SessionContext'
+
+function UpdateUserForm({ user, profile }) {
     const [formStatus, setFormStatus] = useState(0)
+    const session = getSession()
+    const setSession = updateSession()
     const {
         register,
         handleSubmit,
         watch,
         reset,
         control,
-        formState: { errors },
-    } = useForm({ mode: 'onTouched' })
+        formState: { errors, isDirty, isValid, dirtyFields },
+    } = useForm({
+        defaultValues: {
+            fname: user.firstName,
+            lname: user.lastName,
+            mname: user.middleName,
+            suffix: user.suffix,
+            sex: user.sex,
+            email: user.email
+        }
+    })
 
-    const signupUser = async (data) => {
-        delete data.rePass
-        await axios.post("/api/users/create", { data })
+    const updateUser = async (data) => {
+        const dirtyValues = getDirtyValues(data)
+        await axios.put("/api/users/update", { user: { ...dirtyValues }, id: user.id })
             .then(() => {
+                if (profile) {
+                    ls.clear()
+                    ls.set("userData", { ...session, ...dirtyValues }, { ttl: ttl, encrypt: true })
+                    setSession(ls.get("userData", { decrypt: true }))
+                }
                 reset()
                 setFormStatus(200)
-            }).catch(() => {
+            }).catch((err) => {
+                console.log(err)
                 setFormStatus(404)
             })
     }
 
-    async function userExists(email) {
+    const getDirtyValues = (data) => {
+        return Object.fromEntries(Object.keys(dirtyFields).map(key => [key, data[key]]))
+    }
+
+    const userExists = async (email) => {
         let exists = false
         await axios.post("/api/users/find", { email: email })
             .then(res => {
@@ -50,8 +75,8 @@ function SignUpForm() {
 
     return (
         <div>
-            <StatusHandler subject={"User"} code={formStatus} dismiss={setFormStatus} />
-            <form onSubmit={handleSubmit(signupUser)} className="flex max-w-md flex-col gap-4" noValidate>
+            <StatusHandler subject={"User"} action={"updated"} code={formStatus} dismiss={setFormStatus} />
+            <form onSubmit={handleSubmit(updateUser)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div>
                     <div>
                         <div className="mb-2 block">
@@ -134,49 +159,17 @@ function SignUpForm() {
                             required: emptyMsg('email'),
                             validate: {
                                 format: val => validator.isEmail(val) || notEmail(),
-                                exists: async (val) => await userExists(val) == false || "User exists!"
+                                exists: async (val) => ((dirtyFields.email ?? true) || await userExists(val) == false) || "User exists!"
                             }
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.email?.message}</p>
                     </div>
-                    <div>
-                        <div className="mb-2 block">
-                            <Label htmlFor="password2" value="Your password" />
-                        </div>
-                        <TextInput id="password2" type="password" {...register('password', {
-                            required: emptyMsg('password'),
-                            minLength: {
-                                value: minPassLen,
-                                message: belowMinChar('Password', minPassLen),
-                            },
-                            validate: {
-                                format: val => validator.isStrongPassword(val, { returnScore: true }) > 30 || "Password needs 1 of each: uppercase, lowercase, symbol"
-                            }
-                        })} required shadow />
-                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.password?.message}</p>
-                    </div>
-                    <div>
-                        <div className="mb-2 block">
-                            <Label htmlFor="repeat-password" value="Repeat password" />
-                        </div>
-                        <TextInput id="repeat-password" type="password" {...register('rePass', {
-                            required: "You need to retype password",
-                            validate: {
-                                unmatching: val => validator.equals(val, watch('password')) || passNotMatch()
-                            }
-                        })} required shadow />
-                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.rePass?.message}</p>
-                    </div>
                 </div>
-                <Button type="submit">Register new account</Button>
-                <span className='text-sm'>
-                    Already have an account? <Link to="/login"><u>Login here</u></Link><br />
-                    <Link to="/home"><u>Browse as Guest</u></Link>
-                </span>
+                <Button type="submit" disabled={!isDirty}>Update Accout</Button>
             </form>
             <DevTool control={control} />
         </div>
     )
 }
 
-export default SignUpForm
+export default UpdateUserForm

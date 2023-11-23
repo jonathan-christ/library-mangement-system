@@ -6,11 +6,15 @@ import { ttl } from '../../assets/constants';
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { emptyMsg } from '../../assets/formErrorMsg';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
+
+import { getSession, updateSession } from '../SessionContext';
 
 function LoginForm() {
     const [formErr, setFormErr] = useState("")
+    const session = getSession()
+    const setSession = updateSession()
     const navigate = useNavigate()
     const {
         register,
@@ -25,7 +29,9 @@ function LoginForm() {
             .then(res => {
                 let status = res.data.status
                 if (status === 'pass_match') {
+                    delete res.data.data.password
                     ls.set("userData", JSON.stringify(res.data.data), { ttl: ttl, encrypt: true })
+                    setSession(JSON.parse(ls.get('userData', { decrypt: true })))
                     reset()
                     setFormErr("")
                     navigate('../home')
@@ -38,6 +44,9 @@ function LoginForm() {
 
     return (
         <div>
+            {session &&
+                <Navigate to="/catalog" />
+            }
             <form onSubmit={handleSubmit(loginUser)} className="flex max-w-md flex-col gap-4">
                 <div>
                     <div className="mb-2 block">

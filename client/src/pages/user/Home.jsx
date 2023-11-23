@@ -12,7 +12,6 @@ function Home() {
   const getBooks = async () => {
     await axios.get("/api/library/books").then((res) => {
       setBooks(res.data)
-      console.log(res.data)
     }).catch((err) => {
       console.log(err)
     })

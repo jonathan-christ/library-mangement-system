@@ -1,5 +1,5 @@
 import React from 'react'
-import AddPublisherForm from '../../components/forms/AddPublisherForm'
+import AddPublisherForm from '../../components/forms/add/AddPublisherForm'
 
 function Publishers() {
     return (

@@ -7,7 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AuthorList from '../../components/misc/AuthorList'
 import GenreList from '../../components/misc/GenreList'
-import RatingForm from '../../components/forms/RatingForm'
+import RatingForm from '../../components/forms/add/RatingForm'
 import Placeholder from '../../components/loading/Placeholder'
 
 function Book() {

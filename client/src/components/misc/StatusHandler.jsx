@@ -3,11 +3,12 @@ import { Alert } from 'flowbite-react'
 import { useState } from 'react'
 import { HiInformationCircle, HiCheckCircle } from 'react-icons/hi'
 
-function StatusHandler({ subject, code, dismiss }) {
+function StatusHandler({ subject, action, code, dismiss }) {
+    action = action ? action : "added"
     let msg, icon, color
     switch (code) {
         case 200:
-            msg = `${subject} has been added!`
+            msg = `${subject} has been ${action}!`
             color = "success"
             icon = HiCheckCircle
             break
@@ -22,11 +23,14 @@ function StatusHandler({ subject, code, dismiss }) {
             icon = HiInformationCircle
             break
         case 404:
-            msg = "Server Error!"
+            msg = "Server response not found!"
             color = "failure"
             icon = HiInformationCircle
             break
         default:
+            msg = "Server Error!"
+            color = "failure"
+            icon = HiInformationCircle
             break
     }
 

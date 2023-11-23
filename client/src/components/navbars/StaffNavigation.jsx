@@ -30,7 +30,7 @@ function StaffNavigation({ data, functions }) {
                         <span className="block text-sm font-semibold text-gray-900 dark:text-white">{data.firstName + " " + data.lastName}</span>
                         <span className="block text-sm text-gray-500 truncate dark:text-gray-400 font-medium ">{data.email}</span>
                     </Dropdown.Header>
-                    <Dropdown.Item>Profile</Dropdown.Item>
+                    <Dropdown.Item onClick={() => functions.navigate('/profile')}>Profile</Dropdown.Item>
                     <Dropdown.Divider />
                     <Dropdown.Item onClick={() => functions.signOut()}><span className="text-red-600" >Sign out</span></Dropdown.Item>
                 </Dropdown>

@@ -1,3 +1,4 @@
+import { SessionProvider } from './components/SessionContext'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import '@fontsource-variable/inter'
 
@@ -7,10 +8,12 @@ import UserFrame from './components/AppFrame'
 import SignUp from './pages/general/signup'
 import Login from './pages/general/Login'
 import NotFound from './pages/general/NotFound'
+import Home from './pages/user/Home'
+import Book from './pages/user/Book'
 
 // USERS
 import UserGuard from './pages/user/UserGuard'
-import Home from './pages/user/Home'
+import Profile from './pages/general/Profile'
 import Reservations from './pages/user/Reservations'
 import History from './pages/user/History'
 
@@ -24,36 +27,39 @@ import BookOverseer from './pages/staff/BookOverseer'
 // ADMIN
 import AdminGuard from './pages/admin/AdminGuard'
 import AdminDashboard from './pages/admin/AdminDashboard'
-import Book from './pages/user/Book'
+
 
 function App() {
+  console.log("app")
   return (
     <BrowserRouter>
-      <Routes>
-        {/* GENERAL ACCESS */}
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
+      <SessionProvider>
+        <Routes>
+          {/* GENERAL ACCESS */}
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
 
-        <Route element={<UserFrame />}>
-          {/* USERS */}
-          <Route path="catalog" element={<UserGuard element={<Home />} />} />
-          <Route path="catalog/:isbn" element={<UserGuard element={<Book />} />} />
-          <Route path="history" element={<UserGuard element={<History />} />} />
-          <Route path="reservations" element={<UserGuard element={<Reservations />} />} />
+          <Route element={<UserFrame />}>
+            <Route path="catalog" element={<Home />} />
+            <Route path="catalog/:isbn" element={<Book />} />
 
-          {/* STAFF */}
-          <Route path="dashboard" element={<StaffGuard element={<StaffDashboard />} />} />
-          <Route path="authors" element={<StaffGuard element={<Authors />} />} />
-          <Route path="publishers" element={<StaffGuard element={<Publishers />} />} />
-          <Route path="books" element={<StaffGuard element={<BookOverseer />} />} />
+            {/* USERS */}
+            <Route path="profile" element={<UserGuard element={<Profile />} softlock />} />
+            <Route path="history" element={<UserGuard element={<History />} />} />
+            <Route path="reservations" element={<UserGuard element={<Reservations />} />} />
 
-          {/* ADMINS */}
-          <Route path="admindash" element={<AdminGuard element={<AdminDashboard />} />} />
-        </Route>
-        <Route path="*" element={<NotFound />} />
+            {/* STAFF */}
+            <Route path="dashboard" element={<StaffGuard element={<StaffDashboard />} />} />
+            <Route path="authors" element={<StaffGuard element={<Authors />} />} />
+            <Route path="publishers" element={<StaffGuard element={<Publishers />} />} />
+            <Route path="books" element={<StaffGuard element={<BookOverseer />} />} />
 
-
-      </Routes>
+            {/* ADMINS */}
+            <Route path="admindash" element={<AdminGuard element={<AdminDashboard />} />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </SessionProvider>
     </BrowserRouter>
   )
 }

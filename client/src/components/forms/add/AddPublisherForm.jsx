@@ -8,9 +8,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { DevTool } from '@hookform/devtools'
 
 import { Banner, Button, Label, TextInput, Alert, Textarea } from 'flowbite-react'
-import { maxNameLen } from '../../assets/constants'
-import { emptyMsg, exceedCharLimit } from '../../assets/formErrorMsg'
-import StatusHandler from '../misc/StatusHandler'
+import { maxNameLen } from '../../../assets/constants'
+import { emptyMsg, exceedCharLimit } from '../../../assets/formErrorMsg'
+import StatusHandler from '../../misc/StatusHandler'
 
 function AddPublisherForm() {
     const [formStatus, setFormStatus] = useState(0)

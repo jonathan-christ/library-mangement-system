@@ -56,7 +56,7 @@ exports.findOne = (req, res) => {
         })
 }
 
-exports.findOneID = (req, res) => {
+exports.findOneID = async (req, res) => {
     //options
     let id = req.body.id
 
@@ -73,8 +73,18 @@ exports.findOneID = (req, res) => {
         })
 }
 
-exports.update = (req, res) => {
-
+exports.update = async (req, res) => {
+    let data = req.body
+    User.update(data.user, { returning: true, plain: true, where: { id: data.id } })
+        .then(() => {
+            res.status(200).send({
+                message: "User updated!"
+            })
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: err.message })
+        })
 }
 
 exports.delete = (req, res) => {
@@ -108,7 +118,7 @@ exports.login = async (req, res) => {
                     status: 'user not found'
                 })
             }
-        }).catch((err)=>{
+        }).catch((err) => {
             res.status(500).send(err)
         })
 }
