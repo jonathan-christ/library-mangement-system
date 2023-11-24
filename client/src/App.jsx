@@ -1,4 +1,4 @@
-import { SessionProvider } from './components/SessionContext'
+import { SessionProvider } from './components/context-hooks/session/SessionContext'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import '@fontsource-variable/inter'
 
@@ -30,7 +30,6 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 
 
 function App() {
-  console.log("app")
   return (
     <BrowserRouter>
       <SessionProvider>

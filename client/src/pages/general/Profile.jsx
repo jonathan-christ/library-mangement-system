@@ -1,11 +1,8 @@
-import React from 'react'
 import UpdateUserForm from '../../components/forms/update/UpdateUserForm'
-import { useOutletContext } from 'react-router-dom'
-import { getSession, updateSession } from '../../components/SessionContext' 
+import { useSession } from '../../components/context-hooks/session/SessionUtils' 
 
 function Profile() {
-    const session = getSession()
-    const setSession = updateSession()
+    const session = useSession()
     return (
         <UpdateUserForm user={session} profile />
     )

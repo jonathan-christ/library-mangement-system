@@ -1,16 +1,32 @@
-import React from 'react'
 import ViteLogo from '../../assets/vite.svg'
 import SearchBar from '../misc/SearchBar'
+import PropTypes from 'prop-types'
 
-import { useState, useEffect } from 'react'
-import { Link, matchPath, useMatch, useLocation } from 'react-router-dom'
+
+import { Link, useRouteMatch } from 'react-router-dom'
 import { Avatar, Dropdown, Navbar, Button } from 'flowbite-react'
 
-import { getSession, updateSession } from '../SessionContext'
+import { useSession } from '../context-hooks/session/SessionUtils'
 
-function UserNavigation({ data, functions }) {
-    const session = getSession()
-    const setSession = updateSession()
+NavigationLink.propTypes = {
+    to: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired
+}
+const NavigationLink = ({ to, label }) => {
+    const match = useRouteMatch(to);
+
+    return (
+        <Link to={to} className={match ? 'text-blue-600' : ''}>
+            <span className="text-base">{label}</span>
+        </Link>
+    )
+}
+
+UserNavigation.propTypes = {
+    functions: PropTypes.func.isRequired
+}
+function UserNavigation({ functions }) {
+    const session = useSession()
 
     return (
         // className='bg-primary-base text-gray-200'
@@ -53,15 +69,9 @@ function UserNavigation({ data, functions }) {
             <Navbar.Collapse>
                 {session &&
                     <>
-                        <Link to='./catalog' className={useMatch('/catalog') ? 'text-blue-600' : ''}>
-                            <span className="text-base">CATALOG</span>
-                        </Link>
-                        <Link to='./reservations' className={useMatch('/reservations') ? 'text-blue-600' : ''}>
-                            <span className="text-base">RESERVATIONS</span>
-                        </Link>
-                        <Link to='./history' className={useMatch('/history') ? 'text-blue-600' : ''}>
-                            <span className="text-base">HISTORY</span>
-                        </Link>
+                        <NavigationLink to="/catalog" label="CATALOG" />
+                        <NavigationLink to="/reservations" label="RESERVATIONS" />
+                        <NavigationLink to="/history" label="HISTORY" />
                     </>
                 }
                 {!session &&

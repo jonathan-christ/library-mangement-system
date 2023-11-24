@@ -1,4 +1,8 @@
-import React from 'react'
+import PropTypes from 'prop-types'
+
+GenreList.propTypes = {
+    genres: PropTypes.object.isRequired
+}
 
 function GenreList({ genres }) {
     return (

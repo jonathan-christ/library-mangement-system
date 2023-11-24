@@ -1,32 +1,36 @@
-import React from 'react'
-import validator from 'validator'
-import axios from 'axios'
 import ls from 'localstorage-slim'
-import { ttl } from '../../../assets/constants'
+import axios from 'axios'
+import validator from 'validator'
+import PropTypes from 'prop-types'
 import StatusHandler from '../../misc/StatusHandler'
 
+import { ttl } from '../../../assets/constants'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
 import { DevTool } from '@hookform/devtools'
 
-import { Banner, Button, Label, TextInput, Alert } from 'flowbite-react'
-import { maxNameLen, maxSuffixLen, minPassLen } from '../../../assets/constants'
-import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../../assets/formErrorMsg'
+import { Button, Label, TextInput } from 'flowbite-react'
+import { maxNameLen, maxSuffixLen } from '../../../assets/constants'
+import { emptyMsg, exceedCharLimit, notEmail } from '../../../assets/formErrorMsg'
 
-import { getSession, updateSession } from '../../SessionContext'
+import { useSession, useSessionUpdate } from '../../context-hooks/session/SessionUtils'
+
+UpdateUserForm.propTypes = {
+    user: PropTypes.object.isRequired,
+    profile: PropTypes.bool
+}
 
 function UpdateUserForm({ user, profile }) {
     const [formStatus, setFormStatus] = useState(0)
-    const session = getSession()
-    const setSession = updateSession()
+    const session = useSession()
+    const setSession = useSessionUpdate()
     const {
         register,
         handleSubmit,
         watch,
-        reset,
+        // reset,
         control,
-        formState: { errors, isDirty, isValid, dirtyFields },
+        formState: { errors, isDirty, dirtyFields },
     } = useForm({
         defaultValues: {
             fname: user.firstName,
@@ -40,14 +44,15 @@ function UpdateUserForm({ user, profile }) {
 
     const updateUser = async (data) => {
         const dirtyValues = getDirtyValues(data)
+        console.log(dirtyValues)
         await axios.put("/api/users/update", { user: { ...dirtyValues }, id: user.id })
             .then(() => {
                 if (profile) {
+                    const userDat = JSON.stringify({ ...session, ...dirtyValues })
                     ls.clear()
-                    ls.set("userData", { ...session, ...dirtyValues }, { ttl: ttl, encrypt: true })
-                    setSession(ls.get("userData", { decrypt: true }))
+                    ls.set("userData", userDat, { ttl: ttl, encrypt: true })
+                    setSession(JSON.parse(ls.get("userData", { decrypt: true })))
                 }
-                reset()
                 setFormStatus(200)
             }).catch((err) => {
                 console.log(err)
@@ -56,7 +61,24 @@ function UpdateUserForm({ user, profile }) {
     }
 
     const getDirtyValues = (data) => {
-        return Object.fromEntries(Object.keys(dirtyFields).map(key => [key, data[key]]))
+        return Object.fromEntries(
+            Object.keys(dirtyFields).map(key => {
+                let newKey
+                switch (key) {
+                    case 'fname':
+                        newKey = 'firstName'
+                        break
+                    case 'mname':
+                        newKey = 'middleName'
+                        break
+                    case 'lname':
+                        newKey = 'lastName'
+                        break
+                    default:
+                        newKey = key
+                }
+                return [newKey, data[key]]
+            }))
     }
 
     const userExists = async (email) => {
@@ -159,7 +181,7 @@ function UpdateUserForm({ user, profile }) {
                             required: emptyMsg('email'),
                             validate: {
                                 format: val => validator.isEmail(val) || notEmail(),
-                                exists: async (val) => ((dirtyFields.email ?? true) || await userExists(val) == false) || "User exists!"
+                                exists: async (val) => !(dirtyFields.email || watch('email')!==user.email || (await userExists(val))) || "User exists!"
                             }
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.email?.message}</p>

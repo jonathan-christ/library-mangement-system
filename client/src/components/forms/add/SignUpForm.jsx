@@ -1,4 +1,3 @@
-import React from 'react'
 import validator from 'validator'
 import axios from 'axios'
 
@@ -7,9 +6,9 @@ import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { DevTool } from '@hookform/devtools'
 
-import { Banner, Button, Label, TextInput, Alert } from 'flowbite-react'
+import { Button, Label, TextInput } from 'flowbite-react'
 import { maxNameLen, maxSuffixLen, minPassLen } from '../../../assets/constants'
-import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../../assets/formErrorMsg'
+import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, belowMinChar } from '../../../assets/formErrorMsg'
 import StatusHandler from '../../misc/StatusHandler'
 
 function SignUpForm() {

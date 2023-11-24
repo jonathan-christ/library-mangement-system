@@ -1,20 +1,19 @@
-import React from 'react'
-import axios from 'axios';
+import axios from 'axios'
 import ls from 'localstorage-slim'
 
-import { ttl } from '../../assets/constants';
+import { ttl } from '../../assets/constants'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { emptyMsg } from '../../assets/formErrorMsg';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
-import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
+import { emptyMsg } from '../../assets/formErrorMsg'
+import { Link, useNavigate, Navigate } from 'react-router-dom'
+import { Button, Checkbox, Label, TextInput } from 'flowbite-react'
 
-import { getSession, updateSession } from '../SessionContext';
+import { useSession, useSessionUpdate } from '../context-hooks/session/SessionUtils'
 
 function LoginForm() {
     const [formErr, setFormErr] = useState("")
-    const session = getSession()
-    const setSession = updateSession()
+    const session = useSession()
+    const setSession = useSessionUpdate()
     const navigate = useNavigate()
     const {
         register,
@@ -73,7 +72,7 @@ function LoginForm() {
                 <Button type="submit">Login</Button>
                 <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{formErr}</p>
                 <span className='text-sm'>
-                    Aren't a member yet? <Link to="/signup"><u>Sign up here</u></Link><br />
+                    {`Aren't a member yet?`} <Link to="/signup"><u>Sign up here</u></Link><br />
                     <Link to="/home"><u>Browse as Guest</u></Link>
                 </span>
             </form>

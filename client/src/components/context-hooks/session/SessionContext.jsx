@@ -1,21 +1,20 @@
-import React, { useState, useContext } from "react"
 import ls from 'localstorage-slim'
+import PropTypes from 'prop-types'
+
+import React, { useState } from "react"
 
 const SessionContext = React.createContext()
 const SessionUpdateContext = React.createContext()
 
-export function getSession() {
-    return useContext(SessionContext)
+SessionProvider.propTypes = {
+    children: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.node),
+        PropTypes.node,
+    ])
 }
-
-export function updateSession() {
-    return useContext(SessionUpdateContext)
-}
-
 export function SessionProvider({ children }) {
     const [sessionData, setSessionData] = useState(() => {
         // ls.clear()
-        console.log("ref")
         const storedData = ls.get("userData", { decrypt: true })
         return storedData ? JSON.parse(storedData) : undefined
     })

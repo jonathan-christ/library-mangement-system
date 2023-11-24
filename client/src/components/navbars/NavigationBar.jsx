@@ -1,27 +1,29 @@
-import React, { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ttl, ttlCheck } from '../../assets/constants'
+import { ttl } from '../../assets/constants'
 
 import ls from 'localstorage-slim'
 
-import AdminNavigation from './AdminNavigation'
+// import AdminNavigation from './AdminNavigation'
 import UserNavigation from './UserNavigation'
 import StaffNavigation from './StaffNavigation'
 
-import { getSession, updateSession } from '../SessionContext'
+import { useSession, useSessionUpdate } from '../context-hooks/session/SessionUtils'
 
 function NavigationBar() {
-    const data = getSession()
-    const updateData = updateSession()
+    const data = useSession()
+    const updateData = useSessionUpdate()
     const navigate = useNavigate()
 
-    // useEffect(() => {
-    //     const intervalId = setInterval(() => {
-    //         checkTTL();
-    //     }, ttl)
+    useEffect(() => {
+        if (data) {
+            const intervalId = setInterval(() => {
+                checkTTL();
+            }, ttl * 1000)
 
-    //     return () => clearInterval(intervalId)
-    // }, [])
+            return () => clearInterval(intervalId)
+        }
+    }) //might be problem (removed dependency array)
 
     const getInitials = (fname, lname) => {
         let firstNameIn = fname[0].charAt(0).toUpperCase()
@@ -42,7 +44,6 @@ function NavigationBar() {
     }
 
     const translateUserType = (type) => {
-        let retVal
         switch (type) {
             case 2:
                 return "STUDENT"

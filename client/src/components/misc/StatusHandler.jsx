@@ -1,8 +1,13 @@
-import React from 'react'
 import { Alert } from 'flowbite-react'
-import { useState } from 'react'
 import { HiInformationCircle, HiCheckCircle } from 'react-icons/hi'
+import PropTypes from 'prop-types'
 
+StatusHandler.propTypes = {
+    subject: PropTypes.string.isRequired,
+    action: PropTypes.string.isRequired,
+    code: PropTypes.number.isRequired,
+    dismiss: PropTypes.func.isRequired
+}
 function StatusHandler({ subject, action, code, dismiss }) {
     action = action ? action : "added"
     let msg, icon, color

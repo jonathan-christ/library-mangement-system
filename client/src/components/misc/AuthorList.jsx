@@ -1,5 +1,8 @@
-import React from 'react'
+import PropTypes from 'prop-types'
 
+AuthorList.propTypes = {
+    authors: PropTypes.object.isRequired
+}
 function AuthorList({ authors }) {
     return (
         <>
