@@ -1,40 +1,44 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ttl } from '../../assets/constants'
 
 import ls from 'localstorage-slim'
 
-// import AdminNavigation from './AdminNavigation'
+import AdminNavigation from './AdminNavigation'
 import UserNavigation from './UserNavigation'
 import StaffNavigation from './StaffNavigation'
 
 import { useSession, useSessionUpdate } from '../context-hooks/session/SessionUtils'
+
 
 function NavigationBar() {
     const data = useSession()
     const updateData = useSessionUpdate()
     const navigate = useNavigate()
 
-    useEffect(() => {
+    const initializeSession = useCallback(() => {
         if (data) {
             const intervalId = setInterval(() => {
-                checkTTL();
+                if (!JSON.parse(ls.get('userData', { decrypt: true }))) {
+                    ls.clear()
+                    updateData(undefined)
+                    navigate('/')
+                }
             }, ttl * 1000)
 
             return () => clearInterval(intervalId)
         }
-    }) //might be problem (removed dependency array)
+    }, [data, updateData, navigate])
+
+    useEffect(() => {
+        initializeSession()
+    }, [initializeSession]) //might be problem (removed dependency array)
+
 
     const getInitials = (fname, lname) => {
         let firstNameIn = fname[0].charAt(0).toUpperCase()
         let lastNameIn = lname.charAt(0).toUpperCase()
         return firstNameIn + lastNameIn
-    }
-
-    const checkTTL = () => {
-        if (!JSON.parse(ls.get('userData', { decrypt: true }))) {
-            signOut()
-        }
     }
 
     const signOut = () => {
@@ -73,7 +77,7 @@ function NavigationBar() {
         case 4:
             return <StaffNavigation functions={commonFunctions} />
         case 5:
-            return <UserNavigation functions={commonFunctions} />
+            return <AdminNavigation functions={commonFunctions} />
         default:
             return <UserNavigation functions={commonFunctions} />
     }

@@ -8,6 +8,11 @@
 // import { useForm } from 'react-hook-form'
 // import StatusHandler from '../../misc/StatusHandler';
 
+function RatingForm() {
+    return (<>
+    </>)
+}
+
 // function RatingForm({ bookID, userID }) {
 //     const [formStatus, setFormStatus] = useState(0)
 //     const [userRating, setUserRating] = useState(0)
@@ -77,4 +82,4 @@
 //     )
 // }
 
-// export default RatingForm
+export default RatingForm

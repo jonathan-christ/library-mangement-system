@@ -39,6 +39,10 @@ module.exports = (sequelize, Sequelize) => {
     password: {
       type: Sequelize.BLOB,
       allowNull: false
+    },
+    deleted: {
+      type: Sequelize.ENUM('true','false'),
+      defaultValue: 'false'
     }
   })
 

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 
 GenreList.propTypes = {
-    genres: PropTypes.object.isRequired
+    genres: PropTypes.array.isRequired
 }
 
 function GenreList({ genres }) {

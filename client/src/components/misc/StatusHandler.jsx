@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 StatusHandler.propTypes = {
     subject: PropTypes.string.isRequired,
-    action: PropTypes.string.isRequired,
+    action: PropTypes.string,
     code: PropTypes.number.isRequired,
     dismiss: PropTypes.func.isRequired
 }

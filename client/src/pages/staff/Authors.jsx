@@ -1,4 +1,3 @@
-import React from 'react'
 import AddAuthorForm from '../../components/forms/add/AddAuthorForm'
 
 function Authors() {

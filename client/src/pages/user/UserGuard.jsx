@@ -1,9 +1,16 @@
-import React from 'react'
-import ls from 'localstorage-slim'
+import PropTypes from 'prop-types'
 import { Navigate } from 'react-router-dom'
+import { useSession } from './../../components/context-hooks/session/SessionUtils'
 
+UserGuard.propTypes = {
+  element: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
+  softlock: PropTypes.bool
+}
 function UserGuard({ element, softlock }) {
-  const userData = JSON.parse(ls.get('userData', { decrypt: true }))
+  const userData = useSession()
   const type = userData ? userData.typeID : 0
   let nav
 

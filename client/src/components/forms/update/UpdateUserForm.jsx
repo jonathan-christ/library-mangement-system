@@ -27,8 +27,8 @@ function UpdateUserForm({ user, profile }) {
     const {
         register,
         handleSubmit,
-        watch,
-        // reset,
+        // watch,
+        reset,
         control,
         formState: { errors, isDirty, dirtyFields },
     } = useForm({
@@ -44,15 +44,15 @@ function UpdateUserForm({ user, profile }) {
 
     const updateUser = async (data) => {
         const dirtyValues = getDirtyValues(data)
-        console.log(dirtyValues)
         await axios.put("/api/users/update", { user: { ...dirtyValues }, id: user.id })
             .then(() => {
+                const userDat = { ...session, ...dirtyValues }
                 if (profile) {
-                    const userDat = JSON.stringify({ ...session, ...dirtyValues })
                     ls.clear()
-                    ls.set("userData", userDat, { ttl: ttl, encrypt: true })
+                    ls.set("userData", JSON.stringify(userDat), { ttl: ttl, encrypt: true })
                     setSession(JSON.parse(ls.get("userData", { decrypt: true })))
                 }
+                reset(userDat)
                 setFormStatus(200)
             }).catch((err) => {
                 console.log(err)
@@ -181,7 +181,7 @@ function UpdateUserForm({ user, profile }) {
                             required: emptyMsg('email'),
                             validate: {
                                 format: val => validator.isEmail(val) || notEmail(),
-                                exists: async (val) => !(dirtyFields.email || watch('email')!==user.email || (await userExists(val))) || "User exists!"
+                                exists: async (val) => !(dirtyFields.email ? await userExists(val) : false) || "User exists!"
                             }
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.email?.message}</p>

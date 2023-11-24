@@ -33,7 +33,7 @@ function LoginForm() {
                     setSession(JSON.parse(ls.get('userData', { decrypt: true })))
                     reset()
                     setFormErr("")
-                    navigate('../home')
+                    navigate('../catalog')
                 } else {
                     setFormErr('User not found or credential mismatch')
                 }
@@ -51,7 +51,7 @@ function LoginForm() {
                     <div className="mb-2 block">
                         <Label htmlFor="email1" value="Your email" />
                     </div>
-                    <TextInput id="email1" type="email" placeholder="name@flowbite.com" {...register('email', {
+                    <TextInput id="email1" type="email" placeholder="name@flowbite.com" autoComplete='email' {...register('email', {
                         required: emptyMsg('email')
                     })} shadow />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.email?.message}</p>
@@ -60,7 +60,7 @@ function LoginForm() {
                     <div className="mb-2 block">
                         <Label htmlFor="password1" value="Your password" />
                     </div>
-                    <TextInput id="password1" type="password"{...register('password', {
+                    <TextInput id="password1" type="password" autoComplete='current-password' {...register('password', {
                         required: emptyMsg('password')
                     })} shadow />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.password?.message}</p>

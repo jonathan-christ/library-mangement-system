@@ -1,14 +1,12 @@
-import React from 'react'
 import axios from 'axios';
 import Select from 'react-select'
 import validator from 'validator'
 
 import { DevTool } from '@hookform/devtools'
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
-import { maxBookLen, maxISBNLen, maxNameLen, minISBNLen } from '../../../assets/constants'
-import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../../assets/formErrorMsg'
+import { maxBookLen, maxISBNLen, minISBNLen } from '../../../assets/constants'
+import { emptyMsg, exceedCharLimit, belowMinChar } from '../../../assets/formErrorMsg'
 import { Button, Label, Textarea, TextInput, Datepicker } from 'flowbite-react'
 import StatusHandler from '../../misc/StatusHandler';
 
@@ -23,7 +21,6 @@ function AddBookForm() {
         handleSubmit,
         watch,
         reset,
-        resetField,
         control,
         formState: { errors },
     } = useForm({ mode: 'onTouched' });
@@ -43,7 +40,7 @@ function AddBookForm() {
                     let name = auth.firstName + " " + auth.lastName
                     return { value: auth.id, label: name }
                 }))
-            }).catch((err) => {
+            }).catch(() => {
                 setFormStatus(400)
             })
     }
@@ -72,7 +69,7 @@ function AddBookForm() {
 
     const addBook = async (data) => {
         await axios.post("api/library/books/add", { data })
-            .then(res => {
+            .then(() => {
                 reset()
                 setFormStatus(200)
             }).catch((err) => {
@@ -138,7 +135,7 @@ function AddBookForm() {
                         id="bauth"
                         name="authors"
                         control={control}
-                        render={({ field: { onChange }, value, reset }) => (
+                        render={({ field: { onChange }, value }) => (
                             <Select
                                 isMulti
                                 options={authors}
@@ -161,7 +158,7 @@ function AddBookForm() {
                         id="genres"
                         name="genres"
                         control={control}
-                        render={({ field: { onChange }, value, ref }) => (
+                        render={({ field: { onChange }, value }) => (
                             <Select
                                 isMulti
                                 options={genres}
@@ -184,7 +181,7 @@ function AddBookForm() {
                         id="bpub"
                         name="book.publisherID"
                         control={control}
-                        render={({ field: { onChange }, value, ref }) => (
+                        render={({ field: { onChange }, value }) => (
                             <Select
                                 options={publishers}
                                 value={publishers.find((c) => c.value === value) || watch('publisherID') ? value : []}
@@ -203,7 +200,7 @@ function AddBookForm() {
                         id="pdate"
                         name="book.publishDate"
                         control={control}
-                        render={({ field: { onChange }, value, ref }) => (
+                        render={({ field: { onChange }, value }) => (
                             <Datepicker
                                 placeholder='Select Date'
                                 selected={value}

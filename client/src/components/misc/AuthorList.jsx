@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 
 AuthorList.propTypes = {
-    authors: PropTypes.object.isRequired
+    authors: PropTypes.array.isRequired
 }
 function AuthorList({ authors }) {
     return (

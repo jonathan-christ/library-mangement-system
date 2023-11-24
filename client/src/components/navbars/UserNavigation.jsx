@@ -2,28 +2,13 @@ import ViteLogo from '../../assets/vite.svg'
 import SearchBar from '../misc/SearchBar'
 import PropTypes from 'prop-types'
 
-
-import { Link, useRouteMatch } from 'react-router-dom'
+import { useSession } from '../context-hooks/session/SessionUtils'
+import NavigationLink from './NavigationLink'
 import { Avatar, Dropdown, Navbar, Button } from 'flowbite-react'
 
-import { useSession } from '../context-hooks/session/SessionUtils'
-
-NavigationLink.propTypes = {
-    to: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired
-}
-const NavigationLink = ({ to, label }) => {
-    const match = useRouteMatch(to);
-
-    return (
-        <Link to={to} className={match ? 'text-blue-600' : ''}>
-            <span className="text-base">{label}</span>
-        </Link>
-    )
-}
 
 UserNavigation.propTypes = {
-    functions: PropTypes.func.isRequired
+    functions: PropTypes.object.isRequired
 }
 function UserNavigation({ functions }) {
     const session = useSession()

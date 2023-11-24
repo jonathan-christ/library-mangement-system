@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useState, useEffect } from 'react'
 import MiniBook from '../../components/mini/MiniBook'
 
-function Home() {
+function Catalog() {
   const [books, setBooks] = useState([])
 
   useEffect(() => {
@@ -26,4 +26,4 @@ function Home() {
   )
 }
 
-export default Home
+export default Catalog

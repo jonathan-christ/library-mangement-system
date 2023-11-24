@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 
 import React, { useState } from "react"
 
-const SessionContext = React.createContext()
-const SessionUpdateContext = React.createContext()
+export const SessionContext = React.createContext()
+export const SessionUpdateContext = React.createContext()
 
 SessionProvider.propTypes = {
     children: PropTypes.oneOfType([

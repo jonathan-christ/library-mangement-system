@@ -2,13 +2,13 @@ import axios from 'axios'
 import ViteLogo from '../../assets/vite.svg'
 import validator from 'validator'
 import ls from 'localstorage-slim'
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import AuthorList from '../../components/misc/AuthorList'
 import GenreList from '../../components/misc/GenreList'
 import RatingForm from '../../components/forms/add/RatingForm'
-import Placeholder from '../../components/loading/Placeholder'
+// import Placeholder from '../../components/loading/Placeholder'
 
 function Book() {
   const navigate = useNavigate()
@@ -22,27 +22,26 @@ function Book() {
     genres: []
   })
 
-  useEffect(() => {
+  const initializePage = useCallback(async () => {
     if (isbn === undefined || validator.isAlpha(isbn)) {
       navigate('/catalog')
     } else {
-      getBook()
+      await axios.post("/api/library/books/find", { isbn: isbn }).then((res) => {
+        setBook(res.data)
+      }).catch((err) => {
+        console.log("Server error! " + err)
+      })
     }
-  }, [])
+  }, [navigate, isbn])
 
-  const getBook = async () => {
-    await axios.post("/api/library/books/find", { isbn: isbn }).then((res) => {
-      setBook(res.data)
-    }).catch((err) => {
-      console.log("Server error! " + err)
-    })
-  }
-
+  useEffect(() => {
+    initializePage()
+  }, [initializePage])
 
   return (
     <div className='flex flex-col min-w-full p-5  gap-10 '>
       <div className="title flex flex-col text-center gap-5 content-center flex-wrap">
-        
+
         <div>
           <span className="text-5xl font-semibold">{book.title}</span>
           <div className="rating flex flex-wrap content-center">

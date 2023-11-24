@@ -8,8 +8,8 @@ import UserFrame from './components/AppFrame'
 import SignUp from './pages/general/signup'
 import Login from './pages/general/Login'
 import NotFound from './pages/general/NotFound'
-import Home from './pages/user/Home'
 import Book from './pages/user/Book'
+import Catalog from './pages/general/Catalog'
 
 // USERS
 import UserGuard from './pages/user/UserGuard'
@@ -27,6 +27,7 @@ import BookOverseer from './pages/staff/BookOverseer'
 // ADMIN
 import AdminGuard from './pages/admin/AdminGuard'
 import AdminDashboard from './pages/admin/AdminDashboard'
+import Users from './pages/admin/Users'
 
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           <Route element={<UserFrame />}>
-            <Route path="catalog" element={<Home />} />
+            <Route path="catalog" element={<Catalog />} />
             <Route path="catalog/:isbn" element={<Book />} />
 
             {/* USERS */}
@@ -55,6 +56,7 @@ function App() {
 
             {/* ADMINS */}
             <Route path="admindash" element={<AdminGuard element={<AdminDashboard />} />} />
+            <Route path="users" element={<AdminGuard element={<Users />} />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

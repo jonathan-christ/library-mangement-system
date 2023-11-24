@@ -1,12 +1,12 @@
 import ViteLogo from '../../assets/vite.svg'
 import PropTypes from 'prop-types'
 
-import { Link, useMatch } from 'react-router-dom'
 import { Avatar, Dropdown, Navbar } from 'flowbite-react'
-import { useSession } from '../context-hooks/session/SessionContext'
+import { useSession } from '../context-hooks/session/SessionUtils'
+import NavigationLink from './NavigationLink'
 
 StaffNavigation.propTypes = {
-    functions: PropTypes.func.isRequired
+    functions: PropTypes.object.isRequired
 }
 function StaffNavigation({ functions }) {
     const session = useSession()
@@ -42,18 +42,11 @@ function StaffNavigation({ functions }) {
             </div>
             <Navbar.Collapse>
                 <>
-                    <Link to='./dashboard' className={useMatch('/dashboard') ? 'text-blue-600' : ''}>
-                        <span className="text-base">DASHBOARD</span>
-                    </Link>
-                    <Link to='./books' className={useMatch('/books') ? 'text-blue-600' : ''}>
-                        <span className="text-base">BOOKS</span>
-                    </Link>
-                    <Link to='./authors' className={useMatch('/authors') ? 'text-blue-600' : ''}>
-                        <span className="text-base">AUTHORS</span>
-                    </Link>
-                    <Link to='./publishers' className={useMatch('/publishers') ? 'text-blue-600' : ''}>
-                        <span className="text-base">PUBLISHERS</span>
-                    </Link>
+                    <NavigationLink to='dashboard' label="DASHBOARD" />
+                    <NavigationLink to='books' label="BOOK" /> 
+                    {/* ^ to be replaced with CATALOG */}
+                    <NavigationLink to='authors' label="AUTHORS" />
+                    <NavigationLink to='publishers' label="PUBLISHERS" />
                 </>
             </Navbar.Collapse>
         </Navbar>
