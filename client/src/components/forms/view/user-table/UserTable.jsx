@@ -1,13 +1,15 @@
+"use client";
+
 import axios from 'axios'
 
 import { Table, Button, Badge, Modal } from 'flowbite-react'
-import { useState, useEffect } from 'react'
-import { MdEdit, MdDelete } from "react-icons/md";
+import { useState, useEffect, useMemo } from 'react'
+import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
 import StatusHandler from '../../../misc/StatusHandler'
 import UpdateUserForm from '../../update/UpdateUserForm'
-import SignUpForm from '../../add/SignUpForm';
+import SignUpForm from '../../add/SignUpForm'
 
 function UserTable() {
     const [userList, setUserList] = useState([])
@@ -67,6 +69,33 @@ function UserTable() {
         }
     }
 
+    const userCells = useMemo(() =>
+        userList.map((user, idx) => {
+            return (
+                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate" + ((idx % 2 == 0) ? "bg-slate-100" : "bg-gray")}>
+                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                        {user.lastName}
+                    </Table.Cell>
+                    <Table.Cell>{user.firstName}</Table.Cell>
+                    <Table.Cell>{user.middleName ?? user.middleName[0] + "."}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell className='mx-5'>{getType(user.typeID)}</Table.Cell>
+                    <Table.Cell>
+                        <Button.Group>
+                            <Button color='warning' size='sm' onClick={() => { callUpdate(user) }}>
+                                <MdEdit size={20} />
+                            </Button>
+                            <Button color='failure' size='sm' onClick={() => { callDelete(user) }}>
+                                <MdDelete size={20} />
+                            </Button>
+                        </Button.Group>
+                    </Table.Cell>
+                </Table.Row>
+            )
+        })
+        , [userList])
+
+
     return (
         <div>
             {/* MODALS */}
@@ -115,30 +144,7 @@ function UserTable() {
                         <Table.HeadCell >Action</Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="gap-1">
-                        {userList.map((user, idx) => {
-                            return (
-                                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate" + ((idx % 2 == 0) ? "bg-slate-100" : "bg-gray")}>
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                        {user.lastName}
-                                    </Table.Cell>
-                                    <Table.Cell>{user.firstName}</Table.Cell>
-                                    <Table.Cell>{user.middleName ?? user.middleName[0] + "."}</Table.Cell>
-                                    <Table.Cell>{user.email}</Table.Cell>
-                                    <Table.Cell className='mx-5'>{getType(user.typeID)}</Table.Cell>
-                                    <Table.Cell>
-                                        <Button.Group>
-                                            <Button color='warning' size='sm' onClick={() => { callUpdate(user) }}>
-                                                <MdEdit size={20} />
-                                            </Button>
-                                            <Button color='failure' size='sm' onClick={() => { callDelete(user) }}>
-                                                <MdDelete size={20} />
-                                            </Button>
-                                        </Button.Group>
-                                    </Table.Cell>
-                                </Table.Row>
-                            )
-                        })
-                        }
+                        {userCells}
                     </Table.Body>
                 </Table>
             </div>

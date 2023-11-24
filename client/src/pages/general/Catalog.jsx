@@ -1,6 +1,8 @@
+"use client";
+
 import axios from 'axios'
-import { useState, useEffect } from 'react'
-import MiniBook from '../../components/mini/MiniBook'
+import { useState, useEffect, useMemo } from 'react'
+import MiniBook from '../../components/forms/view/books/MiniBook'
 
 function Catalog() {
   const [books, setBooks] = useState([])
@@ -17,11 +19,15 @@ function Catalog() {
     })
   }
 
+  const bookCells = useMemo(() => books.map((book, idx) => {
+    return <MiniBook key={idx} book={book}></MiniBook>
+  })
+    , [books])
+
+
   return (
     <div className="grid grid-cols-1 gap-x-10 gap-y-5 p-5 lg:w-2/3 md:w-full sm:w-full">
-      {books.map((book, idx) => {
-        return <MiniBook key={idx} book={book}></MiniBook>
-      })}
+      {bookCells}
     </div>
   )
 }

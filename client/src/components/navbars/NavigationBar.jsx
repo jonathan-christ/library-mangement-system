@@ -48,22 +48,14 @@ function NavigationBar() {
     }
 
     const translateUserType = (type) => {
-        switch (type) {
-            case 2:
-                return "STUDENT"
-            case 3:
-                return "TEACHER"
-            case 4:
-                return "STAFF"
-            case 5:
-                return "ADMIN"
-            default:
-                return "GUEST"
+        const roles = {
+            2: "STUDENT",
+            3: "TEACHER",
+            4: "STAFF",
+            5: "ADMIN",
         }
-    }
 
-    const permsVal = () => {
-        return data ? data.typeID : 1
+        return roles[type] || "GUEST"
     }
 
     const commonFunctions = {
@@ -73,14 +65,12 @@ function NavigationBar() {
         translateUserType
     }
 
-    switch (permsVal()) {
-        case 4:
-            return <StaffNavigation functions={commonFunctions} />
-        case 5:
-            return <AdminNavigation functions={commonFunctions} />
-        default:
-            return <UserNavigation functions={commonFunctions} />
+    const Navs = {
+        4: <StaffNavigation functions={commonFunctions} />,
+        5: <AdminNavigation functions={commonFunctions} />
     }
+
+    return Navs[data ? data.typeID : 1] || <UserNavigation functions={commonFunctions} />
 }
 
 export default NavigationBar

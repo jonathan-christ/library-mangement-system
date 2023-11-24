@@ -7,7 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AuthorList from '../../components/misc/AuthorList'
 import GenreList from '../../components/misc/GenreList'
-import RatingForm from '../../components/forms/add/RatingForm'
+import BookRating from '../../components/forms/view/BookRating'
 // import Placeholder from '../../components/loading/Placeholder'
 
 function Book() {
@@ -41,12 +41,8 @@ function Book() {
   return (
     <div className='flex flex-col min-w-full p-5  gap-10 '>
       <div className="title flex flex-col text-center gap-5 content-center flex-wrap">
-
         <div>
           <span className="text-5xl font-semibold">{book.title}</span>
-          <div className="rating flex flex-wrap content-center">
-            <RatingForm bookID={book.id} userID={user ? user.id : null} />
-          </div>
         </div>
         <div className="authlist flex flex-col w-1/2">
           <div><AuthorList authors={book.authors} /></div>
@@ -57,6 +53,9 @@ function Book() {
         <img src={ViteLogo} alt="" width={250} height={300} />
       </div>
       <div className='flex flex-col flex-wrap w-full content-center'>
+        <div className="rating flex flex-wrap content-center">
+          <BookRating bookID={book.id} userID={user ? user.id : null} />
+        </div>
         <div className="desc flex flex-wrap text-justify">
           {book.description}
         </div>

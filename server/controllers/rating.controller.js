@@ -3,14 +3,15 @@ const Op = db.Sequelize.Op
 const Rating = db.rating
 
 exports.create = async (req, res) => {
-    const data = req.body.data
-    const Rating = {
+    const data = req.body
+    console.log(data)
+    const rating = {
         bookID: data.bookID,
         userID: data.userID,
-        value: data.value
+        rating: data.rating
     }
 
-    Rating.create(Rating)
+    Rating.create(rating)
         .then(data => {
             res.send(data)
         })
@@ -21,9 +22,22 @@ exports.create = async (req, res) => {
 }
 
 exports.findBookRating = (req, res) => {
-    Rating.findAll({ where: { bookID: req.body.bookID } })
+    Rating.findAll({
+        attributes: [
+            [
+                db.sequelize.literal("COUNT(*)"),
+                'count'
+            ],
+            [
+                db.sequelize.literal("SUM(CASE WHEN rating = 'like' THEN 1 ELSE 0 END)"),
+                'score'
+            ]
+        ],
+        where: { bookID: req.body.bookID },
+        group: ['bookID']
+    })
         .then(data => {
-            res.send(data)
+            res.send(data[0])
         })
         .catch(err => {
             res.status(500)
@@ -33,11 +47,11 @@ exports.findBookRating = (req, res) => {
 
 exports.findUserBookRating = (req, res) => {
 
-    Rating.findOne({ where: { userID: req.body.userID, bookID: req.body.bookID } })
+    Rating.findOne({ where: { userID: req.body.userID, bookID: req.body.bookID }, attributes: ['rating'] })
         .then(data => {
             res.send({
                 status: data ? 'found' : 'not found',
-                data: data ? data : null
+                rating: data?.rating ?? 'none'
             })
         }).catch(err => {
             res.status(500)
@@ -46,13 +60,29 @@ exports.findUserBookRating = (req, res) => {
 }
 
 exports.update = (req, res) => {
-
+    let data = req.body
+    Rating.update({ rating: data.rating }, { where: { userID: data.userID, bookID: data.bookID } })
+        .then(() => {
+            res.status(200).send({
+                message: "Rating updated!"
+            })
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: err.message })
+        })
 }
 
 exports.delete = (req, res) => {
-
-}
-
-exports.deleteAll = (req, res) => {
-
+    let data = req.body
+    Rating.destroy({ where: { userID: data.userID, bookID: data.bookID } })
+        .then(() => {
+            res.status(200).send({
+                message: "Rating deleted!"
+            })
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: err.message })
+        })
 }

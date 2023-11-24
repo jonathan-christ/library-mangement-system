@@ -38,8 +38,6 @@ function StatusHandler({ subject, action, code, dismiss }) {
             icon = HiInformationCircle
             break
     }
-
-    window.scrollTo(0, 0)
     return (
         <>
             {!!code &&

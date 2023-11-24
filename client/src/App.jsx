@@ -8,7 +8,7 @@ import UserFrame from './components/AppFrame'
 import SignUp from './pages/general/signup'
 import Login from './pages/general/Login'
 import NotFound from './pages/general/NotFound'
-import Book from './pages/user/Book'
+import Book from './pages/general/Book'
 import Catalog from './pages/general/Catalog'
 
 // USERS

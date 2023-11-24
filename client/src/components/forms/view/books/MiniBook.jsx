@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import ViteLogo from '../../assets/vite.svg'
+import ViteLogo from '../../../../assets/vite.svg'
 
-import AuthorList from '../misc/AuthorList'
-import GenreList from '../misc/GenreList'
+import AuthorList from '../../../../components/misc/AuthorList'
+import GenreList from '../../../../components/misc/GenreList'
 
 MiniBook.propTypes = {
     book: PropTypes.object.isRequired

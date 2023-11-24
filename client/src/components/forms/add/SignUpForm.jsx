@@ -1,3 +1,5 @@
+"use client";
+
 import validator from 'validator'
 import axios from 'axios'
 
@@ -6,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { DevTool } from '@hookform/devtools'
 
-import { Button, Label, TextInput } from 'flowbite-react'
+import { Button, Label, Radio, TextInput } from 'flowbite-react'
 import { maxNameLen, maxSuffixLen, minPassLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, belowMinChar } from '../../../assets/formErrorMsg'
 import StatusHandler from '../../misc/StatusHandler'
@@ -51,7 +53,7 @@ function SignUpForm() {
         <div>
             <StatusHandler subject={"User"} code={formStatus} dismiss={setFormStatus} />
             <form onSubmit={handleSubmit(signupUser)} className="flex max-w-md flex-col gap-4" noValidate>
-                <div>
+                <div className='flex flex-col gap-3'>
                     <div>
                         <div className="mb-2 block">
                             <Label htmlFor="fname" value="First Name" />
@@ -90,41 +92,43 @@ function SignUpForm() {
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.lname?.message}</p>
                     </div>
-                    <div>
-                        <div className="mb-2 block">
-                            <Label htmlFor="suffix" value="Suffix" />
+                    <div className='grid grid-cols-2 gap-10'>
+                        <div>
+                            <div className="mb-2 block">
+                                <Label htmlFor="suffix" value="Suffix" />
+                            </div>
+                            <TextInput id="suffix" type="text" {...register('suffix', {
+                                maxLength: {
+                                    value: maxSuffixLen,
+                                    message: exceedCharLimit(maxSuffixLen)
+                                }
+                            })} shadow />
+                            <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.suffix?.message}</p>
                         </div>
-                        <TextInput id="suffix" type="text" {...register('suffix', {
-                            maxLength: {
-                                value: maxSuffixLen,
-                                message: exceedCharLimit(maxSuffixLen)
-                            }
-                        })} shadow />
-                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.suffix?.message}</p>
+                        <fieldset id="sex" className="colspan-1 h-full ">
+                            <div className="mb-2 block">
+                                <Label value="Sex" />
+                            </div>
+                            <div className='flex flex-row align-middle p-2'>
+                                <div className="flex items-center ps-3 gap-4">
+                                    <Radio id="male" value="male" {...register('sex', {
+                                        required: emptyMsg('sex')
+                                    })} />
+                                    <Label htmlFor="male" value="Male" />
+                                </div>
+                                <div className="flex items-center ps-3 gap-4">
+                                    <Radio id="female" value="female" {...register('sex', {
+                                        required: emptyMsg('sex')
+                                    })} />
+                                    <Label htmlFor="female" value="Female" />
+                                </div>
+                            </div>
+                            <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.sex?.message}</p>
+                        </fieldset>
                     </div>
-                    <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">Sex</h3>
-                    <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
-                            <div className="flex items-center ps-3">
-                                <input id="male" type="radio" value="male" {...register('sex', {
-                                    required: emptyMsg('sex')
-                                })} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
-                                <label htmlFor="male" className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Male </label>
-                            </div>
-                        </li>
-                        <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
-                            <div className="flex items-center ps-3">
-                                <input id="female" type="radio" value="female" {...register('sex', {
-                                    required: emptyMsg('sex')
-                                })} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
-                                <label htmlFor="female" className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Female</label>
-                            </div>
-                        </li>
-                    </ul>
-                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.sex?.message}</p>
                 </div>
 
-                <div>
+                <div className='flex flex-col gap-3'>
                     <div>
                         <div className="mb-2 block">
                             <Label htmlFor="email2" value="Your email" />
