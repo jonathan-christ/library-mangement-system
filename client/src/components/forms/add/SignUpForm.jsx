@@ -92,7 +92,7 @@ function SignUpForm() {
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.lname?.message}</p>
                     </div>
-                    <div className='grid grid-cols-2 gap-10'>
+                    <div className='grid grid-cols-2 gap-5'>
                         <div>
                             <div className="mb-2 block">
                                 <Label htmlFor="suffix" value="Suffix" />
@@ -105,26 +105,28 @@ function SignUpForm() {
                             })} shadow />
                             <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.suffix?.message}</p>
                         </div>
-                        <fieldset id="sex" className="colspan-1 h-full ">
-                            <div className="mb-2 block">
-                                <Label value="Sex" />
-                            </div>
-                            <div className='flex flex-row align-middle p-2'>
-                                <div className="flex items-center ps-3 gap-4">
-                                    <Radio id="male" value="male" {...register('sex', {
-                                        required: emptyMsg('sex')
-                                    })} />
-                                    <Label htmlFor="male" value="Male" />
-                                </div>
-                                <div className="flex items-center ps-3 gap-4">
-                                    <Radio id="female" value="female" {...register('sex', {
-                                        required: emptyMsg('sex')
-                                    })} />
-                                    <Label htmlFor="female" value="Female" />
-                                </div>
-                            </div>
+                        <div>
+                            <h3 className="mb-[6px] text-gray-900 dark:text-white">Sex</h3>
+                            <ul className="items-center text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex ">
+                                <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                                    <div className="flex items-center ps-3">
+                                        <Radio id="male" value="male" {...register('sex', {
+                                            required: emptyMsg('sex')
+                                        })} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" />
+                                        <Label htmlFor="male" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">Male </Label>
+                                    </div>
+                                </li>
+                                <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                                    <div className="flex items-center ps-3">
+                                        <Radio id="female" value="female" {...register('sex', {
+                                            required: emptyMsg('sex')
+                                        })} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" />
+                                        <Label htmlFor="female" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">Female</Label>
+                                    </div>
+                                </li>
+                            </ul>
                             <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.sex?.message}</p>
-                        </fieldset>
+                        </div>
                     </div>
                 </div>
 
