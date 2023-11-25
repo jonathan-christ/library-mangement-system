@@ -1,7 +1,8 @@
 "use client";
 
-import validator from 'validator'
 import axios from 'axios'
+import validator from 'validator'
+import PropTypes from 'prop-types'
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -13,7 +14,10 @@ import { maxNameLen, maxSuffixLen, minPassLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, belowMinChar } from '../../../assets/formErrorMsg'
 import StatusHandler from '../../misc/StatusHandler'
 
-function SignUpForm() {
+SignUpForm.propTypes = {
+    refreshDependency: PropTypes.func
+}
+function SignUpForm({refreshDependency}) {
     const [formStatus, setFormStatus] = useState(0)
     const {
         register,
@@ -28,6 +32,7 @@ function SignUpForm() {
         delete data.rePass
         await axios.post("/api/users/create", { data })
             .then(() => {
+                refreshDependency ? refreshDependency(true) : ''
                 reset()
                 setFormStatus(200)
             }).catch(() => {

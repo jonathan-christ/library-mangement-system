@@ -1,17 +1,16 @@
 const db = require("../models")
 const Op = db.Sequelize.Op
-const Author = db.author
-const AuthorList = db.authorList
+
+const Subject = db.subject
+const SubjectList = db.subjectList
 
 exports.create = async (req, res) => {
-    const data = req.body.data
-    const author = {
-        firstName: data.fname,
-        lastName: data.lname,
-        bio: data.bio
+    const subject = {
+        name: req.body.name,
+        description: req.body.desc,
     }
 
-    Author.create(author)
+    Subject.create(subject)
         .then(data => {
             res.send(data)
         })
@@ -23,7 +22,7 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    Author.findAll()
+    Subject.findAll()
         .then(data => {
             res.send(data)
         })
@@ -35,15 +34,21 @@ exports.findAll = (req, res) => {
 
 exports.findOne = (req, res) => {
     //conditional
-    let fname = req.body.fname
-    let lname = req.body.lname
+    let name = req.body.name
 
-    Author.findOne({ where: { firstName: fname, lastName: lname } })
+    Subject.findOne({ where: { name: name } })
         .then(data => {
-            res.send({
-                status: data ? 'found' : 'not found',
-                data: data ? data : null
-            })
+            if (data) {
+                res.send({
+                    status: 'found',
+                    data: data
+                })
+            } else {
+                res.send({
+                    status: 'not found',
+                    data: null
+                })
+            }
         })
         .catch(err => {
             res.status(500)
@@ -55,12 +60,19 @@ exports.findOneID = (req, res) => {
     //options
     let id = req.body.id
 
-    Author.findByPk(id)
+    Subject.findByPk(id)
         .then(data => {
-            res.send({
-                status: data ? 'found' : 'not found',
-                data: data ? data : null
-            })
+            if (data) {
+                res.send({
+                    status: 'found',
+                    data: data
+                })
+            } else {
+                res.send({
+                    status: 'not found',
+                    data: null
+                })
+            }
         })
         .catch(err => {
             res.status(500)
@@ -70,10 +82,10 @@ exports.findOneID = (req, res) => {
 
 exports.update = (req, res) => {
     let data = req.body
-    Author.update(data.author, { where: { id: data.id } })
+    Subject.update(data.Subject, { where: { id: data.id } })
         .then(() => {
             res.status(200).send({
-                message: "User type updated!"
+                message: "Subject updated!"
             })
         })
         .catch(err => {
@@ -84,10 +96,10 @@ exports.update = (req, res) => {
 
 exports.delete = (req, res) => {
     let data = req.body
-    Author.destroy({ where: { id: data.id } })
+    Subject.destroy({ where: { id: data.id } })
         .then(() => {
             res.status(200).send({
-                message: "User type deleted!"
+                message: "Subject deleted!"
             })
         })
         .catch(err => {

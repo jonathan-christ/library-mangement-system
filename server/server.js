@@ -25,11 +25,14 @@ app.use(cors())
 require('./routes/library.routes')(app)
 
 require('./routes/user.routes')(app)
+require('./routes/usertype.routes')(app)
+
+require('./routes/book.routes')(app)
 require('./routes/author.routes')(app)
 require('./routes/publisher.routes')(app)
 require('./routes/genre.routes')(app)
+require('./routes/subject.routes')(app)
 require('./routes/rating.routes')(app)
-require('./routes/book.routes')(app)
 
 //unknown get request
 app.get('*', (req, res) => {

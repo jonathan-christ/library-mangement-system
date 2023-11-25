@@ -1,24 +1,23 @@
-import React from 'react'
-import validator from 'validator'
 import axios from 'axios'
+import PropTypes from 'prop-types'
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
 import { DevTool } from '@hookform/devtools'
 
-import { Banner, Button, Label, TextInput, Alert, Textarea } from 'flowbite-react'
-import { maxNameLen, maxSuffixLen, minPassLen } from '../../../assets/constants'
-import { emptyMsg, exceedCharLimit, notEmail, passNotMatch, charOnly, belowMinChar } from '../../../assets/formErrorMsg'
+import { Button, Label, TextInput, Textarea } from 'flowbite-react'
+import { maxNameLen } from '../../../assets/constants'
+import { emptyMsg, exceedCharLimit } from '../../../assets/formErrorMsg'
 import StatusHandler from '../../misc/StatusHandler'
 
-function AddAuthorForm() {
+AddAuthorForm.propTypes = {
+    refreshDependency: PropTypes.func
+}
+function AddAuthorForm({ refreshDependency }) {
     const [formStatus, setFormStatus] = useState(0)
-    const navigate = useNavigate()
     const {
         register,
         handleSubmit,
-        watch,
         reset,
         control,
         formState: { errors },
@@ -30,6 +29,7 @@ function AddAuthorForm() {
             await axios.post("/api/authors/create", { data })
                 .then(() => {
                     reset()
+                    refreshDependency ? refreshDependency(true) : ''
                     setFormStatus(200)
                 }).catch((err) => {
                     console.log(err)

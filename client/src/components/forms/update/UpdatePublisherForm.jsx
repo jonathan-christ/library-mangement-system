@@ -10,26 +10,43 @@ import { maxNameLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit } from '../../../assets/formErrorMsg'
 import StatusHandler from '../../misc/StatusHandler'
 
-AddPublisherForm.propTypes = {
+UpdatePublisherForm.propTypes = {
+    publisher: PropTypes.object.isRequired,
     refreshDependency: PropTypes.func
 }
-function AddPublisherForm({ refreshDependency }) {
+function UpdatePublisherForm({ publisher, refreshDependency }) {
     const [formStatus, setFormStatus] = useState(0)
     const {
         register,
         handleSubmit,
         reset,
         control,
-        formState: { errors },
-    } = useForm({ mode: 'onTouched' });
+        formState: { errors, dirtyFields, isDirty },
+    } = useForm({
+        defaultValues: {
+            name: publisher.name,
+            address: publisher.address
+        }
+    });
 
-    const addPublisher = async (data) => {
-        let exists = await publisherExists(data)
+    const getDirtyValues = (data) => {
+        return Object.fromEntries(
+            Object.keys(dirtyFields).map(key => {
+                return [key, data[key]]
+            }))
+    }
+
+    const updatePublisher = async (data) => {
+        let exists = data.name !== publisher.name ? await publisherExists(data) : ''
+        const dirtyValues = getDirtyValues(data)
         if (!exists) {
-            await axios.post("/api/publishers/create", { data })
+            await axios.put("/api/publishers/update", { publisher: { ...dirtyValues }, id: publisher.id })
                 .then(() => {
+                    const newData = { ...publisher, ...dirtyValues }
+                    reset(newData)
+
                     refreshDependency ? refreshDependency(true) : ''
-                    reset()
+                    setFormStatus(200)
                 }).catch((err) => {
                     console.log(err)
                     setFormStatus(404)
@@ -54,8 +71,8 @@ function AddPublisherForm({ refreshDependency }) {
 
     return (
         <div>
-            <StatusHandler subject={"Publisher"} code={formStatus} dismiss={setFormStatus} />
-            <form onSubmit={handleSubmit(addPublisher)} className="flex max-w-md flex-col gap-4" noValidate>
+            <StatusHandler subject={"Publisher"} action='updated' code={formStatus} dismiss={setFormStatus} />
+            <form onSubmit={handleSubmit(updatePublisher)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div>
                     <div>
                         <div className="mb-2 block">
@@ -80,11 +97,11 @@ function AddPublisherForm({ refreshDependency }) {
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.address?.message}</p>
                     </div>
                 </div>
-                <Button type="submit">Add New Publisher</Button>
+                <Button type="submit" disabled={!isDirty}>Update Publisher</Button>
             </form>
             <DevTool control={control} />
         </div>
     )
 }
 
-export default AddPublisherForm
+export default UpdatePublisherForm

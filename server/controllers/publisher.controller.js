@@ -79,18 +79,30 @@ exports.findOneID = (req, res) => {
         })
 }
 
-exports.findBooksOf = (req, res) => {
-
-}
-
 exports.update = (req, res) => {
-
+    let data = req.body
+    Publisher.update(data.publisher, { where: { id: data.id } })
+        .then(() => {
+            res.status(200).send({
+                message: "Publisher updated!"
+            })
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: err.message })
+        })
 }
 
 exports.delete = (req, res) => {
-
-}
-
-exports.deleteAll = (req, res) => {
-
+    let data = req.body
+    Publisher.destroy({ where: { id: data.id } })
+        .then(() => {
+            res.status(200).send({
+                message: "Publisher deleted!"
+            })
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: err.message })
+        })
 }

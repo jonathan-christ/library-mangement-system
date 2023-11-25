@@ -4,7 +4,6 @@ const Rating = db.rating
 
 exports.create = async (req, res) => {
     const data = req.body
-    console.log(data)
     const rating = {
         bookID: data.bookID,
         userID: data.userID,
@@ -46,7 +45,6 @@ exports.findBookRating = (req, res) => {
 }
 
 exports.findUserBookRating = (req, res) => {
-
     Rating.findOne({ where: { userID: req.body.userID, bookID: req.body.bookID }, attributes: ['rating'] })
         .then(data => {
             res.send({

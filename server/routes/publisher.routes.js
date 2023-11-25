@@ -1,11 +1,13 @@
 module.exports = (app) => {
-    const author = require('../controllers/publisher.controller.js')
+    const publisher = require('../controllers/publisher.controller.js')
     let router = require('express').Router()
 
-    router.post("/create", author.create)
+    router.post("/create", publisher.create)
+    router.put("/update", publisher.update)
+    router.post("/delete", publisher.delete)
 
-    router.get("/", author.findAll)
-    router.post("/find", author.findOne)
+    router.get("/", publisher.findAll)
+    router.post("/find", publisher.findOne)
 
     app.use('/api/publishers', router)
 }

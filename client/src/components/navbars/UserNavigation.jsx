@@ -1,11 +1,11 @@
-import ViteLogo from '../../assets/vite.svg'
 import SearchBar from '../misc/SearchBar'
 import PropTypes from 'prop-types'
 
 import { useSession } from '../context-hooks/session/SessionUtils'
-import NavigationLink from './NavigationLink'
 import { Avatar, Dropdown, Navbar, Button } from 'flowbite-react'
 
+import NavigationLink from './NavigationLink'
+import Logo from './navbar components/Logo'
 
 UserNavigation.propTypes = {
     functions: PropTypes.object.isRequired
@@ -16,12 +16,7 @@ function UserNavigation({ functions }) {
     return (
         // className='bg-primary-base text-gray-200'
         <Navbar fluid className='shadow-md'>
-            <Navbar.Brand href="#">
-                <img src={ViteLogo} className="mr-3 h-6 sm:h-9" alt="PSHS-ZRC Logo" />
-                <div>
-                    <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">ISCP LMS</span>
-                </div>
-            </Navbar.Brand>
+            <Logo to='/catalog' />
             <div className="flex md:order-2">
                 {session &&
                     <Dropdown

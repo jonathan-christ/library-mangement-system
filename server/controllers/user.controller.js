@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt")
 const Op = db.Sequelize.Op
 const User = db.user
 
+const exclude = {exclude: ['password', 'deleted']}
+
 exports.create = async (req, res) => {
     const data = req.body.data
     const user = {
@@ -28,7 +30,7 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    User.findAll({ where: { deleted: 'false' }, attributes: {exclude: ['password', 'deleted']} })
+    User.findAll({ where: { deleted: 'false' }, attributes: exclude })
         .then(data => {
             res.send(data)
         })
@@ -43,7 +45,7 @@ exports.findOne = (req, res) => {
     let email = req.body.email
     let condition = { email: { [Op.eq]: email }, deleted: 'false' }
 
-    User.findOne({ where: condition })
+    User.findOne({ where: condition, attributes: exclude })
         .then(data => {
             res.status(200).send({
                 status: data ? 'found' : 'not found',
@@ -60,7 +62,7 @@ exports.findOneID = async (req, res) => {
     //options
     let id = req.body.id
 
-    User.findOne({ where: { id: id } })
+    User.findOne({ where: { id: id }, attributes: exclude })
         .then(data => {
             res.status(200).send({
                 status: data ? 'found' : 'not found',

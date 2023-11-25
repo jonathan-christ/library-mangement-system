@@ -5,11 +5,11 @@ import PropTypes from 'prop-types'
 import StatusHandler from '../../misc/StatusHandler'
 
 import { ttl } from '../../../assets/constants'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
-import { Button, Label, TextInput, Radio } from 'flowbite-react'
+import { Button, Label, TextInput, Radio, Select } from 'flowbite-react'
 import { maxNameLen, maxSuffixLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit, notEmail } from '../../../assets/formErrorMsg'
 
@@ -17,10 +17,12 @@ import { useSession, useSessionUpdate } from '../../context-hooks/session/Sessio
 
 UpdateUserForm.propTypes = {
     user: PropTypes.object.isRequired,
-    profile: PropTypes.bool
+    profile: PropTypes.bool,
+    userTypes: PropTypes.array,
+    refreshDependency: PropTypes.func
 }
 
-function UpdateUserForm({ user, profile }) {
+function UpdateUserForm({ user, profile, userTypes, refreshDependency }) {
     const [formStatus, setFormStatus] = useState(0)
     const session = useSession()
     const setSession = useSessionUpdate()
@@ -38,7 +40,8 @@ function UpdateUserForm({ user, profile }) {
             mname: user.middleName,
             suffix: user.suffix,
             sex: user.sex,
-            email: user.email
+            email: user.email,
+            type: user.typeID
         }
     })
 
@@ -51,6 +54,8 @@ function UpdateUserForm({ user, profile }) {
                     ls.clear()
                     ls.set("userData", JSON.stringify(userDat), { ttl: ttl, encrypt: true })
                     setSession(JSON.parse(ls.get("userData", { decrypt: true })))
+                }else {
+                    refreshDependency(true)
                 }
                 reset(userDat)
                 setFormStatus(200)
@@ -60,26 +65,27 @@ function UpdateUserForm({ user, profile }) {
             })
     }
 
+
     const getDirtyValues = (data) => {
         return Object.fromEntries(
             Object.keys(dirtyFields).map(key => {
-                let newKey
-                switch (key) {
-                    case 'fname':
-                        newKey = 'firstName'
-                        break
-                    case 'mname':
-                        newKey = 'middleName'
-                        break
-                    case 'lname':
-                        newKey = 'lastName'
-                        break
-                    default:
-                        newKey = key
+                const name = {
+                    'fname': 'firstName',
+                    'mname': 'middleName',
+                    'lname': 'lastName',
+                    'type' : 'typeID'
                 }
-                return [newKey, data[key]]
+                return [name[key] || key, data[key]]
             }))
     }
+
+    const userTypeOpts = useMemo(() => {
+        if (!profile) {
+            return userTypes.map((type, idx) => {
+                return <option key={idx} value={type.id}>{type.title}</option>
+            })
+        }
+    }, [userTypes, profile])
 
     const userExists = async (email) => {
         let exists = false
@@ -177,7 +183,6 @@ function UpdateUserForm({ user, profile }) {
                         </div>
                     </div>
                 </div>
-
                 <div>
                     <div>
                         <div className="mb-2 block">
@@ -192,6 +197,16 @@ function UpdateUserForm({ user, profile }) {
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.email?.message}</p>
                     </div>
+                    {!profile &&
+                        <div className="max-w-md">
+                            <div className="mb-2 block">
+                                <Label htmlFor="countries" value="Select your country" />
+                            </div>
+                            <Select id="type" {...register("type")}>
+                                {userTypeOpts}
+                            </Select>
+                        </div>
+                    }
                 </div>
                 <Button type="submit" disabled={!isDirty}>Update Accout</Button>
             </form>

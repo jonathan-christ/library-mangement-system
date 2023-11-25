@@ -15,6 +15,7 @@ function AddBookForm() {
 
     const [authors, setAuthors] = useState([])
     const [genres, setGenres] = useState([])
+    const [subjects, setSubjects] = useState([])
     const [publishers, setPublishers] = useState([])
     const {
         register,
@@ -30,6 +31,7 @@ function AddBookForm() {
         getPublishers()
         getAuthors()
         getGenres()
+        getSubjects()
     }, [])
 
 
@@ -67,6 +69,15 @@ function AddBookForm() {
             })
     }
 
+    const getSubjects = async () => {
+        await axios.get("api/subjects")
+            .then(res => {
+                setSubjects(res.data.map((subject) => {
+                    return { value: subject.id, label: subject.title }
+                }))
+            })
+    }
+
     const addBook = async (data) => {
         await axios.post("api/library/books/add", { data })
             .then(() => {
@@ -91,7 +102,7 @@ function AddBookForm() {
 
     return (
         <div>
-            <StatusHandler subject={"Book"} code={formStatus} dismiss={setFormStatus}/>
+            <StatusHandler subject={"Book"} code={formStatus} dismiss={setFormStatus} />
             <form onSubmit={handleSubmit(addBook)} className="flex max-w-md flex-col gap-4">
                 <div>
                     <div className="mb-2 block">
@@ -129,7 +140,7 @@ function AddBookForm() {
                 </div>
                 <div>
                     <div className="mb-2 block">
-                        <Label htmlFor="bauth" value="Book Author/s" />
+                        <Label htmlFor="bauth" value="Book Authors" />
                     </div>
                     <Controller
                         id="bauth"
@@ -146,13 +157,13 @@ function AddBookForm() {
                                 isClearable
                             />
                         )}
-                        rules={{ required: emptyMsg('book\'s author/s') }}
+                        rules={{ required: emptyMsg('book\'s authors') }}
                     />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.authors?.message}</p>
                 </div>
                 <div>
                     <div className="mb-2 block">
-                        <Label htmlFor="genres" value="Book Genre/s" />
+                        <Label htmlFor="genres" value="Book Genres" />
                     </div>
                     <Controller
                         id="genres"
@@ -169,10 +180,34 @@ function AddBookForm() {
                                 isClearable
                             />
                         )}
-                        rules={{ required: emptyMsg('book\'s genres/s') }}
+                        rules={{ required: emptyMsg('book\'s genres') }}
                     />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.genres?.message}</p>
                 </div>
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="subjects" value="Book Subjects" />
+                    </div>
+                    <Controller
+                        id="subjects"
+                        name="subjects"
+                        control={control}
+                        render={({ field: { onChange }, value }) => (
+                            <Select
+                                isMulti
+                                options={subjects}
+                                value={value || watch('subjects') ? value : []}
+                                onChange={(subjects) => onChange(subjects.map((subject) => {
+                                    return subject.value
+                                }))}
+                                isClearable
+                            />
+                        )}
+                        rules={{ required: emptyMsg('book\'s subjects/s') }}
+                    />
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.subjects?.message}</p>
+                </div>
+
                 <div>
                     <div className="mb-2 block">
                         <Label htmlFor="bpub" value="Book Publisher" />
@@ -184,7 +219,7 @@ function AddBookForm() {
                         render={({ field: { onChange }, value }) => (
                             <Select
                                 options={publishers}
-                                value={publishers.find((c) => c.value === value) || watch('publisherID') ? value : []}
+                                value={publishers.find((c) => c.value === value) || watch('book.publisherID') ? value : []}
                                 onChange={(elem) => onChange(elem.value)}
                             />
                         )}
@@ -215,7 +250,7 @@ function AddBookForm() {
                     <div className="mb-2 block">
                         <Label htmlFor="desc" value="Book Description" />
                     </div>
-                    <Textarea id="desc" {...register('book.desc')} shadow />
+                    <Textarea id="desc" {...register('book.description')} shadow />
                 </div>
                 <Button type="submit">Add New Book</Button>
             </form>

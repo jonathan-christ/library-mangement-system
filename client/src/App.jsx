@@ -20,14 +20,17 @@ import History from './pages/user/History'
 // STAFF
 import StaffGuard from './pages/staff/StaffGuard'
 import StaffDashboard from './pages/staff/StaffDashboard'
-import Authors from './pages/staff/Authors'
-import Publishers from './pages/staff/Publishers'
-import BookOverseer from './pages/staff/BookOverseer'
 
 // ADMIN
 import AdminGuard from './pages/admin/AdminGuard'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import Users from './pages/admin/Users'
+import UserTypes from './pages/admin/UserTypes'
+import Authors from './pages/admin/Authors'
+import Publishers from './pages/admin/Publishers'
+import Books from './pages/admin/Books'
+import Genres from './pages/admin/Genres'
+import Subjects from './pages/admin/Subjects'
 
 
 function App() {
@@ -50,13 +53,16 @@ function App() {
 
             {/* STAFF */}
             <Route path="dashboard" element={<StaffGuard element={<StaffDashboard />} />} />
-            <Route path="authors" element={<StaffGuard element={<Authors />} />} />
-            <Route path="publishers" element={<StaffGuard element={<Publishers />} />} />
-            <Route path="books" element={<StaffGuard element={<BookOverseer />} />} />
 
             {/* ADMINS */}
             <Route path="admindash" element={<AdminGuard element={<AdminDashboard />} />} />
             <Route path="users" element={<AdminGuard element={<Users />} />} />
+            <Route path="usertypes" element={<AdminGuard element={<UserTypes />} />} />
+            <Route path="books" element={<AdminGuard element={<Books />} />} />
+            <Route path="genres" element={<AdminGuard element={<Genres />} />} />
+            <Route path="authors" element={<AdminGuard element={<Authors />} />} />
+            <Route path="subjects" element={<AdminGuard element={<Subjects />} />} />
+            <Route path="publishers" element={<AdminGuard element={<Publishers />} />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

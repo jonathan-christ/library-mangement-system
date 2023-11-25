@@ -2,20 +2,19 @@
 
 import axios from 'axios'
 
-import { Table, Button, Badge, Modal } from 'flowbite-react'
+import { Table, Button, Modal } from 'flowbite-react'
 import { useState, useEffect, useMemo } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
 import StatusHandler from '../../../misc/StatusHandler'
-import UpdateUserForm from '../../update/UpdateUserForm'
-import SignUpForm from '../../add/SignUpForm'
+import AddAuthorForm from '../../add/AddAuthorForm';
+import UpdateAuthorForm from '../../update/UpdateAuthorForm';
 
-function UserTable() {
+function AuthorTable() {
     const [refresh, setRefresh] = useState(true)
 
-    const [userList, setUserList] = useState([])
-    const [userTypes, setUserTypes] = useState([])
+    const [authors, setAuthors] = useState([])
     const [action, setAction] = useState("retrieved")
     const [status, setStatus] = useState(0)
 
@@ -26,36 +25,29 @@ function UserTable() {
 
 
     useEffect(() => {
-        getUsers()
         getUserTypes()
         setRefresh(false)
     }, [refresh])
 
-    const getUsers = () => {
-        axios.get("api/users/").then((res) => {
-            setUserList(res.data)
-        }).catch((err) => {
-            console.log(err)
-            setStatus(500)
-        })
-    }
-
     const getUserTypes = () => {
-        axios.get("api/usertypes/")
+        axios.get("api/authors/")
             .then((res) => {
-                setUserTypes(res.data)
+                setAuthors(res.data)
             }).catch((err) => {
                 console.log(err)
                 setStatus(500)
             })
     }
 
-    const deleteUser = (id) => {
-        axios.post("api/users/delete", { id: id })
+    const deleteAuthor = (id) => {
+        axios.post("api/authors/delete", { id: id })
             .then(() => {
                 setRefresh(true)
                 setAction("deleted")
                 setStatus(200)
+            }).catch((err) => {
+                console.log(err)
+                setStatus(500)
             })
     }
 
@@ -69,31 +61,18 @@ function UserTable() {
         setDeleteShow(true)
     }
 
-    const getType = (id) => ({
-        1: <Badge color="gray" size="x9l" className="flex justify-center">Guest</Badge>,
-        2: <Badge color="info" size="x9l" className="flex justify-center">Student</Badge>,
-        3: <Badge color="indigo" size="x9l" className="flex justify-center">Teacher</Badge>,
-        4: <Badge color="yellow" size="x9l" className="flex justify-center">Staff</Badge>,
-        5: <Badge color="failure" size="x9l" className="flex justify-center">Admin</Badge>,
-    }[id])
-
-    const userCells = useMemo(() =>
-        userList.map((user, idx) => {
+    const authorCells = useMemo(() =>
+        authors.map((author, idx) => {
             return (
-                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-100")}>
-                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        {user.lastName}
-                    </Table.Cell>
-                    <Table.Cell>{user.firstName}</Table.Cell>
-                    <Table.Cell>{user.middleName ?? user.middleName[0] + "."}</Table.Cell>
-                    <Table.Cell>{user.email}</Table.Cell>
-                    <Table.Cell className='mx-5'>{getType(user.typeID)}</Table.Cell>
+                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "bg-slate-100" : "bg-gray-200")}>
+                    <Table.Cell>{author.lastName}</Table.Cell>
+                    <Table.Cell>{author.firstName}</Table.Cell>
                     <Table.Cell>
                         <Button.Group>
-                            <Button color='warning' size='sm' onClick={() => { callUpdate(user) }}>
+                            <Button color='warning' size='sm' onClick={() => { callUpdate(author) }}>
                                 <MdEdit size={20} />
                             </Button>
-                            <Button color='failure' size='sm' onClick={() => { callDelete(user) }}>
+                            <Button color='failure' size='sm' onClick={() => { callDelete(author) }}>
                                 <MdDelete size={20} />
                             </Button>
                         </Button.Group>
@@ -101,22 +80,22 @@ function UserTable() {
                 </Table.Row>
             )
         })
-        , [userList])
+        , [authors])
 
 
     return (
         <div>
             {/* MODALS */}
             <Modal show={addShow} onClose={() => setAddShow(false)}>
-                <Modal.Header>ADD USER</Modal.Header>
+                <Modal.Header>ADD AUTHOR</Modal.Header>
                 <Modal.Body className='p-5'>
-                    <SignUpForm refreshDependency={setRefresh} />
+                    <AddAuthorForm refreshDependency={setRefresh} />
                 </Modal.Body>
             </Modal>
             <Modal show={updateShow} onClose={() => setUpdateShow(false)}>
-                <Modal.Header>UPDATE USER</Modal.Header>
+                <Modal.Header>UPDATE AUTHOR</Modal.Header>
                 <Modal.Body className='p-5'>
-                    <UpdateUserForm user={modalData} userTypes={userTypes} refreshDependency={setRefresh} />
+                    <UpdateAuthorForm author={modalData} refreshDependency={setRefresh} />
                 </Modal.Body>
             </Modal>
             <Modal show={deleteShow} size="sm" onClose={() => setDeleteShow(false)}>
@@ -127,7 +106,7 @@ function UserTable() {
                     </h3>
                     <div className="flex justify-center gap-4">
                         <Button color="failure" onClick={() => {
-                            deleteUser(modalData.id)
+                            deleteAuthor(modalData.id)
                             setDeleteShow(false)
                         }}>
                             {"Yes, I'm sure"}
@@ -139,20 +118,17 @@ function UserTable() {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"User/s"} action={action} code={status} dismiss={setStatus} />
+            <StatusHandler subject={"Author/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
-                <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add User</Button>
+                <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Author</Button>
                 <Table className='bg-white shadow-lg'>
                     <Table.Head className='shadow-lg text-md text-black'>
-                        <Table.HeadCell className='p-5'>Last Name</Table.HeadCell>
-                        <Table.HeadCell >First Name</Table.HeadCell>
-                        <Table.HeadCell >Middle Name</Table.HeadCell>
-                        <Table.HeadCell >Email</Table.HeadCell>
-                        <Table.HeadCell className=' p-5 flex justify-center'>Type</Table.HeadCell>
+                        <Table.HeadCell >Last Name</Table.HeadCell>
+                        <Table.HeadCell className='p-5'>First Name</Table.HeadCell>
                         <Table.HeadCell >Action</Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="gap-1">
-                        {userCells}
+                        {authorCells}
                     </Table.Body>
                 </Table>
             </div>
@@ -160,4 +136,4 @@ function UserTable() {
     )
 }
 
-export default UserTable
+export default AuthorTable

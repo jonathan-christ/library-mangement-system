@@ -31,6 +31,7 @@ function LoginForm() {
                     delete res.data.data.password
                     ls.set("userData", JSON.stringify(res.data.data), { ttl: ttl, encrypt: true })
                     setSession(JSON.parse(ls.get('userData', { decrypt: true })))
+                    
                     reset()
                     setFormErr("")
                     navigate('../catalog')

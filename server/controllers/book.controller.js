@@ -34,7 +34,6 @@ exports.findAll = async (req, res) => {
 exports.findOne = (req, res) => {
     //conditional
     let isbn = req.body.isbn
-    console.log(isbn)
     Book.findOne({ where: { isbn: isbn } })
         .then(data => {
             res.send({

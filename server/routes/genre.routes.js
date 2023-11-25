@@ -3,6 +3,8 @@ module.exports = (app) => {
     let router = require('express').Router()
 
     router.post("/create", genre.create)
+    router.put("/update", genre.update)
+    router.post("/delete", genre.delete)
 
     router.get("/", genre.findAll)
     router.post("/find", genre.findOne)

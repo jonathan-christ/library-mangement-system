@@ -79,15 +79,30 @@ exports.findOneID = (req, res) => {
                 .send({ message: err.message })
         })
 }
-
 exports.update = (req, res) => {
-
+    let data = req.body
+    Genre.update(data.genre, { where: { id: data.id } })
+        .then(() => {
+            res.status(200).send({
+                message: "Genre updated!"
+            })
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: err.message })
+        })
 }
 
 exports.delete = (req, res) => {
-
-}
-
-exports.deleteAll = (req, res) => {
-
+    let data = req.body
+    Genre.destroy({ where: { id: data.id } })
+        .then(() => {
+            res.status(200).send({
+                message: "Genre deleted!"
+            })
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: err.message })
+        })
 }

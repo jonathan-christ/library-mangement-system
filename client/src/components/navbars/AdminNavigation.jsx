@@ -1,9 +1,9 @@
-import ViteLogo from '../../assets/vite.svg'
-import PropTypes from 'prop-types'
-
-import { Avatar, Dropdown, Navbar } from 'flowbite-react'
 import { useSession } from '../context-hooks/session/SessionUtils'
+import { Avatar, Dropdown, Navbar } from 'flowbite-react'
+
+import PropTypes from 'prop-types'
 import NavigationLink from './NavigationLink'
+import Logo from './navbar components/Logo'
 
 AdminNavigation.propTypes = {
     functions: PropTypes.object.isRequired
@@ -13,12 +13,7 @@ function AdminNavigation({ functions }) {
 
     return (
         <Navbar fluid rounded className='shadow-md z-10'>
-            <Navbar.Brand href="#">
-                <img src={ViteLogo} className="mr-3 h-6 sm:h-9" alt="PSHS-ZRC Logo" />
-                <div>
-                    <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">ISCP LMS</span>
-                </div>
-            </Navbar.Brand>
+            <Logo to='/admindash'/>
             <div className="flex md:order-2">
                 <Dropdown
                     arrowIcon={false}
