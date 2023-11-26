@@ -31,7 +31,7 @@ function AddBookCopyForm({ refreshDependency }) {
     const getBooks = async () => {
         await axios.get("/api/library/books").then((res) => {
             setBooks(res.data.map((book) => {
-                return { value: book.id, label: book.title }
+                return { value: { id: book.id, bcn: book.baseCallNumber }, label: book.title }
             }))
         }).catch((err) => {
             console.log(err)
@@ -39,33 +39,16 @@ function AddBookCopyForm({ refreshDependency }) {
     }
 
     const addCopy = async (data) => {
-        let exists = await copyExists(data)
-        if (!exists) {
-            await axios.post("/api/copies/create", data)
-                .then(() => {
-                    reset()
-                    setFormStatus(200)
-                    refreshDependency ? refreshDependency(true) : ''
-                }).catch((err) => {
-                    console.log(err)
-                    setFormStatus(500)
-                })
-        } else {
-            setFormStatus(402)
-        }
-
-    }
-
-    const copyExists = async (data) => {
-        let retVal
-        await axios.post("/api/copies/find", { name: data.name })
-            .then((res) => {
-                retVal = res.data.status === 'found'
-            }).catch(() => {
-                retVal = false
-                setFormStatus(404)
+        await axios.post("/api/copies/create", { bookID: data.book.id, callNumber: data.book.bcn })
+            .then(() => {
+                reset()
+                setFormStatus(200)
+                refreshDependency ? refreshDependency(true) : ''
+            }).catch((err) => {
+                console.log(err)
+                setFormStatus(500)
             })
-        return retVal
+
     }
 
     return (
@@ -80,18 +63,18 @@ function AddBookCopyForm({ refreshDependency }) {
                             </div>
                             <Controller
                                 id="books"
-                                name="bookID"
+                                name="book"
                                 control={control}
                                 render={({ field: { onChange }, value }) => (
                                     <Select
                                         options={books}
-                                        value={books.find((c) => c.value === value) || watch('bookID') ? value : []}
+                                        value={books.find((c) => c.value === value) || watch('book') ? value : []}
                                         onChange={(elem) => onChange(elem.value)}
                                     />
                                 )}
                                 rules={{ required: emptyMsg('book copy\'s identity') }}
                             />
-                            <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.bookID?.message}</p>
+                            <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.book?.message}</p>
                         </div>
                     </div>
                     <Button type="submit">Add New Copy</Button>

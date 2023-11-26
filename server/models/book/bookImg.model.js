@@ -6,6 +6,10 @@ module.exports = (sequelize, Sequelize) => {
             primaryKey: true,
             autoIncrement: true,
         },
+        title: {
+            type: Sequelize.STRING(100),
+            allowNull: false,
+        },
         uploaderID: {
             type: Sequelize.INTEGER,
             allowNull: false,

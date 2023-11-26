@@ -3,10 +3,14 @@ const Op = db.Sequelize.Op
 
 const Copy = db.bookCopy
 
+const rand = () => {
+    return Math.floor(Math.random() * 900) + 100; // Generates a random 3-digit number
+}
+
 exports.create = async (req, res) => {
     const copy = {
         bookID: req.body.bookID,
-        callNumber: null // for implementation
+        callNumber: req.body.callNumber + rand() // for implementation
     }
 
     Copy.create(copy)
@@ -21,7 +25,11 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    Copy.findAll()
+    console.log(req.body)
+    let val = req.body.bookID
+    let condition = val ? { bookID: val } : null
+
+    Copy.findAll({ where: condition })
         .then(data => {
             res.send(data)
         })
@@ -31,27 +39,26 @@ exports.findAll = (req, res) => {
         })
 }
 
-// exports.findOne = (req, res) => {
-//     //conditional
-//     let name = req.body.name
+exports.findOne = (req, res) => {
+    //conditional
+    let callnum = req.body.callNumber
 
-//     Copy.findOne({ where: { name: name } })
-//         .then(data => {
-//             res.status(200).send({
-//                 status: data ? 'found' : 'not found',
-//                 data: data ? data : null
-//             })
-//         })
-//         .catch(err => {
-//             res.status(500)
-//                 .send({ message: err.message })
-//         })
-// }
+    Copy.findOne({ where: { callNumber: callnum } })
+        .then(data => {
+            res.status(200).send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: err.message })
+        })
+}
 
 exports.findOneID = (req, res) => {
     //options
     let id = req.body.id
-
     Copy.findByPk(id)
         .then(data => {
             res.status(200).send({
@@ -64,6 +71,7 @@ exports.findOneID = (req, res) => {
                 .send({ message: err.message })
         })
 }
+
 exports.update = (req, res) => {
     let data = req.body
     Copy.update(data.copy, { where: { id: data.id } })

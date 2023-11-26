@@ -18,6 +18,7 @@ const BookImage = db.bookImg
 
 exports.addBook = async (req, res) => {
     const data = req.body.data
+    return 
     try {
         db.sequelize.transaction(async (t) => {
             let book = await Book.create(data.book, { transaction: t })

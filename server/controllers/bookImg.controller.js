@@ -22,8 +22,8 @@ exports.create = (req, res) => {
         if (err) {
             return res.status(500).send({ message: "Bitch" + err.message })
         }
-        const { uploaderID } = req.body 
-        const imgLink = `/images/${req.file.filename}`  
+        const { uploaderID } = req.body
+        const imgLink = `/images/${req.file.filename}`
 
         console.log(req.file.path)
         Image.create({ uploaderID, imgLink })
@@ -49,6 +49,22 @@ exports.findAll = (req, res) => {
         })
 }
 
+exports.findOne = (req, res) => {
+    // options
+    let title = req.body.title
+
+    Image.findOne({ where: { title: title } })
+        .then(data => {
+            res.status(200).send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
+        })
+        .catch(err => {
+            res.status(500).send({ message: err.message })
+        })
+}
+
 exports.findOneID = (req, res) => {
     // options
     let id = req.body.id
@@ -66,10 +82,10 @@ exports.findOneID = (req, res) => {
 }
 
 exports.update = (req, res) => {
-    const id = req.body.id  
-    const updatedData = req.body.data 
+    const id = req.body.id
+    const value = req.body.title
 
-    Image.update(updatedData, { where: { id } })
+    Image.update({title: value}, { where: { id } })
         .then(num => {
             if (num == 1) {
                 res.send({ message: 'Image was updated successfully.' })

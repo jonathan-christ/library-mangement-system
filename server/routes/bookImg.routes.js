@@ -7,7 +7,8 @@ module.exports = (app) => {
     router.post("/delete", bookImg.delete)
 
     router.get("/", bookImg.findAll)
-    router.post("/find", bookImg.findOneID)
+    router.post("/find", bookImg.findOne)
+    router.post("/findID", bookImg.findOneID)
 
     app.use('/api/images', router)
 }

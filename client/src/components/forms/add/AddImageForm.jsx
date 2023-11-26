@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
-import { Button, Label, FileInput } from 'flowbite-react'
+import { Button, Label, FileInput, TextInput } from 'flowbite-react'
 import { useSession } from '../../context-hooks/session/SessionUtils'
 
 AddImageForm.propTypes = {
@@ -25,6 +25,7 @@ function AddImageForm({ refreshDependency }) {
 
     const addImage = async (data) => {
         formData.append('bookImg', data.image[0])
+        formData.append('title', data.title)
         formData.append('uploaderID', id)
         console.log(formData)
         await axios.post("/api/images/create", formData, {
@@ -38,7 +39,6 @@ function AddImageForm({ refreshDependency }) {
                 setFormStatus(200)
                 refreshDependency ? refreshDependency(true) : ''
             }).catch((err) => {
-                console.log("asdjhasduahsd")
                 console.log(err)
                 setFormStatus(500)
             })
@@ -55,6 +55,12 @@ function AddImageForm({ refreshDependency }) {
                             <Label htmlFor="file" value="Upload File" />
                         </div>
                         <FileInput id="file" {...register('image')} />
+                    </div>
+                    <div>
+                        <div className="mb-2 block">
+                            <Label htmlFor="title" value="Enter Title" />
+                        </div>
+                        <TextInput id="title" {...register('title')} />
                     </div>
                     <Button type="submit">Upload Book Image</Button>
                 </form>

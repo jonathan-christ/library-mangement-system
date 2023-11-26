@@ -5,7 +5,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             primaryKey: true
         },
-        //IMPLEMENT CALL NUMBER
+        callNumber: {
+            type: Sequelize.STRING(35),
+            alowNull: false
+        },
         bookID: {
             type: Sequelize.INTEGER,
             allowNull: false,

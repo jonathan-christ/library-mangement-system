@@ -2,21 +2,24 @@ import axios from 'axios';
 import Select from 'react-select'
 import validator from 'validator'
 
+import { imageProxy } from '../../../assets/constants';
 import { DevTool } from '@hookform/devtools'
 import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { maxBookLen, maxISBNLen, minISBNLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit, belowMinChar } from '../../../assets/formErrorMsg'
-import { Button, Label, Textarea, TextInput, Datepicker } from 'flowbite-react'
-import StatusHandler from '../../misc/StatusHandler';
+import { Button, Label, Textarea, TextInput, Datepicker, Radio, FileInput } from 'flowbite-react'
+import StatusHandler from '../../misc/StatusHandler'
 
 function AddBookForm() {
     const [formStatus, setFormStatus] = useState(0)
-
+    const [file, setFile] = useState()
+    const [images, setImages] = useState([])
     const [authors, setAuthors] = useState([])
     const [genres, setGenres] = useState([])
     const [subjects, setSubjects] = useState([])
     const [publishers, setPublishers] = useState([])
+    const [classifications, setClassifications] = useState([])
     const {
         register,
         handleSubmit,
@@ -32,8 +35,31 @@ function AddBookForm() {
         getAuthors()
         getGenres()
         getSubjects()
+        getImages()
+        getClasses()
     }, [])
 
+    const getClasses = async () => {
+        await axios.get("api/class/")
+            .then(res => {
+                setClassifications(res.data.map((classif) => {
+                    return { value: classif.id, label: classif.name }
+                }))
+            }).catch(() => {
+                setFormStatus(400)
+            })
+    }
+
+    const getImages = async () => {
+        await axios.get("api/images/")
+            .then(res => {
+                setImages(res.data.map((img) => {
+                    return { value: { value: img.id, link: img.imgLink }, label: img.title }
+                }))
+            }).catch(() => {
+                setFormStatus(400)
+            })
+    }
 
     const getAuthors = async () => {
         await axios.get("api/authors/")
@@ -79,7 +105,14 @@ function AddBookForm() {
     }
 
     const addBook = async (data) => {
-        await axios.post("api/library/books/add", { data })
+        let submitData
+        if (data.select === 'select') {
+            submitData = data
+        } else {
+            submitData = new FormData()
+            submitData.append()
+        }
+        await axios.post("api/library/books/add", { submitData })
             .then(() => {
                 reset()
                 setFormStatus(200)
@@ -98,6 +131,10 @@ function AddBookForm() {
             })
 
         return result
+    }
+
+    const filePreview = (e) => {
+        setFile(URL.createObjectURL(e.target.files[0]));
     }
 
     return (
@@ -137,6 +174,15 @@ function AddBookForm() {
                         }
                     })} shadow />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.book?.title?.message}</p>
+                </div>
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="pages" value="Book Pages" />
+                    </div>
+                    <TextInput id="pages" type="number" {...register('book.pages', {
+                        required: emptyMsg('book\'s page count'),
+                    })} shadow />
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.book?.pages?.message}</p>
                 </div>
                 <div>
                     <div className="mb-2 block">
@@ -229,6 +275,23 @@ function AddBookForm() {
                 </div>
                 <div>
                     <div className="mb-2 block">
+                        <Label htmlFor="class" value="Book Classification" />
+                    </div>
+                    <Controller
+                        id="class"
+                        name="book.classification"
+                        control={control}
+                        render={({ field: { onChange }, value }) => (
+                            <Select
+                                options={classifications}
+                                value={classifications.find((c) => c.value === value) || watch('book.classification') ? value : []}
+                                onChange={(elem) => onChange(elem.value)}
+                            />
+                        )}
+                    />
+                </div>
+                <div>
+                    <div className="mb-2 block">
                         <Label htmlFor="pdate" value="Publish Date" />
                     </div>
                     <Controller
@@ -252,10 +315,71 @@ function AddBookForm() {
                     </div>
                     <Textarea id="desc" {...register('book.description')} shadow />
                 </div>
+
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="imgSelection" value="Image Source" />
+                    </div>
+                    <fieldset id="imgSelection">
+                        <ul className="items-center text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex ">
+                            <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                                <div className="flex items-center ps-3">
+                                    <Radio id="upl" value="upl" {...register('select', {
+                                        required: emptyMsg('selection')
+                                    })} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" selected />
+                                    <Label htmlFor="upl" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">Upload </Label>
+                                </div>
+                            </li>
+                            <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                                <div className="flex items-center ps-3">
+                                    <Radio id="select" value="select" {...register('select', {
+                                        required: emptyMsg('selection')
+                                    })} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" />
+                                    <Label htmlFor="select" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">Select</Label>
+                                </div>
+                            </li>
+                        </ul>
+                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.select?.message}</p>
+                        <div>
+                            {watch('select') === 'select' &&
+                                <>
+                                    <div className="mb-2 block">
+                                        <Label htmlFor="bookImage" value="Select Image" />
+                                    </div>
+                                    <Controller
+                                        id="bookImage"
+                                        name="image.select"
+                                        control={control}
+                                        render={({ field: { onChange }, value }) => (
+                                            <Select
+                                                options={images}
+                                                value={images.find((c) => c.value === value) || watch('image.select') ? value : []}
+                                                onChange={(elem) => {
+                                                    onChange(elem.value.value)
+                                                    setFile(imageProxy + elem.value.link)
+                                                }}
+                                                isDisabled={watch('select') === 'select' ? null : true}
+                                            />
+                                        )}
+                                    />
+                                </>
+                            }
+                            {watch('select') === 'upl' &&
+                                <div>
+                                    <div className="mb-2 block">
+                                        <Label htmlFor="file" value="Upload File" />
+                                    </div>
+                                    <FileInput id="file" {...register("image.upload")} onChange={filePreview} />
+                                </div>
+                            }
+                            <img src={file} />
+                        </div>
+                    </fieldset>
+                </div>
                 <Button type="submit">Add New Book</Button>
-            </form>
+            </form >
             <DevTool control={control} />
-        </div>
+        </div >
     )
 }
 

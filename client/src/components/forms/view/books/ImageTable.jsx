@@ -5,13 +5,14 @@ import { imageProxy } from '../../../../assets/constants';
 
 import { Table, Button, Modal } from 'flowbite-react'
 import { useState, useEffect, useMemo } from 'react'
-import { MdDelete } from "react-icons/md"
+import { MdDelete, MdEdit } from "react-icons/md"
 import { IoEye } from "react-icons/io5";
 
 import { RiErrorWarningFill } from "react-icons/ri"
 
 import StatusHandler from '../../../misc/StatusHandler'
 import AddImageForm from '../../add/AddImageForm'
+import UpdateImageForm from '../../update/UpdateImageForm';
 
 function ImageTable() {
     const [refresh, setRefresh] = useState(true)
@@ -21,6 +22,7 @@ function ImageTable() {
     const [status, setStatus] = useState(0)
 
     const [deleteShow, setDeleteShow] = useState(false)
+    const [updateShow, setUpdateShow] = useState(false)
     const [addShow, setAddShow] = useState(false)
     const [view, setView] = useState(false)
     const [modalData, setModalData] = useState({})
@@ -58,6 +60,11 @@ function ImageTable() {
         setView(true)
     }
 
+    const callUpdate = (data) => {
+        setModalData(data)
+        setUpdateShow(true)
+    }
+
     const callDelete = (data) => {
         setModalData(data)
         setDeleteShow(true)
@@ -68,10 +75,14 @@ function ImageTable() {
             return (
                 <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-200")}>
                     <Table.Cell>{image.id}</Table.Cell>
+                    <Table.Cell>{image.title}</Table.Cell>
                     <Table.Cell>
                         <Button.Group>
-                            <Button color='warning' size='sm' onClick={() => { callView(image) }}>
+                            <Button color='info' size='sm' onClick={() => { callView(image) }}>
                                 <IoEye size={20} />
+                            </Button>
+                            <Button color='warning' size='sm' onClick={() => { callUpdate(image) }}>
+                                <MdEdit size={20} />
                             </Button>
                             <Button color='failure' size='sm' onClick={() => { callDelete(image) }}>
                                 <MdDelete size={20} />
@@ -96,7 +107,13 @@ function ImageTable() {
             <Modal show={view} onClose={() => setView(false)}>
                 <Modal.Header>IMAGE VIEW</Modal.Header>
                 <Modal.Body className='p-5'>
-                    <img src={imageProxy+modalData.imgLink} alt="" />
+                    <img src={imageProxy + modalData.imgLink} alt="" />
+                </Modal.Body>
+            </Modal>
+            <Modal show={updateShow} onClose={() => setUpdateShow(false)}>
+                <Modal.Header>UPDATE IMAGE</Modal.Header>
+                <Modal.Body className='p-5'>
+                    <UpdateImageForm image={modalData} refreshDependency={setRefresh} />
                 </Modal.Body>
             </Modal>
             <Modal show={deleteShow} size="sm" onClose={() => setDeleteShow(false)}>
@@ -125,6 +142,7 @@ function ImageTable() {
                 <Table className='bg-white shadow-lg w-max'>
                     <Table.Head className='shadow-lg text-md text-black'>
                         <Table.HeadCell className='p-5'>Name</Table.HeadCell>
+                        <Table.HeadCell className=' p-5 text-center'>Title</Table.HeadCell>
                         <Table.HeadCell className=' p-5 text-center'>Action</Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="gap-1">

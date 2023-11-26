@@ -6,8 +6,8 @@ module.exports = (app) => {
     router.put("/update", bookCopy.update)
     router.post("/delete", bookCopy.delete)
 
-    router.get("/", bookCopy.findAll)
-    router.post("/find", bookCopy.findOneID)
+    router.post("/", bookCopy.findAll)
+    router.post("/find", bookCopy.findOne)
 
     app.use('/api/copies', router)
 }

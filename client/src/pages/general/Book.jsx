@@ -10,6 +10,7 @@ import AuthorList from '../../components/misc/AuthorList'
 import GenreList from '../../components/misc/GenreList'
 import RatingForm from '../../components/forms/add/RatingForm'
 import { imageProxy } from '../../assets/constants'
+import CopyTable from '../../components/forms/view/books/CopyTable'
 // import Placeholder from '../../components/loading/Placeholder'
 
 function Book() {
@@ -62,7 +63,7 @@ function Book() {
             </div>
           </div>
           <div className="otherDetails flex flex-col flex-wrap w-full content-center">
-            <img src={imageProxy+book.bookImg.imgLink} alt="" width={250} height={300} />
+            <img src={imageProxy + book.bookImg.imgLink} alt="" width={250} height={300} />
           </div>
           <div className='flex flex-col flex-wrap w-full content-center'>
             <div className="rating flex flex-wrap content-center">
@@ -72,6 +73,7 @@ function Book() {
               {book.description}
             </div>
           </div>
+          <CopyTable bookID={book.id} />
         </div>
       }
     </>

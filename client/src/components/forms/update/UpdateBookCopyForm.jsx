@@ -36,37 +36,20 @@ function UpdateBookCopy({ copy, refreshDependency }) {
     }
 
     const updateCopy = async (data) => {
-        let exists = null //= data.status !== copy.status ? await copyExists(data) : ''
         const dirtyValues = getDirtyValues(data)
-        if (!exists) {
-            await axios.put("/api/copies/update", { copy: { ...dirtyValues }, id: copy.id })
-                .then(() => {
-                    const newData = { ...copy, ...dirtyValues }
-                    reset(newData)
 
-                    refreshDependency ? refreshDependency(true) : ''
-                    setFormStatus(200)
-                }).catch((err) => {
-                    console.log(err)
-                    setFormStatus(404)
-                })
-        } else {
-            setFormStatus(402)
-        }
+        await axios.put("/api/copies/update", { copy: { ...dirtyValues }, id: copy.id })
+            .then(() => {
+                const newData = { ...copy, ...dirtyValues }
+                reset(newData)
 
+                refreshDependency ? refreshDependency(true) : ''
+                setFormStatus(200)
+            }).catch((err) => {
+                console.log(err)
+                setFormStatus(404)
+            })
     }
-
-    // const copyExists = async (data) => {
-    //     let retVal
-    //     await axios.post("/api/copies/find", { status: data.status })
-    //         .then((res) => {
-    //             retVal = res.data.status === 'found'
-    //         }).catch(() => {
-    //             retVal = false
-    //             setFormStatus(400)
-    //         })
-    //     return retVal
-    // }
 
     return (
         <div>

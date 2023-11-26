@@ -10,6 +10,10 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
             unique: true,
         },
+        baseCallNumber: {
+            type: Sequelize.STRING(30),
+            alowNull: false
+        },
         title: {
             type: Sequelize.STRING(255),
             allowNull: false
