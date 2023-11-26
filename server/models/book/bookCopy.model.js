@@ -5,6 +5,7 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             primaryKey: true
         },
+        //IMPLEMENT CALL NUMBER
         bookID: {
             type: Sequelize.INTEGER,
             allowNull: false,
@@ -14,15 +15,18 @@ module.exports = (sequelize, Sequelize) => {
             }
         },
         dateAdded: {
-            type: Sequelize.DATE
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.literal('CURRENT_DATE')
         },
         status: {
             type: Sequelize.ENUM('good', 'damaged', 'lost'),
-            allowNull: false
+            allowNull: false,
+            defaultValue: 'good'
         },
         available: {
             type: Sequelize.ENUM('yes', 'no'),
-            allowNull: false
+            allowNull: false,
+            defaultValue: 'yes'
         }
     })
 

@@ -8,13 +8,13 @@ import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
 import StatusHandler from '../../../misc/StatusHandler'
-import UpdateUserTypeForm from '../../update/UpdateUserTypeForm'
-import AddUserTypeForm from '../../add/AddUserTypeForm'
+import AddClassificationForm from '../../add/AddClassificationForm'
+import UpdateClassForm from '../../update/UpdateClassificationForm'
 
-function UserTypeTable() {
+function ClassTable() {
     const [refresh, setRefresh] = useState(true)
 
-    const [userTypes, setUserTypes] = useState([])
+    const [classes, setClasses] = useState([])
     const [action, setAction] = useState("retrieved")
     const [status, setStatus] = useState(0)
 
@@ -25,22 +25,22 @@ function UserTypeTable() {
 
 
     useEffect(() => {
-        getUserTypes()
+        getClasses()
         setRefresh(false)
     }, [refresh])
 
-    const getUserTypes = () => {
-        axios.get("api/usertypes/")
+    const getClasses = () => {
+        axios.get("api/class/")
             .then((res) => {
-                setUserTypes(res.data)
+                setClasses(res.data)
             }).catch((err) => {
                 console.log(err)
                 setStatus(500)
             })
     }
 
-    const deleteUserType = (id) => {
-        axios.post("api/usertypes/delete", { id: id })
+    const deleteGenre = (id) => {
+        axios.post("api/class/delete", { id: id })
             .then(() => {
                 setRefresh(true)
                 setAction("deleted")
@@ -61,17 +61,17 @@ function UserTypeTable() {
         setDeleteShow(true)
     }
 
-    const userTypeCells = useMemo(() =>
-        userTypes.map((userType, idx) => {
+    const classCells = useMemo(() =>
+        classes.map((classification, idx) => {
             return (
                 <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-200")}>
-                    <Table.Cell>{userType.title}</Table.Cell>
+                    <Table.Cell>{classification.name}</Table.Cell>
                     <Table.Cell>
                         <Button.Group>
-                            <Button color='warning' size='sm' onClick={() => { callUpdate(userType) }}>
+                            <Button color='warning' size='sm' onClick={() => { callUpdate(classification) }}>
                                 <MdEdit size={20} />
                             </Button>
-                            <Button color='failure' size='sm' onClick={() => { callDelete(userType) }}>
+                            <Button color='failure' size='sm' onClick={() => { callDelete(classification) }}>
                                 <MdDelete size={20} />
                             </Button>
                         </Button.Group>
@@ -79,33 +79,33 @@ function UserTypeTable() {
                 </Table.Row>
             )
         })
-        , [userTypes])
+        , [classes])
 
 
     return (
         <div>
             {/* MODALS */}
             <Modal show={addShow} onClose={() => setAddShow(false)}>
-                <Modal.Header>ADD USER TYPE</Modal.Header>
+                <Modal.Header>ADD CLASSIFICATION</Modal.Header>
                 <Modal.Body className='p-5'>
-                    <AddUserTypeForm refreshDependency={setRefresh} />
+                    <AddClassificationForm refreshDependency={setRefresh} />
                 </Modal.Body>
             </Modal>
             <Modal show={updateShow} onClose={() => setUpdateShow(false)}>
-                <Modal.Header>UPDATE USER TYPE</Modal.Header>
+                <Modal.Header>UPDATE CLASSIFICATION</Modal.Header>
                 <Modal.Body className='p-5'>
-                    <UpdateUserTypeForm userType={modalData} refreshDependency={setRefresh} />
+                    <UpdateClassForm classification={modalData} refreshDependency={setRefresh} />
                 </Modal.Body>
             </Modal>
             <Modal show={deleteShow} size="sm" onClose={() => setDeleteShow(false)}>
                 <Modal.Body className='flex flex-col p-5 justify-center'>
                     <RiErrorWarningFill className="mx-auto mb-4 h-20 w-20 text-red-600" />
                     <h3 className="mb-5 flex justify-center text-center text-lg font-normal text-gray-500 dark:text-gray-400">
-                        Are you sure you want to delete {modalData.title}?
+                        Are you sure you want to delete {modalData.name}?
                     </h3>
                     <div className="flex justify-center gap-4">
                         <Button color="failure" onClick={() => {
-                            deleteUserType(modalData.id)
+                            deleteGenre(modalData.id)
                             setDeleteShow(false)
                         }}>
                             {"Yes, I'm sure"}
@@ -117,16 +117,16 @@ function UserTypeTable() {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"User/s"} action={action} code={status} dismiss={setStatus} />
-            <div className="p-10 flex flex-col">
-                <Button className='w-fit' color='info' size="xl" onClick={() => setAddShow(1)}>Add User Type</Button>
+            <StatusHandler subject={"Classification/s"} action={action} code={status} dismiss={setStatus} />
+            <div className="p-10">
+                <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Classification</Button>
                 <Table className='bg-white shadow-lg w-max'>
                     <Table.Head className='shadow-lg text-md text-black'>
-                        <Table.HeadCell className=' p-5 text-center'>Title</Table.HeadCell>
+                        <Table.HeadCell className='p-5'>Name</Table.HeadCell>
                         <Table.HeadCell className=' p-5 text-center'>Action</Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="gap-1">
-                        {userTypeCells}
+                        {classCells}
                     </Table.Body>
                 </Table>
             </div>
@@ -134,4 +134,4 @@ function UserTypeTable() {
     )
 }
 
-export default UserTypeTable
+export default ClassTable

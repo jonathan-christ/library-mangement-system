@@ -37,17 +37,10 @@ exports.findOne = (req, res) => {
 
     Publisher.findOne({ where: { name: name } })
         .then(data => {
-            if (data) {
-                res.send({
-                    status: 'found',
-                    data: data
-                })
-            } else {
-                res.send({
-                    status: 'not found',
-                    data: null
-                })
-            }
+            res.status(200).send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
         })
         .catch(err => {
             res.status(500)
@@ -61,17 +54,10 @@ exports.findOneID = (req, res) => {
 
     Publisher.findByPk(id)
         .then(data => {
-            if (data) {
-                res.send({
-                    status: 'found',
-                    data: data
-                })
-            } else {
-                res.send({
-                    status: 'not found',
-                    data: null
-                })
-            }
+            res.status(200).send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
         })
         .catch(err => {
             res.status(500)

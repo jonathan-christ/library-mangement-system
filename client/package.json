@@ -2,7 +2,7 @@
   "name": "library-mangement-system",
   "private": true,
   "version": "0.1.0",
-  "proxy": "192.168.1.2:5000",
+  "proxy": "localhost:5000",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -31,6 +31,9 @@ import Publishers from './pages/admin/Publishers'
 import Books from './pages/admin/Books'
 import Genres from './pages/admin/Genres'
 import Subjects from './pages/admin/Subjects'
+import Classifications from './pages/admin/Classifications'
+import Images from './pages/admin/Images'
+import Copies from './pages/admin/Copies'
 
 
 function App() {
@@ -59,8 +62,11 @@ function App() {
             <Route path="users" element={<AdminGuard element={<Users />} />} />
             <Route path="usertypes" element={<AdminGuard element={<UserTypes />} />} />
             <Route path="books" element={<AdminGuard element={<Books />} />} />
+            <Route path="images" element={<AdminGuard element={<Images />} />} />
+            <Route path="copies" element={<AdminGuard element={<Copies />} />} />
             <Route path="genres" element={<AdminGuard element={<Genres />} />} />
             <Route path="authors" element={<AdminGuard element={<Authors />} />} />
+            <Route path="classes" element={<AdminGuard element={<Classifications />} />} />
             <Route path="subjects" element={<AdminGuard element={<Subjects />} />} />
             <Route path="publishers" element={<AdminGuard element={<Publishers />} />} />
           </Route>

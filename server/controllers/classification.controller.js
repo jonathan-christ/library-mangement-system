@@ -1,15 +1,27 @@
 const db = require("../models")
 const Op = db.Sequelize.Op
-const UserType = db.userType
+
+const Classification = db.classification
 
 exports.create = async (req, res) => {
-    const data = req.body
-    const usertype = {
-        title: data.title,
-        description: data.description,
+    const classification = {
+        name: req.body.name,
+        description: req.body.description,
     }
 
-    UserType.create(usertype)
+    Classification.create(classification)
+        .then(data => {
+            res.send(data)
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: err.message })
+        })
+}
+
+exports.findAll = (req, res) => {
+    //search options
+    Classification.findAll()
         .then(data => {
             res.send(data)
         })
@@ -20,9 +32,10 @@ exports.create = async (req, res) => {
 }
 
 exports.findOne = (req, res) => {
-    let title = req.body.title
+    //conditional
+    let name = req.body.name
 
-    UserType.findOne({ where: { title: title } })
+    Classification.findOne({ where: { name: name } })
         .then(data => {
             res.status(200).send({
                 status: data ? 'found' : 'not found',
@@ -35,24 +48,28 @@ exports.findOne = (req, res) => {
         })
 }
 
-exports.findAll = (req, res) => {
-    //search options
-    UserType.findAll()
+exports.findOneID = (req, res) => {
+    //options
+    let id = req.body.id
+
+    Classification.findByPk(id)
         .then(data => {
-            res.send(data)
+            res.status(200).send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
         })
         .catch(err => {
             res.status(500)
                 .send({ message: err.message })
         })
 }
-
 exports.update = (req, res) => {
     let data = req.body
-    UserType.update(data.usertype, { where: { id: data.id } })
+    Classification.update(data.classification, { where: { id: data.id } })
         .then(() => {
             res.status(200).send({
-                message: "User type updated!"
+                message: "Classification updated!"
             })
         })
         .catch(err => {
@@ -63,10 +80,10 @@ exports.update = (req, res) => {
 
 exports.delete = (req, res) => {
     let data = req.body
-    UserType.destroy({ where: { id: data.id } })
+    Classification.destroy({ where: { id: data.id } })
         .then(() => {
             res.status(200).send({
-                message: "User type deleted!"
+                message: "Classification deleted!"
             })
         })
         .catch(err => {

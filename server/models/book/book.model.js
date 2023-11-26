@@ -17,6 +17,15 @@ module.exports = (sequelize, Sequelize) => {
         description: {
             type: Sequelize.TEXT,
         },
+        imageID: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+            references: {
+                model: "bookImg",
+                key: "id"
+            }
+        },
         publisherID: {
             type: Sequelize.INTEGER,
             allowNull: false,

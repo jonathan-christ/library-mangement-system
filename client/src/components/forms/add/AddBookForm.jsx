@@ -73,7 +73,7 @@ function AddBookForm() {
         await axios.get("api/subjects")
             .then(res => {
                 setSubjects(res.data.map((subject) => {
-                    return { value: subject.id, label: subject.title }
+                    return { value: subject.id, label: subject.name }
                 }))
             })
     }

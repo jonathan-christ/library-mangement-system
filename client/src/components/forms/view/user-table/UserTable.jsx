@@ -70,11 +70,11 @@ function UserTable() {
     }
 
     const getType = (id) => ({
-        1: <Badge color="gray" size="x9l" className="flex justify-center">Guest</Badge>,
-        2: <Badge color="info" size="x9l" className="flex justify-center">Student</Badge>,
-        3: <Badge color="indigo" size="x9l" className="flex justify-center">Teacher</Badge>,
+        1: <Badge color="gray" size="x9l" className="flex justify-center bg-gray-300">Guest</Badge>,
+        2: <Badge color="info" size="x9l" className="flex justify-center bg-teal-200">Student</Badge>,
+        3: <Badge color="indigo" size="x9l" className="flex justify-center bg-violet-200">Teacher</Badge>,
         4: <Badge color="yellow" size="x9l" className="flex justify-center">Staff</Badge>,
-        5: <Badge color="failure" size="x9l" className="flex justify-center">Admin</Badge>,
+        5: <Badge color="failure" size="x9l" className="flex justify-center bg-red-200 text-red-700">Admin</Badge>,
     }[id])
 
     const userCells = useMemo(() =>
@@ -142,14 +142,14 @@ function UserTable() {
             <StatusHandler subject={"User/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add User</Button>
-                <Table className='bg-white shadow-lg'>
+                <Table className='bg-white shadow-lg w-3/4'>
                     <Table.Head className='shadow-lg text-md text-black'>
                         <Table.HeadCell className='p-5'>Last Name</Table.HeadCell>
                         <Table.HeadCell >First Name</Table.HeadCell>
                         <Table.HeadCell >Middle Name</Table.HeadCell>
                         <Table.HeadCell >Email</Table.HeadCell>
-                        <Table.HeadCell className=' p-5 flex justify-center'>Type</Table.HeadCell>
-                        <Table.HeadCell >Action</Table.HeadCell>
+                        <Table.HeadCell className=' p-5 text-center'>Type</Table.HeadCell>
+                        <Table.HeadCell className=' p-5 text-center'>Action</Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="gap-1">
                         {userCells}

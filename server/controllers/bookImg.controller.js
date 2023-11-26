@@ -1,107 +1,99 @@
+const multer = require('multer')
+const path = require('path')
+
 const db = require("../models")
 const Op = db.Sequelize.Op
 const Image = db.bookImg
 
-exports.create = async (req, res) => {
-    const data = req.body.data
-    const bookImg = {
-        bookID: data.bookID, //
-        uploaderID: data.upID,
-        imgLink: data.imgLink
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'images')  // specify the directory for storing images
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, 'image-' + uniqueSuffix + path.extname(file.originalname))
     }
+})
 
-    Image.create(bookImg)
-        .then(data => {
-            res.send(data)
-        })
-        .catch(err => {
-            res.status(500)
-                .send({ message: err.message })
-        })
+const upload = multer({ storage: storage })
+
+exports.create = (req, res) => {
+    upload.single('bookImg')(req, res, (err) => {
+        if (err) {
+            return res.status(500).send({ message: "Bitch" + err.message })
+        }
+        const { uploaderID } = req.body 
+        const imgLink = `/images/${req.file.filename}`  
+
+        console.log(req.file.path)
+        Image.create({ uploaderID, imgLink })
+            .then(() => {
+                res.status(201).send({
+                    status: 'created'
+                })
+            })
+            .catch(err => {
+                res.status(500).send({ message: err })
+            })
+    })
 }
 
 exports.findAll = (req, res) => {
-    //search options
+    // search options
     Image.findAll()
         .then(data => {
             res.send(data)
         })
         .catch(err => {
-            res.status(500)
-                .send({ message: err.message })
-        })
-}
-
-exports.findImagesOf = (req, res) => {
-    //check link
-    Image.findAll({ where: { [Op.eq]: req.body.data.id } })
-        .then(data => {
-            res.send(data)
-        })
-        .catch(err => {
-            res.status(500)
-                .send({ message: err.message })
-        })
-}
-
-exports.findOne = (req, res) => {
-    //conditional
-    let value = req.body.value
-    let searchCon = req.body.condition
-    let condition = value ? { searchCon: { [Op.eq]: value } } : null
-
-    Image.findOne({ where: condition })
-        .then(data => {
-            if (data) {
-                res.send({
-                    status: 'found',
-                    data: data
-                })
-            } else {
-                res.send({
-                    status: 'not found',
-                    data: null
-                })
-            }
-        })
-        .catch(err => {
-            res.status(500)
-                .send({ message: err.message })
+            res.status(500).send({ message: err.message })
         })
 }
 
 exports.findOneID = (req, res) => {
-    //options
+    // options
     let id = req.body.id
 
     Image.findByPk(id)
         .then(data => {
-            if (data) {
-                res.send({
-                    status: 'found',
-                    data: data
-                })
-            } else {
-                res.send({
-                    status: 'not found',
-                    data: null
-                })
-            }
+            res.status(200).send({
+                status: data ? 'found' : 'not found',
+                data: data ? data : null
+            })
         })
         .catch(err => {
-            res.status(500)
-                .send({ message: err.message })
+            res.status(500).send({ message: err.message })
         })
 }
 
 exports.update = (req, res) => {
+    const id = req.body.id  
+    const updatedData = req.body.data 
 
+    Image.update(updatedData, { where: { id } })
+        .then(num => {
+            if (num == 1) {
+                res.send({ message: 'Image was updated successfully.' })
+            } else {
+                res.send({ message: `Image not found!` })
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ message: err.message })
+        })
 }
 
 exports.delete = (req, res) => {
+    const id = req.body.id
 
-}
-
-exports.deleteAll = (req, res) => {
-
-}
+    Image.destroy({ where: { id } })
+        .then(num => {
+            if (num == 1) {
+                res.send({ message: 'Image was deleted successfully.' })
+            } else {
+                res.send({ message: `Image not found!` })
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ message: err.message })
+        })
+} 

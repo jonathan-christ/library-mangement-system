@@ -12,6 +12,9 @@ const GenreList = db.genreList
 const Subject = db.subject
 const SubjectList = db.subjectList
 
+const Publisher = db.publisher
+const BookImage = db.bookImg
+
 
 exports.addBook = async (req, res) => {
     const data = req.body.data
@@ -45,7 +48,7 @@ exports.addBook = async (req, res) => {
 exports.findAllBooks = async (req, res) => {
     try {
         const result = await Book.findAll({
-            include: [Author, Genre, Subject]
+            include: [Author, Genre, Subject, Publisher, BookImage]
         })
         
         res.status(200).send(result)
@@ -58,7 +61,7 @@ exports.findBook = async (req, res) => {
     try {
         const result = await Book.findOne({
             where: { isbn: req.body.isbn },
-            include: [Author, Genre, Subject]
+            include: [Author, Genre, Subject, Publisher, BookImage]
         })
 
         res.status(result ? 200 : 404).send(result ? result : "Book details not found")

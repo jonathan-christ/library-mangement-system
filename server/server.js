@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const db = require('./models')
+const path = require('path')
 const ipconfig = require('./configs/ip.config')
 
 const app = express()
@@ -20,6 +21,7 @@ db.sequelize.sync()
 
 app.use(express.json())
 app.use(cors())
+app.use('/images', express.static('images'));
 
 //main function routes
 require('./routes/library.routes')(app)
@@ -29,10 +31,14 @@ require('./routes/usertype.routes')(app)
 
 require('./routes/book.routes')(app)
 require('./routes/author.routes')(app)
-require('./routes/publisher.routes')(app)
 require('./routes/genre.routes')(app)
 require('./routes/subject.routes')(app)
 require('./routes/rating.routes')(app)
+
+require('./routes/publisher.routes')(app)
+require('./routes/classification.routes')(app)
+require('./routes/bookImg.routes')(app)
+require('./routes/bookCopy.routes')(app)
 
 //unknown get request
 app.get('*', (req, res) => {

@@ -64,7 +64,7 @@ function AuthorTable() {
     const authorCells = useMemo(() =>
         authors.map((author, idx) => {
             return (
-                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "bg-slate-100" : "bg-gray-200")}>
+                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-200")}>
                     <Table.Cell>{author.lastName}</Table.Cell>
                     <Table.Cell>{author.firstName}</Table.Cell>
                     <Table.Cell>
@@ -121,11 +121,11 @@ function AuthorTable() {
             <StatusHandler subject={"Author/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Author</Button>
-                <Table className='bg-white shadow-lg'>
+                <Table className='bg-white shadow-lg w-max'>
                     <Table.Head className='shadow-lg text-md text-black'>
                         <Table.HeadCell >Last Name</Table.HeadCell>
-                        <Table.HeadCell className='p-5'>First Name</Table.HeadCell>
-                        <Table.HeadCell >Action</Table.HeadCell>
+                        <Table.HeadCell >First Name</Table.HeadCell>
+                        <Table.HeadCell className=' p-5 text-center'>Action</Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="gap-1">
                         {authorCells}

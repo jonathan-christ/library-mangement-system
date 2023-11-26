@@ -17,12 +17,13 @@ import { useSession, useSessionUpdate } from '../../context-hooks/session/Sessio
 
 UpdateUserForm.propTypes = {
     user: PropTypes.object.isRequired,
+    modal: PropTypes.bool,
     profile: PropTypes.bool,
     userTypes: PropTypes.array,
     refreshDependency: PropTypes.func
 }
 
-function UpdateUserForm({ user, profile, userTypes, refreshDependency }) {
+function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) {
     const [formStatus, setFormStatus] = useState(0)
     const session = useSession()
     const setSession = useSessionUpdate()
@@ -54,7 +55,7 @@ function UpdateUserForm({ user, profile, userTypes, refreshDependency }) {
                     ls.clear()
                     ls.set("userData", JSON.stringify(userDat), { ttl: ttl, encrypt: true })
                     setSession(JSON.parse(ls.get("userData", { decrypt: true })))
-                }else {
+                } else {
                     refreshDependency(true)
                 }
                 reset(userDat)
@@ -73,7 +74,7 @@ function UpdateUserForm({ user, profile, userTypes, refreshDependency }) {
                     'fname': 'firstName',
                     'mname': 'middleName',
                     'lname': 'lastName',
-                    'type' : 'typeID'
+                    'type': 'typeID'
                 }
                 return [name[key] || key, data[key]]
             }))
@@ -208,7 +209,9 @@ function UpdateUserForm({ user, profile, userTypes, refreshDependency }) {
                         </div>
                     }
                 </div>
-                <Button type="submit" disabled={!isDirty}>Update Accout</Button>
+                {!modal &&
+                    <Button type="submit" disabled={!isDirty}>Update Accout</Button>
+                }
             </form>
             <DevTool control={control} />
         </div>

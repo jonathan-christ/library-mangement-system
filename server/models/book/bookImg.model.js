@@ -3,15 +3,8 @@ module.exports = (sequelize, Sequelize) => {
     const BookImage = sequelize.define("bookImg", {
         id: {
             type: Sequelize.INTEGER,
-            primaryKey: true
-        },
-        bookID: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: "book",
-                key: "id"
-            }
+            primaryKey: true,
+            autoIncrement: true,
         },
         uploaderID: {
             type: Sequelize.INTEGER,
@@ -22,7 +15,7 @@ module.exports = (sequelize, Sequelize) => {
             }
         },
         imgLink: {
-            type: Sequelize.STRING(100),
+            type: Sequelize.STRING(255),
             allowNull: false
         },
     })

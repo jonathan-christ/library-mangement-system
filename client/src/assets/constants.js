@@ -11,3 +11,5 @@ export const maxSuffixLen = 15
 export const maxISBNLen = 13
 export const minISBNLen = 11
 export const maxBookLen = 255
+
+export const imageProxy = 'http://localhost:5000'
