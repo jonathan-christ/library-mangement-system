@@ -1,4 +1,8 @@
-const db = require("../models");
+const multer = require('multer')
+const path = require('path')
+const unflatten = require('../assets/helper functions/unflatten')
+
+const db = require("../models")
 const Op = db.Sequelize.Op
 
 const Book = db.book
@@ -16,31 +20,52 @@ const Publisher = db.publisher
 const BookImage = db.bookImg
 
 
+
 exports.addBook = async (req, res) => {
-    const data = req.body.data
-    return 
+    let data = req.body
     try {
         db.sequelize.transaction(async (t) => {
-            let book = await Book.create(data.book, { transaction: t })
-            
-            let authors = data.authors.map((author) => {
-                return { authorID: author, bookID: book.id }
-            })
-            
-            let genres = data.genres.map((genre) => {
-                return { genreID: genre, bookID: book.id }
-            })
+            if (data.book === undefined) {
+                const uploadedImage = await new Promise((resolve, reject) => {
+                    upload.single('bookImg')(req, res, (err) => {
+                        if (err) {
+                            reject(new Error("Multer error"));
+                            return;
+                        }
+                        data = unflatten.unflatObject(req.body)
+                        const { uploaderID, title } = req.body;
+                        const imgLink = `/images/${req.file.filename}`;
 
-            let subjects = data.subjects.map((subject) => {
-                return { subjectID: subject, bookID: book.id }
-            })
-            
+                        console.log(req.file.path);
+                        BookImage.create({ uploaderID, imgLink, title }, { transaction: t })
+                            .then((image) => resolve(image))
+                            .catch((error) => reject(error));
+                    })
+                })
+                data.book.imageID = uploadedImage.id
+            } else {
+                data.book.imageID = data.image.select
+            }
+            data.book.baseCallNumber = createCallNumber(
+                data.subjects[0] ?? data.subject,
+                data.genres[0] ?? data.genres,
+                data.authors[0] ?? data.authors,
+                data.book.imageID
+            )
+            console.log(data.book)
+            let book = await Book.create(data.book, { transaction: t })
+
+            let authors = prepForBulk('author', data.authors, book.id)
+            let genres = prepForBulk('genre', data.genres, book.id)
+            let subjects = prepForBulk('subject', data.subjects, book.id)
+
+
             await AuthorList.bulkCreate(authors, { transaction: t })
             await GenreList.bulkCreate(genres, { transaction: t })
             await SubjectList.bulkCreate(subjects, { transaction: t })
+            res.status(200).send({ message: "Book has been added successfully!" })
+
         })
-        
-        res.status(200).send({ message: "Book has been added successfully!" })
     } catch (error) {
         res.status(500).send({ message: error.message })
     }
@@ -49,9 +74,10 @@ exports.addBook = async (req, res) => {
 exports.findAllBooks = async (req, res) => {
     try {
         const result = await Book.findAll({
+            where: {deleted: false},
             include: [Author, Genre, Subject, Publisher, BookImage]
         })
-        
+
         res.status(200).send(result)
     } catch (error) {
         res.status(500).send({ message: error.message });
@@ -75,34 +101,103 @@ exports.updateBook = async (req, res) => {
     // check changes
     let data = req.body.data
     try {
-        const result = db.sequelize.transaction(async (t) => {
-            const book = await Book.findByPk(req.body.id, { transaction: t })
-            await Book.update(data.book, { transaction: t }) //INCOMPLETE should be separated from authors 
+        const result = await db.sequelize.transaction(async (t) => {
+            console.log("start");
+            if (data === undefined) {
+                const uploadedImage = await new Promise((resolve, reject) => {
+                    upload.single('bookImg')(req, res, async (err) => {
+                        if (err) {
+                            reject(new Error("Multer error"));
+                            return;
+                        }
+                        data = unflatten.unflatObject(req.body)
+                        const { uploaderID, title } = req.body;
+                        const imgLink = `/images/${req.file.filename}`;
+
+                        console.log(req.file.path);
+                        await BookImage.create({ uploaderID, imgLink, title }, { transaction: t })
+                            .then((image) => resolve(image))
+                            .catch((error) => reject(error));
+                    })
+                })
+                data.book.imageID = uploadedImage.id
+            } else {
+                data.image ? data.book.imageID = data.image.select : ''
+            }
+
+            const bookID = data.id
+            console.log(bookID)
+            await Book.update(data.book, { where: { id: bookID } }, { transaction: t }) //INCOMPLETE should be separated from authors 
             //OYOYOYO use react form hook (..register("book.___"))
 
-            updateList(data.authors, 'authorID', AuthorList, book.id, {transaction: t})
-            updateList(data.genres, 'genreID', GenreList, book.id, {transaction: t})
-            updateList(data.subject, 'subjectID', SubjectList, book.id, {transaction: t})
+            console.log("authors")
+            data.authors ? await updateList(data.authors, 'authorID', AuthorList, bookID, { transaction: t }) : 1
+            console.log("genres")
+            data.genres ? await updateList(data.genres, 'genreID', GenreList, bookID, { transaction: t }) : 1
+            console.log("subjects")
+            data.subjects ? await updateList(data.subjects, 'subjectID', SubjectList, bookID, { transaction: t }) : 1
+
+            res.status(200).send("Book has been updated!")
         })
-        
-        res.status(200).send("Book has been updated!")
+        console.log("yeah")
+
     } catch (error) {
         res.status(500).send("Error in updating book! " + error.message)
     }
 }
 
-const updateList = async (data, modelName, dbModel, bookID, transaction) => {
-    const models = await dbModel.findAll({ where: { bookID: bookID } }, transaction)
-    const removedModels = models.filter((author) =>
-        !data.includes(author.id)
-    )
-    let temp = list.filter((modelID) =>
-        !data.some((currModel) => currModel.id === modelID)
-    )
-    const newModels = temp.map((model) => {
-        return { [`${modelName}`]: model, bookID: bookID }
-    })
+// image handling
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'images')  // specify the directory for storing images
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, 'image-' + uniqueSuffix + path.extname(file.originalname))
+    }
+})
+const upload = multer({ storage: storage })
 
-    await dbModel.destroy({ where: { id: removedModels } }, transaction)
-    await dbModel.createBulk(newModels, { validate: true, ...transaction})
+const prepForBulk = (name, array, bookID) => {
+    !(array instanceof Array) ? array = [array] : 1
+    return array.map((element) => {
+        return { [`${name}ID`]: element, bookID: bookID }
+    })
 }
+
+const createCallNumber = (subject, genre, author, imageID) => {
+    return `${subject}-${genre}-${author}-${imageID}`
+}
+
+
+const updateList = async (data, modelName, dbModel, bookID, transaction) => {
+    // Ensure data is an array
+    data = Array.isArray(data) ? data : [data];
+
+    console.log("updatelist + " + bookID);
+
+    // Retrieve models from the database
+    const models = await dbModel.findAll({ where: { bookID: bookID } }, transaction);
+
+    // Identify removed models
+    const removedModels = models.filter((elem) => !data.includes(elem[modelName]));
+
+    // Identify new models
+    const newModels = data
+        .filter((modelID) => !removedModels.some((currModel) => currModel[modelName] === modelID))
+        .map((modelID) => ({ [modelName]: modelID, bookID: bookID }));
+
+    console.log("updatelist new");
+
+    console.log("updatelist queries" + bookID);
+
+    // Conditionally destroy removed models
+    if (removedModels.length > 0) {
+        await dbModel.destroy({ where: { [modelName]: removedModels.map((model) => model[modelName]) } }, transaction);
+    }
+
+    // Conditionally create new models
+    if (newModels.length > 0) {
+        await dbModel.bulkCreate(newModels, { validate: true, ...transaction });
+    }
+};

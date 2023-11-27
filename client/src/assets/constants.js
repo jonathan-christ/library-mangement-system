@@ -13,3 +13,4 @@ export const minISBNLen = 11
 export const maxBookLen = 255
 
 export const imageProxy = 'http://localhost:5000'
+export const supportedImageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'webp']

@@ -52,7 +52,7 @@ function Book() {
 
       </Link>
       {!loading &&
-        <div className='flex flex-col min-w-full p-5  gap-10 '>
+        <div className='flex flex-col min-w-full p-5 gap-10'>
           <div className="title flex flex-col text-center gap-5 content-center flex-wrap">
             <div>
               <span className="text-5xl font-semibold">{book.title}</span>
@@ -62,11 +62,13 @@ function Book() {
               <div><GenreList genres={book.genres} /></div>
             </div>
           </div>
-          <div className="otherDetails flex flex-col flex-wrap w-full content-center">
-            <img src={imageProxy + book.bookImg.imgLink} alt="" width={250} height={300} />
+          <div className='otherDetails flex flex-col flex-wrap w-full h-[500px] content-center'>
+            <div className="aspect-[2/3] h-full">
+              <img src={imageProxy + book.bookImg.imgLink} alt="" className='object-cover w-full h-full' />
+            </div>
           </div>
           <div className='flex flex-col flex-wrap w-full content-center'>
-            <div className="rating flex flex-wrap content-center">
+            <div className="rating flex flex-wrap content-center ">
               <RatingForm bookID={book.id} userID={user ? user.id : null} />
             </div>
             <div className="desc flex flex-wrap text-justify">

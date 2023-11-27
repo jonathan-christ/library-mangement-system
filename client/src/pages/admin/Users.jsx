@@ -2,7 +2,9 @@ import UserTable from "../../components/forms/view/user-table/UserTable"
 
 function Users() {
   return (
-    <UserTable />
+    <div className="flex w-full justify-center">
+      <UserTable />
+    </div>
   )
 }
 

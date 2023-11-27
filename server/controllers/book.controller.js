@@ -8,7 +8,11 @@ exports.create = async (req, res, transaction) => {
         const book = {
             isbn: data.isbn,
             title: data.title,
+            pages: data.pages,
+            baseCallNumber: data.bcn,
             description: data.desc,
+            imageID: data.imageID,
+            classificationID: data.classificationID,
             publisherID: data.publisherID,
             publishDate: data.publishDate,
         }
@@ -64,14 +68,16 @@ exports.findOneID = (req, res) => {
         })
 }
 
-exports.update = (req, res) => {
-
-}
-
 exports.delete = (req, res) => {
-
-}
-
-exports.deleteAll = (req, res) => {
-
+    let id = req.body.id
+    Book.update({ deleted: true }, { where: { id: id, deleted: false } })
+        .then((rows) => {
+            res.status(rows[0] === 1 ? 200 : 404).send({
+                message: rows[0] === 1 ? "Book deleted!" : "Book not found!",
+            })
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: err.message })
+        })
 }

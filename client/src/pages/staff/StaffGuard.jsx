@@ -1,7 +1,10 @@
-import React from 'react'
+import PropTypes from 'prop-types'
 import ls from 'localstorage-slim'
 import { Navigate } from 'react-router-dom'
 
+StaffGuard.propTypes = {
+    element: PropTypes.node
+}
 function StaffGuard({ element }) {
     const userData = JSON.parse(ls.get('userData', { decrypt: true }))
     const type = userData ? userData.typeID : 1

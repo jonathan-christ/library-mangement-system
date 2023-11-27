@@ -2,7 +2,9 @@ import ImageTable from "../../components/forms/view/books/ImageTable"
 
 function Images() {
     return (
-        <ImageTable />
+        <div className="flex w-full justify-center">
+            <ImageTable />
+        </div>
     )
 }
 

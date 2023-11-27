@@ -1,17 +1,23 @@
 import axios from 'axios';
 import Select from 'react-select'
 import validator from 'validator'
+import PropTypes from 'prop-types'
 
-import { imageProxy } from '../../../assets/constants';
+import { imageProxy, supportedImageExtensions } from '../../../assets/constants';
 import { DevTool } from '@hookform/devtools'
 import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { maxBookLen, maxISBNLen, minISBNLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit, belowMinChar } from '../../../assets/formErrorMsg'
 import { Button, Label, Textarea, TextInput, Datepicker, Radio, FileInput } from 'flowbite-react'
+import { useSession } from '../../context-hooks/session/SessionUtils';
 import StatusHandler from '../../misc/StatusHandler'
 
-function AddBookForm() {
+AddBookForm.propTypes = {
+    refreshDependency: PropTypes.func
+}
+function AddBookForm({ refreshDependency }) {
+    const userData = useSession()
     const [formStatus, setFormStatus] = useState(0)
     const [file, setFile] = useState()
     const [images, setImages] = useState([])
@@ -105,15 +111,32 @@ function AddBookForm() {
     }
 
     const addBook = async (data) => {
-        let submitData
+        let submitData, header
         if (data.select === 'select') {
             submitData = data
+            header = null
         } else {
             submitData = new FormData()
-            submitData.append()
+            submitData.append('authors', data.authors)
+            submitData.append('genres', data.genres)
+            submitData.append('subjects', data.subjects)
+            submitData.append('uploaderID', userData.id)
+            submitData.append('bookImg', data.image.upload[0])
+            submitData.append('title', data.image.title)
+            for (var key in data.book) {
+                submitData.append('book.' + key, data.book[key]);
+            }
+            header = {
+                headers: {
+                    "Content-Type": 'multipart/form-data'
+                }
+            }
         }
-        await axios.post("api/library/books/add", { submitData })
+
+        await axios.post("api/library/books/add", submitData, header)
             .then(() => {
+                refreshDependency ? refreshDependency() : ''
+                setFile(null)
                 reset()
                 setFormStatus(200)
             }).catch((err) => {
@@ -135,6 +158,11 @@ function AddBookForm() {
 
     const filePreview = (e) => {
         setFile(URL.createObjectURL(e.target.files[0]));
+    }
+
+    const isImg = (val) => {
+        const fileExtension = val[0].name.split('.').pop().toLowerCase()
+        return supportedImageExtensions.includes(fileExtension);
     }
 
     return (
@@ -279,16 +307,18 @@ function AddBookForm() {
                     </div>
                     <Controller
                         id="class"
-                        name="book.classification"
+                        name="book.classificationID"
                         control={control}
                         render={({ field: { onChange }, value }) => (
                             <Select
                                 options={classifications}
-                                value={classifications.find((c) => c.value === value) || watch('book.classification') ? value : []}
+                                value={classifications.find((c) => c.value === value) || watch('book.classificationID') ? value : []}
                                 onChange={(elem) => onChange(elem.value)}
                             />
                         )}
+                        rules={{ required: emptyMsg('book\'s classification') }}
                     />
+                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.book?.classificationID?.message}</p>
                 </div>
                 <div>
                     <div className="mb-2 block">
@@ -316,11 +346,11 @@ function AddBookForm() {
                     <Textarea id="desc" {...register('book.description')} shadow />
                 </div>
 
-                <div>
-                    <div className="mb-2 block">
-                        <Label htmlFor="imgSelection" value="Image Source" />
-                    </div>
-                    <fieldset id="imgSelection">
+                <div >
+                    <fieldset id="imgSelection" className='flex flex-col gap-3'>
+                        <div className="mb-2 block">
+                            <Label htmlFor="imgSelection" value="Image Source" />
+                        </div>
                         <ul className="items-center text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex ">
                             <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
                                 <div className="flex items-center ps-3">
@@ -340,7 +370,7 @@ function AddBookForm() {
                             </li>
                         </ul>
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.select?.message}</p>
-                        <div>
+                        <div className='flex flex-col gap-3'>
                             {watch('select') === 'select' &&
                                 <>
                                     <div className="mb-2 block">
@@ -365,11 +395,28 @@ function AddBookForm() {
                                 </>
                             }
                             {watch('select') === 'upl' &&
-                                <div>
-                                    <div className="mb-2 block">
-                                        <Label htmlFor="file" value="Upload File" />
+                                <div className='mb-3 flex flex-col gap-3'>
+                                    <div>
+                                        <div className="mb-2 block">
+                                            <Label htmlFor="file" value="Upload File" />
+                                        </div>
+                                        <FileInput id="file" {...register("image.upload", {
+                                            required: emptyMsg('book\'s image'),
+                                            validate: {
+                                                fileType: val => isImg(val) || "File is not of image type!"
+                                            }
+                                        })} onChange={filePreview} />
+                                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.image?.upload?.message}</p>
                                     </div>
-                                    <FileInput id="file" {...register("image.upload")} onChange={filePreview} />
+                                    <div>
+                                        <div className="mb-2 block">
+                                            <Label htmlFor="title" value="Enter Title" />
+                                        </div>
+                                        <TextInput id="title" {...register('image.title', {
+                                            required: emptyMsg('book\'s image title'),
+                                        })} />
+                                    </div>
+                                    <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.image?.title?.message}</p>
                                 </div>
                             }
                             <img src={file} />

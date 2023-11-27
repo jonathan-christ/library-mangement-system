@@ -25,11 +25,11 @@ function AuthorTable() {
 
 
     useEffect(() => {
-        getUserTypes()
+        getAuthors()
         setRefresh(false)
     }, [refresh])
 
-    const getUserTypes = () => {
+    const getAuthors = () => {
         axios.get("api/authors/")
             .then((res) => {
                 setAuthors(res.data)

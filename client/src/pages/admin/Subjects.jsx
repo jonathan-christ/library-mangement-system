@@ -2,7 +2,9 @@ import SubjectTable from "../../components/forms/view/subjects/SubjectTable"
 
 function Subjects() {
     return (
-        <SubjectTable />
+        <div className="flex w-full justify-center">
+            <SubjectTable />
+        </div>
     )
 }
 

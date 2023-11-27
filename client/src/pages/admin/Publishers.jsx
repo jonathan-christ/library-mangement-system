@@ -2,7 +2,9 @@ import PublisherTable from '../../components/forms/view/publisher/PublisherTable
 
 function Publishers() {
     return (
-        <PublisherTable />
+        <div className="flex w-full justify-center">
+            <PublisherTable />
+        </div>
     )
 }
 

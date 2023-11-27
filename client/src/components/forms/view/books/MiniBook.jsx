@@ -12,9 +12,9 @@ MiniBook.propTypes = {
 
 function MiniBook({ book }) {
     return (
-        <Link className='minibook transition ease-in duration-7 hover:border-blue-600 border-x-transparent border-x-4 col-span-1 flex flex-row p-5 gap-6 shadow-md max-h-max bg-white' to={`${book.isbn}`}>
-            <div className="flex col-span-2 flex-shrink-0 object-contain">
-                <img src={imageProxy+book.bookImg.imgLink} alt="" width={'75px'} height={'150px'} />
+        <Link className='minibook transition ease-in duration-7 hover:border-blue-600 border-x-transparent border-x-4 col-span-1 flex flex-row p-5 gap-6 shadow-md max-h-full bg-white h-[150px] sm:h-[250px]' to={`${book.isbn}`}>
+            <div className="flex col-span-2 aspect-[2/3] flex-shrink-0 k">
+                <img src={imageProxy + book.bookImg.imgLink} alt="" className='object-cover w-full h-full' />
             </div>
             <div className='flex flex-col gap-1 px-5 truncate'>
                 <span className='text-xl font-semibold'>{book.title}</span>
@@ -30,7 +30,7 @@ function MiniBook({ book }) {
                     <span className='font-semibold'>Subjects: </span>
                     <SubjectList subjects={book.subjects} />
                 </div>
-                <p className='flex my-2 truncate'>{book.description}</p>
+                <p className='whitespace-pre-wrap my-2 text-ellipsis text-justify'>{book.description}</p>
             </div>
         </Link>
     )

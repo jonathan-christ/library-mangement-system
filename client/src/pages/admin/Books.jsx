@@ -1,8 +1,10 @@
-import AddBookForm from '../../components/forms/add/AddBookForm'
+import BookTable from '../../components/forms/view/books/BookTable'
 
 function Books() {
     return (
-        <AddBookForm />
+        <div className="flex w-full justify-center">
+            <BookTable />
+        </div>
     )
 }
 

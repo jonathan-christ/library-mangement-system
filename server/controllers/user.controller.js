@@ -30,7 +30,7 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    User.findAll({ where: { deleted: 'false' }, attributes: exclude })
+    User.findAll({ where: { deleted: false }, attributes: exclude })
         .then(data => {
             res.send(data)
         })
@@ -43,7 +43,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
     //options
     let email = req.body.email
-    let condition = { email: { [Op.eq]: email }, deleted: 'false' }
+    let condition = { email: { [Op.eq]: email }, deleted: false }
 
     User.findOne({ where: condition, attributes: exclude })
         .then(data => {
@@ -91,7 +91,7 @@ exports.update = async (req, res) => {
 
 exports.delete = (req, res) => {
     let id = req.body.id
-    User.update({ deleted: 'true' }, { where: { id: id, deleted: 'false' } })
+    User.update({ deleted: true }, { where: { id: id, deleted: false } })
         .then((rows) => {
             res.status(rows[0] === 1 ? 200 : 404).send({
                 message: rows[0] === 1 ? "User deleted!" : "User not found!",
@@ -104,7 +104,7 @@ exports.delete = (req, res) => {
 }
 
 exports.deleteAll = (req, res) => {
-    User.update({ deleted: 'true' })
+    User.update({ deleted: true })
         .then(() => {
             res.status(200).send({
                 message: "User deleted!"
@@ -120,7 +120,7 @@ exports.deleteAll = (req, res) => {
 exports.login = async (req, res) => {
     let email = req.body.email
     let pass = req.body.password
-    let condition = { email: { [Op.eq]: email }, deleted: 'false' }
+    let condition = { email: { [Op.eq]: email }, deleted: false }
 
     User.findAll({ where: condition })
         .then(data => {
@@ -147,7 +147,7 @@ exports.login = async (req, res) => {
 exports.changePass = async (req, res) => {
     const id = req.body.id
     const pass = await bcrypt.hash(req.body.password, 10)
-    User.update({ password: pass }, { where: { id: id, deleted: 'false' } })
+    User.update({ password: pass }, { where: { id: id, deleted: false } })
         .then((rows) => {
             res.status(rows[0] === 1 ? 200 : 404).send({
                 message: rows[0] === 1 ? `User password updated!` : "User not found!",
@@ -162,7 +162,7 @@ exports.changePass = async (req, res) => {
 exports.verifyPass = async (req, res) => {
     const id = req.body.id
     let pass = req.body.password
-    let condition = { id: id, deleted: 'false' }
+    let condition = { id: id, deleted: false }
 
     User.findAll({ where: condition, attributes: ['password'] })
         .then(data => {

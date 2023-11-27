@@ -41,8 +41,8 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false
     },
     deleted: {
-      type: Sequelize.ENUM('true','false'),
-      defaultValue: 'false'
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
     }
   })
 

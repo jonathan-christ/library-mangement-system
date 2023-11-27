@@ -5,6 +5,7 @@ module.exports = (app) => {
     router.get("/", book.findAll)
     router.post("/find", book.findOne)
     router.post("/create", book.create)
+    router.post("/delete", book.delete)
 
     app.use('/api/books', router)
 }

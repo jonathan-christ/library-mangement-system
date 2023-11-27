@@ -2,7 +2,9 @@ import ClassTable from "../../components/forms/view/classifications/Classificati
 
 function Classifications() {
   return (
-    <ClassTable></ClassTable>
+    <div className="flex w-full justify-center">
+      <ClassTable />
+    </div>
   )
 }
 

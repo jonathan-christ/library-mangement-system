@@ -21,12 +21,24 @@ module.exports = (sequelize, Sequelize) => {
         description: {
             type: Sequelize.TEXT,
         },
+        pages: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+        },
         imageID: {
             type: Sequelize.INTEGER,
             allowNull: false,
             defaultValue: 0,
             references: {
                 model: "bookImg",
+                key: "id"
+            }
+        },
+        classificationID: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            references : {
+                model: "classification",
                 key: "id"
             }
         },
@@ -40,6 +52,10 @@ module.exports = (sequelize, Sequelize) => {
         },
         publishDate: {
             type: Sequelize.DATE,
+        },
+        deleted: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
         }
     })
 

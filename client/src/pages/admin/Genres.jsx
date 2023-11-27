@@ -2,7 +2,9 @@ import GenreTable from '../../components/forms/view/genres/GenreTable'
 
 function Genres() {
     return (
-        <GenreTable />
+        <div className="flex w-full justify-center">
+            <GenreTable />
+        </div>
     )
 }
 

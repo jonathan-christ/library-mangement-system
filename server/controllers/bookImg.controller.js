@@ -20,13 +20,13 @@ const upload = multer({ storage: storage })
 exports.create = (req, res) => {
     upload.single('bookImg')(req, res, (err) => {
         if (err) {
-            return res.status(500).send({ message: "Bitch" + err.message })
+            return res.status(500).send({ message: err.message })
         }
-        const { uploaderID } = req.body
+        const { uploaderID, title } = req.body
         const imgLink = `/images/${req.file.filename}`
 
         console.log(req.file.path)
-        Image.create({ uploaderID, imgLink })
+        Image.create({ uploaderID, imgLink, title })
             .then(() => {
                 res.status(201).send({
                     status: 'created'

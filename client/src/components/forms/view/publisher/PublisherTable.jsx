@@ -25,11 +25,11 @@ function UserTypeTable() {
 
 
     useEffect(() => {
-        getUserTypes()
+        getPublishers()
         setRefresh(false)
     }, [refresh])
 
-    const getUserTypes = () => {
+    const getPublishers = () => {
         axios.get("api/publishers/")
             .then((res) => {
                 setPublishers(res.data)

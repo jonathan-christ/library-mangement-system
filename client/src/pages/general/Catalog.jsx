@@ -26,8 +26,10 @@ function Catalog() {
 
 
   return (
-    <div className="grid grid-cols-1 gap-x-10 gap-y-5 p-5 lg:w-2/3 md:w-full sm:w-full">
-      {bookCells}
+    <div className='w-full flex justify-center'>
+      <div className=" grid grid-cols-1 gap-x-10 gap-y-5 p-5 lg:w-2/3 md:w-full sm:w-full">
+        {bookCells}
+      </div>
     </div>
   )
 }

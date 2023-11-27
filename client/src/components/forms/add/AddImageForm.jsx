@@ -28,11 +28,7 @@ function AddImageForm({ refreshDependency }) {
         formData.append('title', data.title)
         formData.append('uploaderID', id)
         console.log(formData)
-        await axios.post("/api/images/create", formData, {
-            headers: {
-                "Content-Type": 'multipart/form-data'
-            }
-        })
+        await axios.post("/api/images/create", formData)
             .then(() => {
                 new FormData()
                 reset()

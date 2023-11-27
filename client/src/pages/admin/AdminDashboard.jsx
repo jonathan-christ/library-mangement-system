@@ -1,7 +1,7 @@
 
 function AdminDashboard() {
   return (
-    <div>AdminDashboard</div>
+    <div className="flex w-full justify-center">AdminDashboard</div>
   )
 }
 

@@ -50,7 +50,7 @@ function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) 
         const dirtyValues = getDirtyValues(data)
         await axios.put("/api/users/update", { user: { ...dirtyValues }, id: user.id })
             .then(() => {
-                const userDat = { ...session, ...dirtyValues }
+                const userDat = profile ? { ...session, ...dirtyValues } : { ...user, ...dirtyValues }
                 if (profile) {
                     ls.clear()
                     ls.set("userData", JSON.stringify(userDat), { ttl: ttl, encrypt: true })
@@ -90,15 +90,16 @@ function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) 
 
     const userExists = async (email) => {
         let exists = false
-        await axios.post("/api/users/find", { email: email })
-            .then(res => {
-                if (res.data.status === 'found') {
-                    exists = true
-                }
-            }).catch(() => {
-                setFormStatus(402)
-            })
-
+        if ((!profile) ? user.email === email : session.email === email) {
+            await axios.post("/api/users/find", { email: email })
+                .then(res => {
+                    if (res.data.status === 'found') {
+                        exists = true
+                    }
+                }).catch(() => {
+                    setFormStatus(402)
+                })
+        }
         return exists
     }
 
