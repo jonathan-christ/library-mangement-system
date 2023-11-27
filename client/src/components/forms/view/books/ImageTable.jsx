@@ -106,7 +106,7 @@ function ImageTable() {
             </Modal>
             <Modal show={view} onClose={() => setView(false)}>
                 <Modal.Header>IMAGE VIEW</Modal.Header>
-                <Modal.Body className='p-5'>
+                <Modal.Body className='p-5 flex justify-center'>
                     <img src={imageProxy + modalData.imgLink} alt="" />
                 </Modal.Body>
             </Modal>
