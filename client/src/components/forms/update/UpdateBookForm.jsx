@@ -98,7 +98,7 @@ function UpdateBookForm({ book, components, refreshDependency }) {
                 }
             }
         }
-        console.log(submitData)
+        console.log(data.image)
         await axios.post("api/library/books/update", submitData, header)
             .then(() => {
                 const newData = { ...data, ...dirtyValues }
@@ -380,8 +380,8 @@ function UpdateBookForm({ book, components, refreshDependency }) {
                                                 defaultValue={images.find(c => c.value === book.imageID)}
                                                 value={images.find((c) => c.value === value) || watch('image.select') ? value : []}
                                                 onChange={(elem) => {
-                                                    onChange(elem.value.value)
-                                                    setFile(imageProxy + elem.value.link)
+                                                    onChange(elem.value)
+                                                    setFile(imageProxy + elem.link)
                                                 }}
                                                 isDisabled={watch('select') === 'select' ? null : true}
                                             />

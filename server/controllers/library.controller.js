@@ -100,6 +100,7 @@ exports.findBook = async (req, res) => {
 exports.updateBook = async (req, res) => {
     // check changes
     let data = req.body.data
+    console.log(data)
     try {
         const result = await db.sequelize.transaction(async (t) => {
             console.log("start");
@@ -111,7 +112,7 @@ exports.updateBook = async (req, res) => {
                             return;
                         }
                         data = unflatten.unflatObject(req.body)
-                        data.book.description? data.book.description = data.book.description[0] : 1
+                        data.book.description ? data.book.description = data.book.description[0] : 1
                         const { uploaderID, title } = req.body;
                         const imgLink = `/images/${req.file.filename}`;
 
@@ -123,21 +124,24 @@ exports.updateBook = async (req, res) => {
                 })
                 data.book.imageID = uploadedImage.id
             } else {
-                data.image ? data.book.imageID = data.image.select : ''
+                data.book ? 1 : data.book = {}
+                console.log(data.book)
+                data.image ? data.book.imageID = data.image.select : 1
+                console.log("pre after else")
             }
-
+            console.log("after else")
             const bookID = data.id
             console.log(bookID)
             console.log(data.book)
-            await Book.update(data.book, { where: { id: bookID } }, { transaction: t }) //INCOMPLETE should be separated from authors 
+            await Book.update(data.book, { where: { id: bookID }, transaction: t }) //INCOMPLETE should be separated from authors 
             //OYOYOYO use react form hook (..register("book.___"))
 
             console.log("authors")
-            data.authors ? await updateList(data.authors, 'authorID', AuthorList, bookID, { transaction: t }) : 1
+            data.authors ? await updateList(data.authors, 'authorID', AuthorList, bookID, t) : 1
             console.log("genres")
-            data.genres ? await updateList(data.genres, 'genreID', GenreList, bookID, { transaction: t }) : 1
+            data.genres ? await updateList(data.genres, 'genreID', GenreList, bookID, t) : 1
             console.log("subjects")
-            data.subjects ? await updateList(data.subjects, 'subjectID', SubjectList, bookID, { transaction: t }) : 1
+            data.subjects ? await updateList(data.subjects, 'subjectID', SubjectList, bookID, t) : 1
 
             res.status(200).send("Book has been updated!")
         })
@@ -178,28 +182,18 @@ const updateList = async (data, modelName, dbModel, bookID, transaction) => {
 
     console.log("updatelist + " + bookID);
 
-    // Retrieve models from the database
-    const models = await dbModel.findAll({ where: { bookID: bookID } }, transaction);
-
-    // Identify removed models
-    const removedModels = models.filter((elem) => !data.includes(elem[modelName]));
-
-    // Identify new models
+    const models = await dbModel.findAll({ where: { bookID: bookID }, transaction: transaction })
+    const removedModels = models.filter((elem) => !data.includes(elem[modelName]))
     const newModels = data
         .filter((modelID) => !removedModels.some((currModel) => currModel[modelName] === modelID))
         .map((modelID) => ({ [modelName]: modelID, bookID: bookID }));
 
     console.log("updatelist new");
-
     console.log("updatelist queries" + bookID);
-
-    // Conditionally destroy removed models
     if (removedModels.length > 0) {
-        await dbModel.destroy({ where: { [modelName]: removedModels.map((model) => model[modelName]) } }, transaction);
+        await dbModel.destroy({ where: { [modelName]: removedModels.map((model) => model[modelName]) }, transaction: transaction });
     }
-
-    // Conditionally create new models
     if (newModels.length > 0) {
-        await dbModel.bulkCreate(newModels, { validate: true, ...transaction });
+        await dbModel.bulkCreate(newModels, { validate: true, transaction: transaction });
     }
 };
