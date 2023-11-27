@@ -74,7 +74,7 @@ exports.addBook = async (req, res) => {
 exports.findAllBooks = async (req, res) => {
     try {
         const result = await Book.findAll({
-            where: {deleted: false},
+            where: { deleted: false },
             include: [Author, Genre, Subject, Publisher, BookImage]
         })
 
@@ -111,6 +111,7 @@ exports.updateBook = async (req, res) => {
                             return;
                         }
                         data = unflatten.unflatObject(req.body)
+                        data.book.description? data.book.description = data.book.description[0] : 1
                         const { uploaderID, title } = req.body;
                         const imgLink = `/images/${req.file.filename}`;
 
@@ -127,6 +128,7 @@ exports.updateBook = async (req, res) => {
 
             const bookID = data.id
             console.log(bookID)
+            console.log(data.book)
             await Book.update(data.book, { where: { id: bookID } }, { transaction: t }) //INCOMPLETE should be separated from authors 
             //OYOYOYO use react form hook (..register("book.___"))
 

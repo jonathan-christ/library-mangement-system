@@ -3,7 +3,7 @@ import Select from 'react-select'
 import validator from 'validator'
 import PropTypes from 'prop-types'
 
-import { imageProxy } from '../../../assets/constants';
+import { imageProxy, supportedImageExtensions } from '../../../assets/constants';
 import { DevTool } from '@hookform/devtools'
 import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
@@ -76,15 +76,21 @@ function UpdateBookForm({ book, components, refreshDependency }) {
             submitData = { data: { ...dirtyValues, id: book.id } }
         } else {
             submitData = new FormData()
-            dirtyValues.authors ? submitData.append('authors', dirtyValues.authors) : ''
-            dirtyValues.genres ? submitData.append('genres', dirtyValues.genres) : ''
-            dirtyValues.subjects ? submitData.append('subjects', dirtyValues.subjects) : ''
-            dirtyValues.classificationID ? submitData.append('classificationID', dirtyValues.classificationID) : ''
+            // dirtyValues.authors ? submitData.append('authors', dirtyValues.authors) : ''
+            // dirtyValues.genres ? submitData.append('genres', dirtyValues.genres) : ''
+            // dirtyValues.subjects ? submitData.append('subjects', dirtyValues.subjects) : ''
+            // dirtyValues.classificationID ? submitData.append('classificationID', dirtyValues.classificationID) : ''
             submitData.append('uploaderID', userData.id)
             submitData.append('bookImg', dirtyValues.image.upload[0])
             submitData.append('title', dirtyValues.image.title)
-            for (var key in dirtyValues.book) {
-                submitData.append('book.' + key, dirtyValues.book[key]);
+            submitData.append('id', book.id)
+            console.log(dirtyValues)
+            for (var key in dirtyValues) {
+                if (key == 'book' || key == 'image') continue
+                submitData.append(key, dirtyValues[key])
+            }
+            for (var bkey in dirtyValues.book) {
+                submitData.append('book.' + bkey, dirtyValues.book[bkey]);
             }
             header = {
                 headers: {
@@ -93,7 +99,6 @@ function UpdateBookForm({ book, components, refreshDependency }) {
             }
         }
         console.log(submitData)
-
         await axios.post("api/library/books/update", submitData, header)
             .then(() => {
                 const newData = { ...data, ...dirtyValues }
@@ -119,10 +124,16 @@ function UpdateBookForm({ book, components, refreshDependency }) {
         return result
     }
 
-    const getDirtyValues = (data) => {
+    const getDirtyValues = (data, field = dirtyFields) => {
         return Object.fromEntries(
-            Object.keys(dirtyFields).map(key => {
-                return [key, data[key]]
+            Object.keys(field).map(key => {
+                console.log(+"asad" + key)
+                if (key === 'book') {
+                    console.log('book keys')
+                    return [key, getDirtyValues(data.book, dirtyFields.book)]
+                } else {
+                    return [key, data[key]]
+                }
             }))
     }
 
@@ -131,16 +142,8 @@ function UpdateBookForm({ book, components, refreshDependency }) {
     }
 
     const isImg = (val) => {
-        const image = new Image();
-        image.src = val
-
-        image.onload = function () {
-            return true
-        }
-
-        image.onerror = function () {
-            return false
-        }
+        const fileExtension = val[0].name.split('.').pop().toLowerCase()
+        return supportedImageExtensions.includes(fileExtension);
     }
 
     return (
