@@ -2,7 +2,6 @@ import { useSession } from '../context-hooks/session/SessionUtils'
 import { Avatar, Dropdown, Navbar } from 'flowbite-react'
 
 import PropTypes from 'prop-types'
-import NavigationLink from './NavigationLink'
 import Logo from './navbar components/Logo'
 
 AdminNavigation.propTypes = {
@@ -12,8 +11,8 @@ function AdminNavigation({ functions }) {
     const session = useSession()
 
     return (
-        <Navbar fluid rounded className='shadow-md z-10'>
-            <Logo to='/admindash'/>
+        <Navbar fluid>
+            <Logo to='/admindash' />
             <div className="flex md:order-2">
                 <Dropdown
                     arrowIcon={false}
@@ -35,16 +34,6 @@ function AdminNavigation({ functions }) {
                 </Dropdown>
                 <Navbar.Toggle />
             </div>
-            <Navbar.Collapse>
-                <>
-                < Navbar.Link/>
-                    <NavigationLink to='admindash' label="DASHBOARD" />
-                    <NavigationLink to='users' label="USERS" />
-                    {/* ^ to be replaced with CATALOG */}
-                    <NavigationLink to='authors' label="AUTHORS" />
-                    <NavigationLink to='publishers' label="PUBLISHERS" />
-                </>
-            </Navbar.Collapse>
         </Navbar>
     )
 }

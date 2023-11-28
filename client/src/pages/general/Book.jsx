@@ -46,13 +46,13 @@ function Book() {
   }, [initializePage])
 
   return (
-    <>
+    <div className='flex flex-col justify-center w-full'>
       <Link to='/catalog'>
         <Button>Go Back</Button>
 
       </Link>
       {!loading &&
-        <div className='flex flex-col min-w-full p-5 gap-10'>
+        <div className='flex flex-col justify-center min-w-full p-5 gap-10'>
           <div className="title flex flex-col text-center gap-5 content-center flex-wrap">
             <div>
               <span className="text-5xl font-semibold">{book.title}</span>
@@ -78,7 +78,7 @@ function Book() {
           <CopyTable bookID={book.id} />
         </div>
       }
-    </>
+    </div>
   )
 }
 

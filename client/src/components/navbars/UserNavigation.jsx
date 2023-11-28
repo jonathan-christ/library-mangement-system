@@ -15,7 +15,7 @@ function UserNavigation({ functions }) {
 
     return (
         // className='bg-primary-base text-gray-200'
-        <Navbar fluid className='shadow-md'>
+        <Navbar fluid>
             <Logo to='/catalog' />
             <div className="flex md:order-2">
                 {session &&

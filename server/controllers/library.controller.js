@@ -112,7 +112,7 @@ exports.updateBook = async (req, res) => {
                             return;
                         }
                         data = unflatten.unflatObject(req.body)
-                        data.book.description ? data.book.description = data.book.description[0] : 1
+                        data.book?.description ? data.book.description = data.book.description[0] : 1
                         const { uploaderID, title } = req.body;
                         const imgLink = `/images/${req.file.filename}`;
 
@@ -122,6 +122,7 @@ exports.updateBook = async (req, res) => {
                             .catch((error) => reject(error));
                     })
                 })
+                data.book ? 1 : data.book = {}
                 data.book.imageID = uploadedImage.id
             } else {
                 data.book ? 1 : data.book = {}

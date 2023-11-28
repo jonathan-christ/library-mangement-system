@@ -42,11 +42,19 @@ db.classification = require('./book/classification/classification.model')(sequel
 db.publisher = require('./book/publisher/publisher.model')(sequelize, Sequelize)
 db.rating = require('./book/rating/rating.model')(sequelize, Sequelize)
 
+db.fineCateg = require('./transaction/fineCateg.model')(sequelize, Sequelize)
+db.fine = require('./transaction/fine.model')(sequelize, Sequelize)
+
 //RELATIONS
 // user
 db.userType.hasMany(db.user, { foreignKey: 'typeID' })
+db.user.belongsTo(db.userType, { foreignKey: 'typeID' })
+
 db.user.hasMany(db.rating, { foreignKey: 'userID' })
 db.rating.belongsTo(db.user, { foreignKey: 'userID' })
+
+db.user.hasMany(db.fine, {foreignKey: 'userID'})
+db.fine.belongsTo(db.user, {foreignKey: 'userID'})
 
 // books
 db.book.belongsTo(db.bookImg, { foreignKey: 'imageID' })
@@ -72,6 +80,10 @@ db.publisher.hasMany(db.book, { foreignKey: 'publisherID' })
 
 db.book.belongsTo(db.classification, { foreignKey: 'classificationID' })
 db.classification.hasMany(db.book, { foreignKey: 'classificationID' })
+
+// fines
+db.fine.belongsTo(db.fineCateg, {foreignKey: 'categID'})
+db.fineCateg.hasMany(db.fine, {foreignKey: 'categID'})
 
 
 module.exports = db

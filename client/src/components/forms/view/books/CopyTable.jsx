@@ -160,11 +160,11 @@ function CopyTable({ bookID }) {
                 </>
             }
             <StatusHandler subject={"Copy/s"} action={action} code={status} dismiss={setStatus} />
-            <div className="p-10">
+            <div className="p-10 flex flex-col justify-center">
                 {!bookID &&
                     <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Copy</Button>
                 }
-                <Table className='bg-white shadow-lg w-max'>
+                <Table className='bg-white shadow-lg w-max justify-center'>
                     <Table.Head className='shadow-lg text-md text-black'>
                         <Table.HeadCell className='p-5'>Book</Table.HeadCell>
                         <Table.HeadCell className='p-5'>Call Number</Table.HeadCell>

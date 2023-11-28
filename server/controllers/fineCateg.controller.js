@@ -1,20 +1,16 @@
 const db = require("../models")
 const Op = db.Sequelize.Op
 
-const Copy = db.bookCopy
-const Book = db.book
-
-const rand = () => {
-    return Math.floor(Math.random() * 900) + 100; // Generates a random 3-digit number
-}
+const FineCateg = db.fineCateg
 
 exports.create = async (req, res) => {
-    const copy = {
-        bookID: req.body.bookID,
-        callNumber: req.body.callNumber + rand() // for implementation
+    const fineCateg = {
+        name: req.body.name,
+        amount: req.body.amount,
+        description: req.body.desc,
     }
 
-    Copy.create(copy)
+    FineCateg.create(fineCateg)
         .then(data => {
             res.send(data)
         })
@@ -26,13 +22,7 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    console.log(req.body)
-    let val = req.body.bookID
-    let condition = val ? { bookID: val } : null
-
-    Copy.findAll({
-        include: [Book], 
-        where: condition })
+    FineCateg.findAll()
         .then(data => {
             res.send(data)
         })
@@ -44,9 +34,9 @@ exports.findAll = (req, res) => {
 
 exports.findOne = (req, res) => {
     //conditional
-    let callnum = req.body.callNumber
+    let name = req.body.name
 
-    Copy.findOne({ where: { callNumber: callnum } })
+    FineCateg.findOne({ where: { name: name } })
         .then(data => {
             res.status(200).send({
                 status: data ? 'found' : 'not found',
@@ -62,7 +52,8 @@ exports.findOne = (req, res) => {
 exports.findOneID = (req, res) => {
     //options
     let id = req.body.id
-    Copy.findByPk(id)
+
+    FineCateg.findByPk(id)
         .then(data => {
             res.status(200).send({
                 status: data ? 'found' : 'not found',
@@ -74,13 +65,12 @@ exports.findOneID = (req, res) => {
                 .send({ message: err.message })
         })
 }
-
 exports.update = (req, res) => {
     let data = req.body
-    Copy.update(data.copy, { where: { id: data.id } })
+    FineCateg.update(data.fineCateg, { where: { id: data.id } })
         .then(() => {
             res.status(200).send({
-                message: "Copy updated!"
+                message: "FineCateg updated!"
             })
         })
         .catch(err => {
@@ -91,10 +81,10 @@ exports.update = (req, res) => {
 
 exports.delete = (req, res) => {
     let data = req.body
-    Copy.destroy({ where: { id: data.id } })
+    FineCateg.destroy({ where: { id: data.id } })
         .then(() => {
             res.status(200).send({
-                message: "Copy deleted!"
+                message: "Fine category deleted!"
             })
         })
         .catch(err => {

@@ -1,23 +1,23 @@
 import PropTypes from 'prop-types'
 import { useLocation, useLinkClickHandler } from 'react-router-dom'
-import { Navbar } from "flowbite-react"
+import { Sidebar } from 'flowbite-react'
 
-NavigationLink.propTypes = {
+SidebarLink.propTypes = {
     to: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired
+    label: PropTypes.string.isRequired,
+    icon: PropTypes.node
 }
-function NavigationLink({ to, label }) {
+function SidebarLink({ to, label, icon }) {
     const location = useLocation();
     const clickHandler = useLinkClickHandler(to);
-    console.log(location)
 
     return (
         <span onClick={clickHandler}>
-            <Navbar.Link href={to} active={location.pathname === to}>
+            <Sidebar.Item href={to} active={location.pathname === to} icon={icon}>
                 {label}
-            </Navbar.Link>
+            </Sidebar.Item>
         </span>
     )
 }
 
-export default NavigationLink
+export default SidebarLink

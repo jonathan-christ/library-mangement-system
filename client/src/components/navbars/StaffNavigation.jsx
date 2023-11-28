@@ -12,7 +12,7 @@ function StaffNavigation({ functions }) {
     const session = useSession()
 
     return (
-        <Navbar fluid rounded className='shadow-md z-10'>
+        <Navbar fluid>
             <Logo to='/dashboard' />
             <div className="flex md:order-2">
                 <Dropdown
@@ -37,11 +37,11 @@ function StaffNavigation({ functions }) {
             </div>
             <Navbar.Collapse>
                 <>
-                    <NavigationLink to='dashboard' label="DASHBOARD" />
-                    <NavigationLink to='books' label="BOOK" />
+                    <NavigationLink to='/dashboard' label="DASHBOARD" />
+                    <NavigationLink to='/books' label="BOOK" />
                     {/* ^ to be replaced with CATALOG */}
-                    <NavigationLink to='authors' label="AUTHORS" />
-                    <NavigationLink to='publishers' label="PUBLISHERS" />
+                    <NavigationLink to='/authors' label="AUTHORS" />
+                    <NavigationLink to='/publishers' label="PUBLISHERS" />
                 </>
             </Navbar.Collapse>
         </Navbar>

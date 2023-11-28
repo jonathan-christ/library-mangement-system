@@ -52,6 +52,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         publishDate: {
             type: Sequelize.DATE,
+            defaultValue: Sequelize.NOW
         },
         deleted: {
             type: Sequelize.BOOLEAN,
