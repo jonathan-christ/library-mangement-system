@@ -1,17 +1,19 @@
+const { Sequelize, fineCateg } = require("../models")
 const db = require("../models")
 const Op = db.Sequelize.Op
 
+const User = db.user
+const Ticket = db.ticket
+const Fine = db.fine
 const FineCateg = db.fineCateg
 
 exports.create = async (req, res) => {
-    const fineCateg = {
-        name: req.body.name,
-        amount: req.body.amount,
-        frequency: req.body.frequency,
-        description: req.body.description,
+    const fine = {
+        ticketID: req.body.ticketID,
+        categID: req.body.categID,
     }
 
-    FineCateg.create(fineCateg)
+    Fine.create(fine)
         .then(data => {
             res.send(data)
         })
@@ -23,7 +25,22 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    FineCateg.findAll()
+    Fine.findAll({
+        include: [
+            {
+                model: Ticket,
+                include: [{
+                    model: User,
+                    attributes: ['firstName', 'lastName']
+                }],
+                attributes: ['uuid', 'lendDate']
+            },
+            {
+                model: FineCateg,
+                attributes: ['name', 'amount', 'frequency']
+            }
+        ]
+    })
         .then(data => {
             res.send(data)
         })
@@ -33,28 +50,28 @@ exports.findAll = (req, res) => {
         })
 }
 
-exports.findOne = (req, res) => {
-    //conditional
-    let name = req.body.name
+// exports.findOne = (req, res) => {
+//     //conditional
+//     let name = req.body.name
 
-    FineCateg.findOne({ where: { name: name } })
-        .then(data => {
-            res.status(200).send({
-                status: data ? 'found' : 'not found',
-                data: data ? data : null
-            })
-        })
-        .catch(err => {
-            res.status(500)
-                .send({ message: err.message })
-        })
-}
+//     Fine.findOne({ where: { name: name } })
+//         .then(data => {
+//             res.status(200).send({
+//                 status: data ? 'found' : 'not found',
+//                 data: data ? data : null
+//             })
+//         })
+//         .catch(err => {
+//             res.status(500)
+//                 .send({ message: err.message })
+//         })
+// }
 
 exports.findOneID = (req, res) => {
     //options
     let id = req.body.id
 
-    FineCateg.findByPk(id)
+    Fine.findByPk(id)
         .then(data => {
             res.status(200).send({
                 status: data ? 'found' : 'not found',
@@ -68,10 +85,11 @@ exports.findOneID = (req, res) => {
 }
 exports.update = (req, res) => {
     let data = req.body
-    FineCateg.update(data.fineCateg, { where: { id: data.id } })
+    console.log(data)
+    Fine.update({ status: data.status }, { where: { id: data.id } })
         .then(() => {
             res.status(200).send({
-                message: "FineCateg updated!"
+                message: "Fine record updated!"
             })
         })
         .catch(err => {
@@ -82,10 +100,10 @@ exports.update = (req, res) => {
 
 exports.delete = (req, res) => {
     let data = req.body
-    FineCateg.destroy({ where: { id: data.id } })
+    Fine.destroy({ where: { id: data.id } })
         .then(() => {
             res.status(200).send({
-                message: "Fine category deleted!"
+                message: "Fine record deleted!"
             })
         })
         .catch(err => {

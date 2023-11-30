@@ -45,6 +45,8 @@ db.rating = require('./book/rating/rating.model')(sequelize, Sequelize)
 db.fineCateg = require('./transaction/fineCateg.model')(sequelize, Sequelize)
 db.fine = require('./transaction/fine.model')(sequelize, Sequelize)
 
+db.ticket = require('./transaction/ticket.model')(sequelize, Sequelize)
+
 //RELATIONS
 // user
 db.userType.hasMany(db.user, { foreignKey: 'typeID' })
@@ -52,9 +54,6 @@ db.user.belongsTo(db.userType, { foreignKey: 'typeID' })
 
 db.user.hasMany(db.rating, { foreignKey: 'userID' })
 db.rating.belongsTo(db.user, { foreignKey: 'userID' })
-
-db.user.hasMany(db.fine, {foreignKey: 'userID'})
-db.fine.belongsTo(db.user, {foreignKey: 'userID'})
 
 // books
 db.book.belongsTo(db.bookImg, { foreignKey: 'imageID' })
@@ -82,8 +81,19 @@ db.book.belongsTo(db.classification, { foreignKey: 'classificationID' })
 db.classification.hasMany(db.book, { foreignKey: 'classificationID' })
 
 // fines
-db.fine.belongsTo(db.fineCateg, {foreignKey: 'categID'})
-db.fineCateg.hasMany(db.fine, {foreignKey: 'categID'})
+db.fine.belongsTo(db.fineCateg, { foreignKey: 'categID' })
+db.fineCateg.hasMany(db.fine, { foreignKey: 'categID' })
 
+db.ticket.hasOne(db.fine, {foreignKey: 'ticketID'})
+db.fine.belongsTo(db.ticket, {foreignKey: 'ticketID'})
+
+db.ticket.belongsTo(db.user, { foreignKey: 'userID' })
+db.user.hasMany(db.ticket, { foreignKey: 'userID' })
+
+db.ticket.belongsTo(db.book, { foreignKey: 'bookID' })
+db.book.hasMany(db.ticket, { foreignKey: 'bookID' })
+
+db.ticket.belongsTo(db.bookCopy, { foreignKey: 'copyID' })
+db.bookCopy.hasMany(db.ticket, { foreignKey: 'copyID' })
 
 module.exports = db

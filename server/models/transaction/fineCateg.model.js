@@ -13,6 +13,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.DECIMAL(10,2),
             allowNull: false
         },
+        frequency: {
+            type: Sequelize.ENUM("hourly", "daily"),
+            allowNull: false
+        },
         description: {
             type: Sequelize.TEXT
         }

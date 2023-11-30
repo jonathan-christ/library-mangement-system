@@ -1,6 +1,7 @@
 const db = require("../models");
 const Op = db.Sequelize.Op;
 const Book = db.book;
+const BookCopy = db.bookCopy
 
 exports.create = async (req, res, transaction) => {
     try {
@@ -29,6 +30,21 @@ exports.create = async (req, res, transaction) => {
 exports.findAll = async (req, res) => {
     try {
         const books = await Book.findAll()
+        res.send(books);
+    } catch (error) {
+        res.status(500).send({ message: error.message })
+    }
+}
+
+exports.findAllHasCopies = async (req, res) => {
+    try {
+        const books = await Book.findAll({
+            include: [{
+                model: BookCopy,
+                required: true,
+                where: {status: 'good'}
+            }]
+        })
         res.send(books);
     } catch (error) {
         res.status(500).send({ message: error.message })

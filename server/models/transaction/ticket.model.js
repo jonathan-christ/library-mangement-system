@@ -5,6 +5,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             primaryKey: true
         },
+        uuid: {
+            type: Sequelize.STRING(36),
+            allowNull: false
+        },
         userID: {
             type: Sequelize.INTEGER,
             allowNull: false,
@@ -24,8 +28,9 @@ module.exports = (sequelize, Sequelize) => {
         copyID: {
             type: Sequelize.INTEGER,
             allowNull: true,
+            defaultValue: null,
             references: {
-                model: "book",
+                model: "bookCopy",
                 key: "id"
             }
         },
@@ -34,16 +39,23 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
             defaultValue: Sequelize.NOW
         },
+        reserveDate: {
+            type: Sequelize.DATE,
+            defaultValue: null,
+        },
         lendDate: {
             type: Sequelize.DATE,
             allowNull: true,
+            defaultValue: null,
         },
-        closeDate: {
+        returnDate: {
             type: Sequelize.DATE,
             allowNull: true,
+            defaultValue: null,
         },
         status: {
-            type: Sequelize.ENUM("queued", "borrowed", "closed", "overdue")
+            type: Sequelize.ENUM("queued", "reserved", "borrowed", "closed", "overdue", "cancelled"),
+            defaultValue: "queued"
         }
     })
 

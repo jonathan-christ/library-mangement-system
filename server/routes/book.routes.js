@@ -3,6 +3,7 @@ module.exports = (app) => {
     let router = require('express').Router()
 
     router.get("/", book.findAll)
+    router.get("/hascopies", book.findAllHasCopies)
     router.post("/find", book.findOne)
     router.post("/create", book.create)
     router.post("/delete", book.delete)

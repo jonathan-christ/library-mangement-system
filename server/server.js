@@ -41,7 +41,9 @@ require('./routes/rating.routes')(app)
 require('./routes/publisher.routes')(app)
 require('./routes/classification.routes')(app)
 
+require('./routes/fine.routes')(app)
 require('./routes/fineCateg.routes')(app)
+require('./routes/transaction.routes')(app)
 
 
 //unknown get request

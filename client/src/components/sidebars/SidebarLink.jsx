@@ -5,7 +5,7 @@ import { Sidebar } from 'flowbite-react'
 SidebarLink.propTypes = {
     to: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
-    icon: PropTypes.node
+    icon: PropTypes.func
 }
 function SidebarLink({ to, label, icon }) {
     const location = useLocation();

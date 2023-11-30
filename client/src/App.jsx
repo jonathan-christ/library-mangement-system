@@ -33,6 +33,9 @@ import Genres from './pages/admin/Genres'
 import Subjects from './pages/admin/Subjects'
 import Classifications from './pages/admin/Classifications'
 import Copies from './pages/admin/Copies'
+import FineCategs from './pages/admin/FineCategs'
+import Tickets from './pages/admin/Tickets'
+import Fines from './pages/admin/Fines'
 
 
 function App() {
@@ -59,14 +62,21 @@ function App() {
             {/* ADMINS */}
             <Route path="admindash" element={<AdminGuard element={<AdminDashboard />} />} />
             <Route path="users" element={<AdminGuard element={<Users />} />} />
-            <Route path="usertypes" element={<AdminGuard element={<UserTypes />} />} />
+
+            <Route path="tickets" element={<AdminGuard element={<Tickets />} />} />
+            <Route path="fines" element={<AdminGuard element={<Fines />} />} />
+
             <Route path="books" element={<AdminGuard element={<Books />} />} />
             <Route path="copies" element={<AdminGuard element={<Copies />} />} />
+
             <Route path="genres" element={<AdminGuard element={<Genres />} />} />
             <Route path="authors" element={<AdminGuard element={<Authors />} />} />
-            <Route path="classes" element={<AdminGuard element={<Classifications />} />} />
             <Route path="subjects" element={<AdminGuard element={<Subjects />} />} />
             <Route path="publishers" element={<AdminGuard element={<Publishers />} />} />
+
+            <Route path="classes" element={<AdminGuard element={<Classifications />} />} />
+            <Route path="usertypes" element={<AdminGuard element={<UserTypes />} />} />
+            <Route path="finecategs" element={<AdminGuard element={<FineCategs />} />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

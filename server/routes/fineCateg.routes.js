@@ -9,5 +9,5 @@ module.exports = (app) => {
     router.get("/", fineCateg.findAll)
     router.post("/find", fineCateg.findOne)
 
-    app.use('/api/fineCategs', router)
+    app.use('/api/finecategs', router)
 }

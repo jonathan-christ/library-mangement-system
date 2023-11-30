@@ -1,0 +1,131 @@
+import axios from 'axios'
+import PropTypes from 'prop-types'
+import StatusHandler from '../../misc/StatusHandler'
+
+import { useState, useEffect } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { DevTool } from '@hookform/devtools'
+
+import Select from 'react-select'
+import { Button, Label } from 'flowbite-react'
+import { emptyMsg } from '../../../assets/formErrorMsg'
+
+AddFineForm.propTypes = {
+    refreshDependency: PropTypes.func
+}
+function AddFineForm({ refreshDependency }) {
+    const [formStatus, setFormStatus] = useState(0)
+    const [tickets, setTickets] = useState([])
+    const [finecategs, setFineCategs] = useState([])
+
+    const showOnly = {
+        'borrowed': true,
+        'overdue': true
+    }
+    const {
+        handleSubmit,
+        reset,
+        watch,
+        control,
+        formState: { errors },
+    } = useForm({ mode: 'onTouched' })
+
+    useEffect(() => {
+        getTickets()
+        getFineCategs()
+    }, [])
+
+    const addTicket = async (data) => {
+        await axios.post("/api/fines/create", data)
+            .then(() => {
+                reset()
+                setFormStatus(200)
+                refreshDependency ? refreshDependency(true) : ''
+            }).catch((err) => {
+                console.log(err)
+                setFormStatus(500)
+            })
+
+    }
+
+    const getTickets = async () => {
+        await axios.get("/api/transactions/tickets")
+            .then((res) => {
+                setTickets(res.data)
+            })
+    }
+
+    const getFineCategs = async () => {
+        await axios.get("/api/finecategs")
+            .then((res) => {
+                setFineCategs(res.data)
+            })
+    }
+
+    const ticketOpts = tickets
+        .filter(ticket => showOnly[ticket.status] === true)
+        .map(ticket => ({
+            value: ticket.id,
+            label: ticket.user.userName + ' - ' + ticket.book.title
+        }))
+
+    const categOpts = finecategs.map((category) => {
+        return (
+            { value: category.id, label: category.name }
+        )
+    })
+
+
+    return (
+        <>
+            <StatusHandler subject={"Fine category"} code={formStatus} dismiss={setFormStatus} />
+            <div>
+                <form onSubmit={handleSubmit(addTicket)} className="flex max-w-md flex-col gap-4" noValidate>
+                    <div>
+                        <div className="mb-2 block">
+                            <Label htmlFor="ticket" value="Select Ticket" />
+                        </div>
+                        <Controller
+                            id="ticket"
+                            name="ticketID"
+                            control={control}
+                            render={({ field: { onChange }, value }) => (
+                                <Select
+                                    options={ticketOpts}
+                                    value={tickets.find((c) => c.value === value) || watch('ticketID') ? value : []}
+                                    onChange={(elem) => onChange(elem.value)}
+                                    isDisabled={!ticketOpts.length}
+                                />
+                            )}
+                            rules={{ required: emptyMsg('ticket') }}
+                        />
+                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.ticketID?.message}</p>
+                    </div>
+                    <div className="max-w-md">
+                        <div className="mb-2 block">
+                            <Label htmlFor="finecateg" value="Fine Category" />
+                        </div>
+                        <Controller
+                            id="finecateg"
+                            name="categID"
+                            control={control}
+                            render={({ field: { onChange }, value }) => (
+                                <Select
+                                    options={categOpts}
+                                    value={finecategs.find((c) => c.value === value) || watch('categID') ? value : []}
+                                    onChange={(elem) => onChange(elem.value)}
+                                />
+                            )}
+                            rules={{ required: emptyMsg('finecateg') }}
+                        />
+                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.categID?.message}</p>
+                    </div>
+                    <Button type="submit">Add New Ticket</Button>
+                </form>
+                <DevTool control={control} />
+            </div>
+        </>
+    )
+}
+
+export default AddFineForm

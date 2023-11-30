@@ -1,11 +1,11 @@
 module.exports = (sequelize, Sequelize) => {
     // id, name, desc
     const Fine = sequelize.define("fine", {
-        userID: {
+        ticketID: {
             type: Sequelize.INTEGER,
             allowNull: false,
             references: {
-                model: "user",
+                model: "ticket",
                 key: "id"
             }
         },
