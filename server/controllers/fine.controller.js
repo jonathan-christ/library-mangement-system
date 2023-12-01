@@ -85,8 +85,8 @@ exports.findOneID = (req, res) => {
 }
 exports.update = (req, res) => {
     let data = req.body
-    console.log(data)
-    Fine.update({ status: data.status }, { where: { id: data.id } })
+    console.log(data, data.status, data.payDate)
+    Fine.update({ status: data.status, payDate: data.payDate }, { where: { id: data.id } })
         .then(() => {
             res.status(200).send({
                 message: "Fine record updated!"

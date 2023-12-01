@@ -1,3 +1,4 @@
+import PropTypes from "prop-types"
 "use client";
 
 import axios from 'axios'
@@ -9,7 +10,7 @@ import { RiErrorWarningFill } from "react-icons/ri"
 import StatusHandler from '../../../misc/StatusHandler'
 import AddFineForm from '../../add/AddFineForm'
 
-function FineTable() {
+function FineTable({ userID, staff }) {
     const [refresh, setRefresh] = useState(true)
 
     const [fines, setFines] = useState([])
@@ -22,11 +23,11 @@ function FineTable() {
     const [modalData, setModalData] = useState({})
 
     useEffect(() => {
-        getTickets()
+        getFines()
         setRefresh(false)
     }, [refresh])
 
-    const getTickets = async () => {
+    const getFines = async () => {
         await axios.get("api/fines")
             .then((res) => {
                 setFines(res.data)
@@ -36,8 +37,9 @@ function FineTable() {
             })
     }
 
-    const updateTicket = async (id, status) => {
-        let data = { id: id, status: status }
+    const updateTicket = async (id, status, date) => {
+        let data = { id: id, status: status, payDate: date }
+        console.log(data)
         await axios.put("api/fines/update", data)
             .then(() => {
                 setRefresh(true)
@@ -55,8 +57,9 @@ function FineTable() {
             })
     }
 
-    const callUpdate = (data, status) => {
+    const callUpdate = (data, status, date) => {
         data.status = status
+        data.payDate = date
         setModalData(data)
         setPromptShow(true)
     }
@@ -67,15 +70,16 @@ function FineTable() {
         setDeleteShow(true)
     }
 
-    const dateDiff = (lendDate, rate) => {
+    const dateDiff = (lendDate, currDate, rate) => {
         lendDate = new Date(lendDate)
-        let now = new Date()
+        let now = new Date(currDate)
         let cancel = {
             'hourly': 24,
             'daily': 1,
             'fixed': 0
         }
-        return lendDate > now ? 0 : Math.fround((now - lendDate) / (1000 * 60 * 60 * 24 / cancel[rate])).toFixed(2)
+
+        return lendDate > now ? 0 : Math.floor((now - lendDate) / (1000 * 60 * 60 * 24 / cancel[rate]))
     }
 
     const getStatus = (status) => ({
@@ -85,26 +89,28 @@ function FineTable() {
 
     const userCells = useMemo(() =>
         fines.map((fine, idx) => {
+            const amount = dateDiff(fine.ticket.lendDate, fine.ticket.payDate ?? new Date(), fine.fineCategory.frequency) * fine.fineCategory.amount
             return (
                 <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-100")}>
                     <Table.Cell className='mx-5'>{fine.ticket.uuid}</Table.Cell>
-                    <Table.Cell>{fine.ticket.user.firstName + ' ' + fine.ticket.user.lastName}</Table.Cell>
+                    {!!userID || <Table.Cell>{fine.ticket.user.firstName + ' ' + fine.ticket.user.lastName}</Table.Cell>}
                     <Table.Cell>{fine.fineCategory.name}</Table.Cell>
                     <Table.Cell>{fine.fineCategory.amount}</Table.Cell>
                     <Table.Cell>{fine.fineCategory.frequency}</Table.Cell>
-                    <Table.Cell>{'₱' + dateDiff(fine.ticket.lendDate, fine.fineCategory.frequency) * fine.fineCategory.amount}</Table.Cell>
+                    <Table.Cell>{'₱' + amount.toFixed(2)}</Table.Cell>
+                    <Table.Cell>{fine.payDate}</Table.Cell>
                     <Table.Cell>{getStatus(fine.status)}</Table.Cell>
-                    <Table.Cell className='flex flex-col gap-2'>
-                        <Button color='success' size='sm' onClick={() => { callUpdate(fine, 'paid') }} disabled={fine.status === 'paid'}>
+                    {!!userID || <Table.Cell className='flex flex-col gap-2'>
+                        <Button color='success' size='sm' onClick={() => { callUpdate(fine, 'paid', new Date()) }} disabled={fine.status === 'paid'}>
                             Paid
                         </Button>
-                        <Button color='failure' size='sm' onClick={() => { callUpdate(fine, 'unpaid') }} disabled={fine.status === 'unpaid'}>
+                        {!!staff || <Button color='failure' size='sm' onClick={() => { callUpdate(fine, 'unpaid') }} disabled={fine.status === 'unpaid'}>
                             Unpaid
-                        </Button>
-                        <Button color='failure' size='sm' onClick={() => { callDelete(fine) }} >
+                        </Button>}
+                        {!!staff || <Button color='failure' size='sm' onClick={() => { callDelete(fine) }} >
                             Delete
-                        </Button>
-                    </Table.Cell>
+                        </Button>}
+                    </Table.Cell>}
                 </Table.Row>
             )
         })
@@ -130,7 +136,7 @@ function FineTable() {
                     </h3>
                     <div className="flex justify-center gap-4">
                         <Button color="failure" onClick={() => {
-                            updateTicket(modalData.id, modalData.status)
+                            updateTicket(modalData.id, modalData.status, modalData.payDate)
                             setPromptShow(false)
                         }}>
                             {"Yes, I'm sure"}
@@ -163,17 +169,18 @@ function FineTable() {
 
             <StatusHandler subject={"User/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
-                <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Fine</Button>
+                {!!(userID || staff) || <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Fine</Button>}
                 <Table className='bg-white shadow-lg w-3/4'>
                     <Table.Head className='shadow-lg text-md text-black'>
                         <Table.HeadCell className='p-5'>UUID</Table.HeadCell>
-                        <Table.HeadCell >Owner</Table.HeadCell>
+                        {!!userID || <Table.HeadCell >Owner</Table.HeadCell>}
                         <Table.HeadCell >Category</Table.HeadCell>
                         <Table.HeadCell >Amount</Table.HeadCell>
                         <Table.HeadCell >Rate</Table.HeadCell>
                         <Table.HeadCell >Current Cost</Table.HeadCell>
+                        <Table.HeadCell className='text-center'>Pay Date</Table.HeadCell>
                         <Table.HeadCell className='text-center'>Status</Table.HeadCell>
-                        <Table.HeadCell className=' p-5 text-center'>Set Status</Table.HeadCell>
+                        {!!userID || <Table.HeadCell className=' p-5 text-center'>Set Status</Table.HeadCell>}
                     </Table.Head>
                     <Table.Body className="gap-1">
                         {userCells}
@@ -182,6 +189,11 @@ function FineTable() {
             </div>
         </div>
     )
+}
+
+FineTable.propTypes = {
+    userID: PropTypes.number,
+    staff: PropTypes.bool
 }
 
 export default FineTable

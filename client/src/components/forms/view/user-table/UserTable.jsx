@@ -1,5 +1,6 @@
 "use client";
 
+import PropTypes from "prop-types"
 import axios from 'axios'
 
 import { Table, Button, Badge, Modal } from 'flowbite-react'
@@ -11,7 +12,7 @@ import StatusHandler from '../../../misc/StatusHandler'
 import UpdateUserForm from '../../update/UpdateUserForm'
 import SignUpForm from '../../add/SignUpForm'
 
-function UserTable() {
+function UserTable({ staff }) {
     const [refresh, setRefresh] = useState(true)
 
     const [userList, setUserList] = useState([])
@@ -59,6 +60,15 @@ function UserTable() {
             })
     }
 
+    const updateType = async (id, type) => {
+        await axios.put("api/users/update", { user: { typeID: type }, id: id })
+            .then(() => {
+                setRefresh(true)
+                setAction("updated")
+                setStatus(200)
+            })
+    }
+
     const callUpdate = (data) => {
         setModalData(data)
         setUpdateShow(true)
@@ -78,30 +88,46 @@ function UserTable() {
     }[id])
 
     const userCells = useMemo(() =>
-        userList.map((user, idx) => {
-            return (
-                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-100")}>
-                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        {user.lastName}
-                    </Table.Cell>
-                    <Table.Cell>{user.firstName}</Table.Cell>
-                    <Table.Cell>{user.middleName ?? user.middleName[0] + "."}</Table.Cell>
-                    <Table.Cell>{user.email}</Table.Cell>
-                    <Table.Cell className='mx-5'>{getType(user.typeID)}</Table.Cell>
-                    <Table.Cell>
-                        <Button.Group>
-                            <Button color='warning' size='sm' onClick={() => { callUpdate(user) }}>
-                                <MdEdit size={20} />
-                            </Button>
-                            <Button color='failure' size='sm' onClick={() => { callDelete(user) }}>
-                                <MdDelete size={20} />
-                            </Button>
-                        </Button.Group>
-                    </Table.Cell>
-                </Table.Row>
-            )
-        })
-        , [userList])
+        userList
+            .filter(user => ![4, 5].includes(user.typeID))
+            .map((user, idx) => {
+                return (
+                    <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-100")}>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                            {user.lastName}
+                        </Table.Cell>
+                        <Table.Cell>{user.firstName}</Table.Cell>
+                        <Table.Cell>{user.middleName ?? user.middleName[0] + "."}</Table.Cell>
+                        <Table.Cell>{user.email}</Table.Cell>
+                        <Table.Cell className='mx-5'>{getType(user.typeID)}</Table.Cell>
+                        <Table.Cell>
+                            {staff ?
+                                <div className="flex flex-col gap-2">
+                                    <Button color='dark' size='sm' disabled={user.typeID == 1} onClick={() => { updateType(user.id, 1) }}>
+                                        Guest
+                                    </Button>
+                                    <Button color='info' size='sm' disabled={user.typeID == 2} onClick={() => { updateType(user.id, 2) }}>
+                                        Student
+                                    </Button>
+                                    <Button color='purple' size='sm' disabled={user.typeID == 3} onClick={() => { updateType(user.id, 3) }}>
+                                        Teacher
+                                    </Button>
+                                </div>
+                                :
+                                <Button.Group>
+                                    <Button color='warning' size='sm' onClick={() => { callUpdate(user) }}>
+                                        <MdEdit size={20} />
+                                    </Button>
+                                    <Button color='failure' size='sm' onClick={() => { callDelete(user) }}>
+                                        <MdDelete size={20} />
+                                    </Button>
+                                </Button.Group>
+                            }
+                        </Table.Cell>
+                    </Table.Row>
+                )
+            })
+        , [userList, staff])
 
 
     return (
@@ -141,7 +167,9 @@ function UserTable() {
 
             <StatusHandler subject={"User/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
-                <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add User</Button>
+                {!staff &&
+                    <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add User</Button>
+                }
                 <Table className='bg-white shadow-lg w-3/4'>
                     <Table.Head className='shadow-lg text-md text-black'>
                         <Table.HeadCell className='p-5'>Last Name</Table.HeadCell>
@@ -158,6 +186,10 @@ function UserTable() {
             </div>
         </div>
     )
+}
+
+UserTable.propTypes = {
+    staff: PropTypes.bool
 }
 
 export default UserTable

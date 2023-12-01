@@ -31,8 +31,12 @@ exports.findAll = (req, res) => {
     let condition = val ? { bookID: val } : null
 
     Copy.findAll({
-        include: [Book], 
-        where: condition })
+        include: [{
+            model: Book,
+            where: {deleted: false}
+        }],
+        where: condition
+    })
         .then(data => {
             res.send(data)
         })

@@ -59,10 +59,15 @@ function AddBookForm({ refreshDependency }) {
     const getImages = async () => {
         await axios.get("api/images/")
             .then(res => {
-                setImages(res.data.map((img) => {
-                    return { value: { value: img.id, link: img.imgLink }, label: img.title }
-                }))
-            }).catch(() => {
+                setImages(
+                    res.data
+                        .filter((img) => img.book === null)
+                        .map((img) => {
+                            return { value: { value: img.id, link: img.imgLink }, label: img.title }
+                        })
+                )
+            })
+            .catch(() => {
                 setFormStatus(400)
             })
     }

@@ -25,6 +25,8 @@ const limiter = new Bottleneck({
 
 
 exports.findAllTickets = async (req, res) => {
+    const userID = req.body.userID
+    console.log(userID)
     try {
         const result = await Ticket.findAll({
             include: [
@@ -47,10 +49,28 @@ exports.findAllTickets = async (req, res) => {
                     ]
                 }
             ],
+            where: userID ? { userID: userID } : ''
         })
 
         res.send(result)
 
+    } catch (error) {
+        res.status(500).send('Error finding tickets! ' + error.message)
+    }
+}
+
+exports.findOneTicket = async (req, res) => {
+    const data = req.body
+    try {
+        await Ticket.findOne({
+            where: { userID: data.userID, bookID: data.bookID, status: { [Op.notIn]: ['cancelled', 'closed'] } },
+        })
+            .then((data) => {
+                res.send({
+                    found: data ? true : false,
+                    data: data ? data : null
+                })
+            })
     } catch (error) {
         res.status(500).send('Error finding tickets! ' + error.message)
     }
@@ -76,13 +96,13 @@ exports.createTicket = async (req, res) => {
                 }
 
                 ticket = await Ticket.create(ticketData, { transaction: t })
-                await checkQueueAndReserve()
             } else {
                 return res
                     .status(400)
                     .send("No available book copies for reservation.")
             }
         })
+        await checkQueueAndReserve()
         return res.status(201).send(ticket)
 
     } catch (error) {
@@ -111,7 +131,6 @@ exports.updateTicket = async (req, res) => {
                     if (data.status === 'closed') {
                         ticket.returnDate = new Date()
                     }
-                    await checkQueueAndReserve()
                 }
                 if (data.status === 'borrowed') {
                     ticket.lendDate = new Date()
@@ -120,6 +139,7 @@ exports.updateTicket = async (req, res) => {
             ticket.status = data.status
             await ticket.save({ transaction: t })
         })
+        await checkQueueAndReserve()
         return res.status(201).send(result)
     } catch (error) {
         return res.status(500).send(`Error updating ticket to ${data.status} ${error.message}`)
@@ -130,7 +150,7 @@ exports.updateTicket = async (req, res) => {
 const checkQueueAndReserve = async () => {
     try {
         const result = await db.sequelize.transaction(async (t) => {
-            console.log('[checkQueueAndReserve] Start')
+            console.log('\n[checkQueueAndReserve] Start\n')
             const availCopies = await BookCopy.findAll({
                 where: { status: 'good', available: 'yes' },
                 transaction: t
@@ -162,13 +182,13 @@ const checkQueueAndReserve = async () => {
                     await limiter.schedule(async () => {
                         await Ticket.bulkCreate(updateTicketList, { updateOnDuplicate: ['status', 'reserveDate', 'copyID'], transaction: t })
                     })
-                    return console.log("[checkQueueAndReserve] Tickets have been assigned")
+                    return console.log("\n[checkQueueAndReserve] Tickets have been assigned\n")
                 }
             }
         })
-        console.log("[checkQueueAndReserve] No tickets assigned")
+        console.log("\n[checkQueueAndReserve] No tickets assigned\n\n")
     } catch (error) {
-        console.log("Error in checkQueueAndReserve:" + error.message)
+        console.log("\nError in checkQueueAndReserve:" + error.message + "\n\n")
     }
 }
 
@@ -178,7 +198,7 @@ const checkQueueAndReserve = async () => {
 const checkReservedTickets = async () => {
     try {
         const result = await db.sequelize.transaction(async (t) => {
-            console.log("[checkReservedTickets] Running ")
+            console.log("\n[checkReservedTickets] Running\n ")
             const reservedTickets = await Ticket.findAll({
                 where: { status: 'reserved' },
                 transaction: t
@@ -220,7 +240,7 @@ const checkReservedTickets = async () => {
 const checkBorrowedTickets = async () => {
     try {
         const result = await db.sequelize.transaction(async (t) => {
-            console.log("[checkBorrowedTickets] Running")
+            console.log("\n[checkBorrowedTickets] Running\n\n")
             const borrowedTickets = await Ticket.findAll({
                 include: [{
                     model: Book,
@@ -251,7 +271,7 @@ const checkBorrowedTickets = async () => {
                             id: ticket.id,
                             status: 'overdue',
                         })
-
+                        console.log(fineMappings[className]['overdue'], className)
                         const category = await FineCateg.findOne({
                             where: { name: { [Op.like]: fineMappings[className]['overdue'] } },
                             attributes: ['id']
@@ -266,58 +286,67 @@ const checkBorrowedTickets = async () => {
                     await limiter.schedule(async () => {
                         await Ticket.bulkCreate(updateTicketList, { updateOnDuplicate: ['status'], transaction: t })
                     })
-                    console.log("[checkBorrowedTickets] Some tickets have been updated")
+                    console.log("\n[checkBorrowedTickets] Some tickets have been updated\n")
                 }
             }
         })
-        console.log("[checkBorrowedTickets] No tickets updated")
+        console.log("\n[checkBorrowedTickets] No tickets updated\n\n")
     } catch (error) {
-        console.log("Error in checkBorrowedTickets:" + error.message)
+        console.log("\nError in checkBorrowedTickets:" + error.message +"\n\n")
+    }
+}
+
+const checkOverdueReserved = async () => {
+    try {
+        const result = await db.sequelize.transaction(async (t) => {
+            console.log("\n[checkOverdueReserved] Running\n")
+            const overdueTickets = await Ticket.findAll({
+                include: [{
+                    model: Book,
+                    include: [{
+                        model: Classification,
+                        attributes: ['name'],
+                        where: { bookID: db.Sequelize.col('Book.id'), name: 'Reserved' }
+                    }],
+                    attributes: ['classificationID'],
+                    where: { id: db.Sequelize.col('Ticket.bookID') },
+                }],
+                where: { status: 'overdue' },
+                transaction: t
+            })
+
+            if (overdueTickets) {
+                for (const ticket of overdueTickets) {
+                    const dateDiffMilli = dateDiff(ticket.lendDate, new Date())
+                    const dateDiffDays = convertMilliTo(dateDiffMilli, 'day')
+                    const className = ticket.book.classification.name.toUpperCase()
+
+                    console.log("[something] " + JSON.stringify(ticket))
+                    if (dateDiffDays >= 1) {
+                        console.log("[yes]")
+                        console.log(fineMappings[className]['overdue'], className)
+                        const category = await FineCateg.findOne({
+                            where: { name: { [Op.like]: fineMappings[className]['overduePlus'] } },
+                            attributes: ['id']
+                        })
+                        await Fine.update({ categID: category.id }, { where: { ticketID: ticket.id, status: 'unpaid' }, transaction: t })
+                        console.log("\n[checkOverdueReserved] Fines updated\n")
+                    }
+                }
+            }
+        })
+        console.log("\n[checkOverdueReserved] No fines updated\n\n")
+    } catch (error) {
+        console.log("\nError in checkOverdueReserved:" + error.message +"\n\n")
     }
 }
 
 
-exports.copiesAndTickets = async (req, res) => {
-    // const copy = await BookCopy.findAll({
-    //     include: [{
-    //         model: Ticket,
-    //         where: { status: 'queued' },
-    //         order: [['createDate', 'ASC']],
-    //         //required: true, // Use left join to get copies even without tickets
-    //     }],
-    //     where: { status: 'good', available: 'yes' },
-    // })
-
-    // const copy = await Ticket.findAll({
-    //     include: [{
-    //         model: BookCopy,
-    //         where: { bookID: db.Sequelize.col('Ticket.bookID') },
-    //     }],
-    // })
-    // res.send(copy)
-
-
-
-}
-
-
-exports.test = async (req, res) => {
-    let msg = await checkQueueAndReserve()
-    msg += ' ' + await checkReservedTickets()
-    msg += ' ' + await checkBorrowedTickets()
-    
-    // const msg = await Ticket.findAll({
-    //     include: [{
-    //         model: Book,
-    //         // include: [{
-    //         //     model: Classification,
-    //         //     attributes: ['name'],
-    //         //     where: { id: db.Sequelize.col('Book.classificationID') }
-    //         // }],
-    //         attributes: ['classificationID'],
-    //         where: { id: db.Sequelize.col('Ticket.bookID') },
-    //     }],
-    //     where: { status: 'borrowed' }
-    // })
-    res.send(msg)
+exports.routineCheck = async (req, res) => {
+    console.log('\n\n\n [ROUTINE CHECKING START] \n\n\n')
+    await checkQueueAndReserve()
+    await checkReservedTickets()
+    await checkBorrowedTickets()
+    await checkOverdueReserved()
+    console.log('\n\n\n [ROUTINE CHECKING END] \n\n\n')
 }

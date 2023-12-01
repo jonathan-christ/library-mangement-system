@@ -9,7 +9,6 @@ NavigationLink.propTypes = {
 function NavigationLink({ to, label }) {
     const location = useLocation();
     const clickHandler = useLinkClickHandler(to);
-    console.log(location)
 
     return (
         <span onClick={clickHandler}>

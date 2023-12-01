@@ -49,7 +49,7 @@ function AddFineForm({ refreshDependency }) {
     }
 
     const getTickets = async () => {
-        await axios.get("/api/transactions/tickets")
+        await axios.post("/api/transactions/tickets")
             .then((res) => {
                 setTickets(res.data)
             })

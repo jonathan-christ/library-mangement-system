@@ -15,11 +15,14 @@ import Catalog from './pages/general/Catalog'
 import UserGuard from './pages/user/UserGuard'
 import Profile from './pages/general/Profile'
 import Reservations from './pages/user/Reservations'
-import History from './pages/user/History'
+import UserFines from './pages/user/UserFines'
 
 // STAFF
 import StaffGuard from './pages/staff/StaffGuard'
 import StaffDashboard from './pages/staff/StaffDashboard'
+import ConfirmUsers from './pages/staff/ConfirmUsers'
+import UpdateTicket from './pages/staff/UpdateTicket'
+import FineList from './pages/staff/FineList'
 
 // ADMIN
 import AdminGuard from './pages/admin/AdminGuard'
@@ -53,11 +56,14 @@ function App() {
 
             {/* USERS */}
             <Route path="profile" element={<UserGuard element={<Profile />} softlock />} />
-            <Route path="history" element={<UserGuard element={<History />} />} />
+            <Route path="userfines" element={<UserGuard element={<UserFines />} />} />
             <Route path="reservations" element={<UserGuard element={<Reservations />} />} />
 
             {/* STAFF */}
             <Route path="dashboard" element={<StaffGuard element={<StaffDashboard />} />} />
+            <Route path="userconfirm" element={<StaffGuard element={<ConfirmUsers />} />} />
+            <Route path="updateticket" element={<StaffGuard element={<UpdateTicket />} />} />
+            <Route path="finelist" element={<StaffGuard element={<FineList />} />} />
 
             {/* ADMINS */}
             <Route path="admindash" element={<AdminGuard element={<AdminDashboard />} />} />

@@ -39,9 +39,11 @@ function UpdateBookForm({ book, components, refreshDependency }) {
     const classifications = components.classifications.map((classif) => {
         return { value: classif.id, label: classif.name }
     })
-    const images = components.images.map((image) => {
-        return { value: image.id, label: image.title, link: image.imgLink }
-    })
+    const images = components.images
+        .filter((image) => (image.book === null || image.book.id === book.id))
+        .map((image) => {
+            return { value: image.id, label: image.title, link: image.imgLink }
+        })
     const [file, setFile] = useState(imageProxy + images.find(c => c.value === book.imageID).link)
 
     const {
@@ -76,10 +78,7 @@ function UpdateBookForm({ book, components, refreshDependency }) {
             submitData = { data: { ...dirtyValues, id: book.id } }
         } else {
             submitData = new FormData()
-            // dirtyValues.authors ? submitData.append('authors', dirtyValues.authors) : ''
-            // dirtyValues.genres ? submitData.append('genres', dirtyValues.genres) : ''
-            // dirtyValues.subjects ? submitData.append('subjects', dirtyValues.subjects) : ''
-            // dirtyValues.classificationID ? submitData.append('classificationID', dirtyValues.classificationID) : ''
+
             submitData.append('uploaderID', userData.id)
             submitData.append('bookImg', dirtyValues.image.upload[0])
             submitData.append('title', dirtyValues.image.title)

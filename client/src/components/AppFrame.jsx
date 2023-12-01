@@ -11,7 +11,7 @@ function AppFrame() {
       </div>
       <div className='flex flex-row h-full z-0'>
         <SideBar />
-        <div className='w-full overflow-x-scroll'>
+        <div className='w-full pb-10 overflow-x-scroll'>
           <Outlet />
         </div>
       </div>

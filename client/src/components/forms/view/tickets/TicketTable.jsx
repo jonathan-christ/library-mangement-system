@@ -1,3 +1,4 @@
+import PropTypes from "prop-types"
 "use client";
 
 import axios from 'axios'
@@ -9,7 +10,7 @@ import { RiErrorWarningFill } from "react-icons/ri"
 import StatusHandler from '../../../misc/StatusHandler'
 import AddTicketForm from '../../add/AddTicketForm'
 
-function TicketTable() {
+function TicketTable({ userID }) {
     const [refresh, setRefresh] = useState(true)
 
     const [tickets, setTickets] = useState([])
@@ -27,10 +28,11 @@ function TicketTable() {
     useEffect(() => {
         getTickets()
         setRefresh(false)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refresh])
 
     const getTickets = () => {
-        axios.get("api/transactions/tickets").then((res) => {
+        axios.post("api/transactions/tickets", userID ? { userID: userID } : '').then((res) => {
             setTickets(res.data)
         }).catch((err) => {
             console.log(err)
@@ -68,19 +70,23 @@ function TicketTable() {
             return (
                 <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-100")}>
                     <Table.Cell className='mx-5'>{ticket.uuid}</Table.Cell>
-                    <Table.Cell>{ticket.user.userName}</Table.Cell>
+                    {!userID ?? <Table.Cell>{ticket.user.userName}</Table.Cell>}
                     <Table.Cell>{ticket.book.title}</Table.Cell>
                     <Table.Cell>{ticket.bookCopy?.callNumber ?? ''}</Table.Cell>
                     <Table.Cell>{ticket.createDate}</Table.Cell>
                     <Table.Cell>{ticket.returnDate ?? ''}</Table.Cell>
                     <Table.Cell>{getStatus(ticket.status)}</Table.Cell>
                     <Table.Cell className='flex flex-col gap-2'>
-                        <Button color='blue' size='sm' onClick={() => { callUpdate(ticket, 'borrowed') }} disabled={!borrowable[ticket.status]}>
-                            Borrow
-                        </Button>
-                        <Button color='success' size='sm' onClick={() => { callUpdate(ticket, 'closed') }} disabled={!closeable[ticket.status]}>
-                            Close
-                        </Button>
+                        {!!userID ||
+                            <>
+                                <Button color='blue' size='sm' onClick={() => { callUpdate(ticket, 'borrowed') }} disabled={!borrowable[ticket.status]}>
+                                    Borrow
+                                </Button>
+                                <Button color='success' size='sm' onClick={() => { callUpdate(ticket, 'closed') }} disabled={!closeable[ticket.status]}>
+                                    Close
+                                </Button>
+                            </>
+                        }
                         <Button color='failure' size='sm' onClick={() => { callUpdate(ticket, 'cancelled') }} disabled={!cancellable[ticket.status]}>
                             Cancel
                         </Button>
@@ -124,17 +130,17 @@ function TicketTable() {
 
             <StatusHandler subject={"User/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
-                <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Ticket</Button>
+                {!!userID || <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Ticket</Button>}
                 <Table className='bg-white shadow-lg w-3/4'>
                     <Table.Head className='shadow-lg text-md text-black'>
                         <Table.HeadCell className='p-5'>UUID</Table.HeadCell>
-                        <Table.HeadCell >Owner</Table.HeadCell>
+                        {!userID ?? <Table.HeadCell >Owner</Table.HeadCell>}
                         <Table.HeadCell >Book</Table.HeadCell>
                         <Table.HeadCell >Call Number</Table.HeadCell>
                         <Table.HeadCell >Create Date</Table.HeadCell>
                         <Table.HeadCell >Return Date</Table.HeadCell>
                         <Table.HeadCell className='text-center'>Status</Table.HeadCell>
-                        <Table.HeadCell className=' p-5 text-center'>Set Status</Table.HeadCell>
+                        <Table.HeadCell className=' p-5 text-center'>Action</Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="gap-1">
                         {userCells}
@@ -143,6 +149,10 @@ function TicketTable() {
             </div>
         </div>
     )
+}
+
+TicketTable.propTypes = {
+    userID: PropTypes.number
 }
 
 export default TicketTable

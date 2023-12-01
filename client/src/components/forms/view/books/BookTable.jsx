@@ -38,7 +38,7 @@ function BookTable() {
         getPublishers()
         getClasses()
         getImages()
-        
+
         setRefresh(false)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refresh])
@@ -103,14 +103,15 @@ function BookTable() {
             })
     }
 
-    const getImages = () => {
-        axios.get("api/images/")
+    const getImages = async () => {
+        await axios.get("api/images/")
             .then((res) => {
                 setImages(res.data)
             }).catch((err) => {
                 console.log(err)
                 setStatus(500)
             })
+        console.log(images)
     }
 
     const deleteBook = (id) => {

@@ -27,7 +27,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         imageID: {
             type: Sequelize.INTEGER,
-            allowNull: false,
+            allowNull: true,
             defaultValue: 0,
             references: {
                 model: "bookImg",

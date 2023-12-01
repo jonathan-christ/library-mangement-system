@@ -38,10 +38,10 @@ function StaffNavigation({ functions }) {
             <Navbar.Collapse>
                 <>
                     <NavigationLink to='/dashboard' label="DASHBOARD" />
-                    <NavigationLink to='/books' label="BOOK" />
-                    {/* ^ to be replaced with CATALOG */}
-                    <NavigationLink to='/authors' label="AUTHORS" />
-                    <NavigationLink to='/publishers' label="PUBLISHERS" />
+                    <NavigationLink to='/catalog' label="CATALOG" />
+                    <NavigationLink to='/userconfirm' label="USERS" />
+                    <NavigationLink to='/updateticket' label="TICKETS" />
+                    <NavigationLink to='/finelist' label="FINES" />
                 </>
             </Navbar.Collapse>
         </Navbar>

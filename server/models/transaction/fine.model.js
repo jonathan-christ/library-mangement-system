@@ -21,6 +21,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.ENUM('paid', 'unpaid'),
             allowNull: false,
             defaultValue: 'unpaid'
+        },
+        payDate: {
+            type: Sequelize.DATE,
+            allowNull: true,
         }
     })
 

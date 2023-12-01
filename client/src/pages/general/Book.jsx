@@ -14,7 +14,9 @@ import CopyTable from '../../components/forms/view/books/CopyTable'
 // import Placeholder from '../../components/loading/Placeholder'
 
 function Book() {
+  const [reserved, setReserved] = useState(true)
   const [loading, setLoading] = useState(true)
+  const [hasCopies, setHasCopies] = useState(false)
 
   const user = useSession()
   const { isbn } = useParams()
@@ -43,13 +45,32 @@ function Book() {
 
   useEffect(() => {
     initializePage()
-  }, [initializePage])
+    hasReserved()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading])
+
+  const reserveBook = async (bookID) => {
+    await axios.post("/api/transactions/tickets/create", { bookID: bookID, id: user.id })
+      .then(() => {
+
+      }).catch((err) => {
+        console.log(err)
+      })
+  }
+
+  const hasReserved = async () => {
+    await axios.post("/api/transactions/tickets/find", { userID: user.id, bookID: book.id })
+      .then((res) => {
+        setReserved(res.data.found)
+      }).catch((err) => {
+        console.log(err)
+      })
+  }
 
   return (
     <div className='flex flex-col justify-center w-full'>
       <Link to='/catalog'>
         <Button>Go Back</Button>
-
       </Link>
       {!loading &&
         <div className='flex flex-col justify-center min-w-full p-5 gap-10'>
@@ -75,7 +96,14 @@ function Book() {
               {book.description}
             </div>
           </div>
-          <CopyTable bookID={book.id} />
+          <CopyTable bookID={book.id} setExists={setHasCopies} />
+          <Button onClick={async () => {
+            await reserveBook(book.id)
+            setLoading(true)
+          }}
+            disabled={(reserved || !hasCopies || user.typeID == 1) ? true : null}>
+            Borrow Book
+          </Button>
         </div>
       }
     </div>

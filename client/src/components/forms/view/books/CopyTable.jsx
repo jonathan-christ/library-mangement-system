@@ -14,9 +14,10 @@ import UpdateBookCopy from '../../update/UpdateBookCopyForm'
 
 
 CopyTable.propTypes = {
-    bookID: PropTypes.number
+    bookID: PropTypes.number,
+    setExists: PropTypes.func
 }
-function CopyTable({ bookID }) {
+function CopyTable({ bookID, setExists }) {
     const [refresh, setRefresh] = useState(true)
 
     const [copies, setCopies] = useState([])
@@ -36,10 +37,11 @@ function CopyTable({ bookID }) {
     }, [refresh])
 
     const getCopies = () => {
-        console.log(bookID ? { bookID: bookID } : null)
         axios.post("/api/copies/", bookID ? { bookID: bookID } : null)
             .then((res) => {
                 setCopies(res.data)
+                setExists ? setExists(res.data.length ? true : false) : ''
+                console.log(res.data.length ? true : false)
             }).catch((err) => {
                 console.log(err)
                 setStatus(500)

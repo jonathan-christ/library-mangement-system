@@ -18,7 +18,7 @@ function UserNavigation({ functions }) {
         <Navbar fluid>
             <Logo to='/catalog' />
             <div className="flex md:order-2">
-                {session &&
+                {session ?
                     <Dropdown
                         arrowIcon={false}
                         inline
@@ -37,8 +37,7 @@ function UserNavigation({ functions }) {
                         <Dropdown.Divider />
                         <Dropdown.Item onClick={() => functions.signOut()}><span className="text-red-600" >Sign out</span></Dropdown.Item>
                     </Dropdown>
-                }
-                {!session &&
+                    :
                     <>
                         <Button color="none" onClick={() => functions.navigate('/login')}>Login</Button>
                         <Button color="blue" onClick={() => functions.navigate('/signup')}>Signup</Button>
@@ -47,14 +46,13 @@ function UserNavigation({ functions }) {
                 <Navbar.Toggle />
             </div>
             <Navbar.Collapse>
-                {session &&
+                {session ?
                     <>
                         <NavigationLink to="/catalog" label="CATALOG" />
                         <NavigationLink to="/reservations" label="RESERVATIONS" />
-                        <NavigationLink to="/history" label="HISTORY" />
+                        <NavigationLink to="/userfines" label="FINES" />
                     </>
-                }
-                {!session &&
+                    :
                     <SearchBar />
                 }
             </Navbar.Collapse>

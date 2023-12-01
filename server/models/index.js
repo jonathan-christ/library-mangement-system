@@ -46,18 +46,22 @@ db.fineCateg = require('./transaction/fineCateg.model')(sequelize, Sequelize)
 db.fine = require('./transaction/fine.model')(sequelize, Sequelize)
 
 db.ticket = require('./transaction/ticket.model')(sequelize, Sequelize)
+db.notification = require('./user/notification.model')(sequelize, Sequelize)
 
 //RELATIONS
 // user
 db.userType.hasMany(db.user, { foreignKey: 'typeID' })
 db.user.belongsTo(db.userType, { foreignKey: 'typeID' })
 
+db.user.hasMany(db.notification, { foreignKey: 'userID' })
+db.notification.belongsTo(db.user, { foreignKey: 'userID' })
+
 db.user.hasMany(db.rating, { foreignKey: 'userID' })
 db.rating.belongsTo(db.user, { foreignKey: 'userID' })
 
 // books
 db.book.belongsTo(db.bookImg, { foreignKey: 'imageID' })
-db.bookImg.hasMany(db.book, { foreignKey: 'imageID' })
+db.bookImg.hasOne(db.book, { foreignKey: 'imageID' })
 
 db.book.hasMany(db.bookCopy, { foreignKey: 'bookID' })
 db.bookCopy.belongsTo(db.book, { foreignKey: 'bookID' })
@@ -84,8 +88,8 @@ db.classification.hasMany(db.book, { foreignKey: 'classificationID' })
 db.fine.belongsTo(db.fineCateg, { foreignKey: 'categID' })
 db.fineCateg.hasMany(db.fine, { foreignKey: 'categID' })
 
-db.ticket.hasOne(db.fine, {foreignKey: 'ticketID'})
-db.fine.belongsTo(db.ticket, {foreignKey: 'ticketID'})
+db.ticket.hasOne(db.fine, { foreignKey: 'ticketID' })
+db.fine.belongsTo(db.ticket, { foreignKey: 'ticketID' })
 
 db.ticket.belongsTo(db.user, { foreignKey: 'userID' })
 db.user.hasMany(db.ticket, { foreignKey: 'userID' })

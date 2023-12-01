@@ -1,4 +1,6 @@
 const express = require('express')
+require('./scheduler')
+
 const cors = require('cors')
 const db = require('./models')
 const path = require('path')

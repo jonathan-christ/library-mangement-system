@@ -1,8 +1,10 @@
-import React from 'react'
+import { useSession } from '../../components/context-hooks/session/SessionUtils'
+import TicketTable from '../../components/forms/view/tickets/TicketTable'
 
 function Reservations() {
+  const user = useSession()
   return (
-    <div className='text-x9l '>Reservations</div>
+    <TicketTable userID={user.id}/>
   )
 }
 

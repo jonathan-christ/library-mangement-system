@@ -1,8 +1,11 @@
 const multer = require('multer')
 const path = require('path')
+const { Sequelize } = require('../models')
 
 const db = require("../models")
 const Op = db.Sequelize.Op
+
+const Book = db.book
 const Image = db.bookImg
 
 const storage = multer.diskStorage({
@@ -40,7 +43,13 @@ exports.create = (req, res) => {
 
 exports.findAll = (req, res) => {
     // search options
-    Image.findAll()
+    Image.findAll({
+        include: [{
+            model: Book,
+            where: { deleted: false },
+            required: false,
+        }]
+    })
         .then(data => {
             res.send(data)
         })
@@ -85,7 +94,7 @@ exports.update = (req, res) => {
     const id = req.body.id
     const value = req.body.title
 
-    Image.update({title: value}, { where: { id } })
+    Image.update({ title: value }, { where: { id } })
         .then(num => {
             if (num == 1) {
                 res.send({ message: 'Image was updated successfully.' })
@@ -112,4 +121,4 @@ exports.delete = (req, res) => {
         .catch(err => {
             res.status(500).send({ message: err.message })
         })
-} 
+}
