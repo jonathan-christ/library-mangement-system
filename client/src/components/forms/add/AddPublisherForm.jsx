@@ -1,20 +1,18 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, TextInput } from 'flowbite-react'
 import { maxNameLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit } from '../../../assets/formErrorMsg'
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
 AddPublisherForm.propTypes = {
     refreshDependency: PropTypes.func
 }
 function AddPublisherForm({ refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const {
         register,
         handleSubmit,
@@ -32,10 +30,10 @@ function AddPublisherForm({ refreshDependency }) {
                     reset()
                 }).catch((err) => {
                     console.log(err)
-                    setFormStatus(404)
+                    toast.error('Unable to add publisher! Server error')
                 })
         } else {
-            setFormStatus(402)
+            toast.error('Publisher already exists!')
         }
 
     }
@@ -47,14 +45,13 @@ function AddPublisherForm({ refreshDependency }) {
                 retVal = res.data.status === 'found'
             }).catch(() => {
                 retVal = false
-                setFormStatus(400)
+                toast.error('Unable to retrieve publishers! Server error')
             })
         return retVal
     }
 
     return (
         <div>
-            <StatusHandler subject={"Publisher"} code={formStatus} dismiss={setFormStatus} />
             <form onSubmit={handleSubmit(addPublisher)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div>
                     <div>

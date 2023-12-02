@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
-import StatusHandler from '../../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 import AddSubjectForm from '../../add/AddSubjectForm'
 import UpdateSubjectForm from '../../update/UpdateSubjectForm'
 
@@ -15,8 +15,6 @@ function SubjectTable() {
     const [refresh, setRefresh] = useState(true)
 
     const [subjects, setSubjects] = useState([])
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [deleteShow, setDeleteShow] = useState(false)
     const [addShow, setAddShow] = useState(false)
@@ -35,7 +33,7 @@ function SubjectTable() {
                 setSubjects(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve subjects! Server Error')
             })
     }
 
@@ -43,11 +41,10 @@ function SubjectTable() {
         axios.post("api/subjects/delete", { id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("deleted")
-                setStatus(200)
+                toast.success('Subject has been deleted!')
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to delete subject! Server Error')
             })
     }
 
@@ -117,7 +114,6 @@ function SubjectTable() {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"Subject/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Subject</Button>
                 <Table className='bg-white shadow-lg w-max'>

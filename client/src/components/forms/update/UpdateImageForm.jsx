@@ -1,7 +1,6 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
@@ -9,7 +8,7 @@ import { Button, Label, TextInput } from 'flowbite-react'
 import { maxNameLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit } from '../../../assets/formErrorMsg'
 
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
 
 UpdateImageForm.propTypes = {
@@ -17,7 +16,6 @@ UpdateImageForm.propTypes = {
     refreshDependency: PropTypes.func
 }
 function UpdateImageForm({ image, refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const {
         register,
         handleSubmit,
@@ -47,12 +45,13 @@ function UpdateImageForm({ image, refreshDependency }) {
                     reset(newData)
 
                     refreshDependency ? refreshDependency(true) : ''
-                    setFormStatus(200)
+                    toast.success('Image has been updated!')
                 }).catch((err) => {
+                    toast.error('Unable to update image! Server Error')
                     console.log(err)
                 })
         } else {
-            setFormStatus(402)
+            toast.error('Image already exists!')
         }
 
     }
@@ -64,14 +63,13 @@ function UpdateImageForm({ image, refreshDependency }) {
                 retVal = res.data.status === 'found'
             }).catch(() => {
                 retVal = false
-                setFormStatus(404)
+                toast.error('Unable to retrieve images! Server Error')
             })
         return retVal
     }
 
     return (
         <>
-            <StatusHandler subject={"Image"} action='updated' code={formStatus} dismiss={setFormStatus} />
             <div>
                 <form onSubmit={handleSubmit(updateImage)} className="flex max-w-md flex-col gap-4" noValidate>
                     <div>

@@ -7,8 +7,8 @@ import { Table, Button, Modal, Badge } from 'flowbite-react'
 import { useState, useEffect, useMemo } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
+import { toast } from 'react-toastify'
 
-import StatusHandler from '../../../misc/StatusHandler'
 import AddBookCopyForm from '../../add/AddBookCopyForm'
 import UpdateBookCopy from '../../update/UpdateBookCopyForm'
 
@@ -21,8 +21,6 @@ function CopyTable({ bookID, setExists }) {
     const [refresh, setRefresh] = useState(true)
 
     const [copies, setCopies] = useState([])
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [deleteShow, setDeleteShow] = useState(false)
     const [addShow, setAddShow] = useState(false)
@@ -44,7 +42,7 @@ function CopyTable({ bookID, setExists }) {
                 console.log(res.data.length ? true : false)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve book copies! Server Error')
             })
     }
 
@@ -52,11 +50,10 @@ function CopyTable({ bookID, setExists }) {
         axios.post("api/copies/delete", { id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("deleted")
-                setStatus(200)
+                toast.success('Book copy has been deleted!')
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to delete book copy! Server Error')
             })
     }
 
@@ -161,7 +158,6 @@ function CopyTable({ bookID, setExists }) {
                     </Modal>
                 </>
             }
-            <StatusHandler subject={"Copy/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10 flex flex-col justify-center">
                 {!bookID &&
                     <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Copy</Button>

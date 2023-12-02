@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
-import StatusHandler from '../../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 import AddBookForm from '../../add/AddBookForm'
 import UpdateBookForm from '../../update/UpdateBookForm'
 
@@ -19,9 +19,6 @@ function BookTable() {
     const [publishers, setPublishers] = useState([])
     const [classifications, setClasses] = useState([])
     const [images, setImages] = useState([])
-
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [deleteShow, setDeleteShow] = useState(false)
     const [addShow, setAddShow] = useState(false)
@@ -49,7 +46,7 @@ function BookTable() {
                 setBooks(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve books! Server Error')
             })
     }
 
@@ -59,7 +56,7 @@ function BookTable() {
                 setClasses(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve classes! Server Error')
             })
     }
 
@@ -69,7 +66,7 @@ function BookTable() {
                 setGenres(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve genres! Server Error')
             })
     }
 
@@ -79,7 +76,7 @@ function BookTable() {
                 setPublishers(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve publishers! Server Error')
             })
     }
 
@@ -89,7 +86,7 @@ function BookTable() {
                 setSubjects(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve subjects! Server Error')
             })
     }
 
@@ -99,7 +96,7 @@ function BookTable() {
                 setAuthors(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve authors! Server Error')
             })
     }
 
@@ -109,7 +106,7 @@ function BookTable() {
                 setImages(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve images! Server Error')
             })
         console.log(images)
     }
@@ -118,11 +115,10 @@ function BookTable() {
         axios.post("api/books/delete", { id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("deleted")
-                setStatus(200)
+                toast.success('Book has been deleted!')
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to delete book! Server Error')
             })
     }
 
@@ -196,7 +192,6 @@ function BookTable() {
                     </Modal.Body>
                 </Modal>
             </>
-            <StatusHandler subject={"Copy/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Copy</Button>
                 <Table className='bg-white shadow-lg w-max'>

@@ -7,10 +7,10 @@ import { Table, Button, Modal } from 'flowbite-react'
 import { useState, useEffect, useMemo } from 'react'
 import { MdDelete, MdEdit } from "react-icons/md"
 import { IoEye } from "react-icons/io5";
-
 import { RiErrorWarningFill } from "react-icons/ri"
 
-import StatusHandler from '../../../misc/StatusHandler'
+import { toast } from 'react-toastify'
+
 import AddImageForm from '../../add/AddImageForm'
 import UpdateImageForm from '../../update/UpdateImageForm';
 
@@ -18,8 +18,6 @@ function ImageTable() {
     const [refresh, setRefresh] = useState(true)
 
     const [images, setImages] = useState([])
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [deleteShow, setDeleteShow] = useState(false)
     const [updateShow, setUpdateShow] = useState(false)
@@ -39,7 +37,7 @@ function ImageTable() {
                 setImages(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve images! Server Error')
             })
     }
 
@@ -47,11 +45,10 @@ function ImageTable() {
         axios.post("api/images/delete", { id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("deleted")
-                setStatus(200)
+                toast.success('Image has been deleted!')
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to delete image! Server Error')
             })
     }
 
@@ -136,7 +133,6 @@ function ImageTable() {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"Image/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Image</Button>
                 <Table className='bg-white shadow-lg w-max'>

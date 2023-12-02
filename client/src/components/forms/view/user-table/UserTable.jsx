@@ -8,7 +8,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
-import StatusHandler from '../../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 import UpdateUserForm from '../../update/UpdateUserForm'
 import SignUpForm from '../../add/SignUpForm'
 
@@ -17,8 +17,6 @@ function UserTable({ staff }) {
 
     const [userList, setUserList] = useState([])
     const [userTypes, setUserTypes] = useState([])
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [deleteShow, setDeleteShow] = useState(false)
     const [addShow, setAddShow] = useState(false)
@@ -37,7 +35,7 @@ function UserTable({ staff }) {
             setUserList(res.data)
         }).catch((err) => {
             console.log(err)
-            setStatus(500)
+            toast.error('Unable to retrieve users! Server Error')
         })
     }
 
@@ -47,7 +45,7 @@ function UserTable({ staff }) {
                 setUserTypes(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve user types! Server Error')
             })
     }
 
@@ -55,8 +53,7 @@ function UserTable({ staff }) {
         axios.post("api/users/delete", { id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("deleted")
-                setStatus(200)
+                toast.success('User has been deleted!')
             })
     }
 
@@ -64,8 +61,7 @@ function UserTable({ staff }) {
         await axios.put("api/users/update", { user: { typeID: type }, id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("updated")
-                setStatus(200)
+                toast.success('User type has been updated!')
             })
     }
 
@@ -165,7 +161,6 @@ function UserTable({ staff }) {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"User/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 {!staff &&
                     <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add User</Button>

@@ -7,10 +7,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { BiSolidLike, BiSolidDislike } from "react-icons/bi";
 import { Button } from 'flowbite-react'
 
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
 const RatingForm = ({ bookID, userID }) => {
-    const [formStatus, setFormStatus] = useState(0)
     const [ratings, setRatings] = useState({})
     const [userRating, setUserRating] = useState(null)
 
@@ -20,7 +19,7 @@ const RatingForm = ({ bookID, userID }) => {
             .then((res) => {
                 setRatings(res.data)
             }).catch((err) => {
-                setFormStatus(500)
+                toast.error('Unable to retrieve ratings! Server error')
                 console.error('Error fetching ratings:', err.message)
 
             })
@@ -33,7 +32,7 @@ const RatingForm = ({ bookID, userID }) => {
                 setUserRating(data === 'like' ? "Like" : data === 'dislike' ? "Dislike" : null)
             })
             .catch((error) => {
-                setFormStatus(500)
+                toast.error('Unable to retrieve ratings! Server error')
                 console.error('Error fetching user rating:', error)
             })
     }, [bookID, userID])
@@ -53,7 +52,7 @@ const RatingForm = ({ bookID, userID }) => {
             fetchRatings()
             fetchUserRating()
         } catch (error) {
-            setFormStatus(500)
+            toast.error('Unable to submit ratings! Server error')
             console.error('Error submitting rating:', error)
         }
     }
@@ -70,8 +69,6 @@ const RatingForm = ({ bookID, userID }) => {
 
     return (
         <div>
-            { }
-            <StatusHandler subject={"Ratings"} code={formStatus} dismiss={setFormStatus} />
             <h2><strong>Book Ratings</strong></h2>
             <div>
                 <span>

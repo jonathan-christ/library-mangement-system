@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
-import StatusHandler from '../../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 import AddGenreForm from '../../add/AddGenreForm'
 import UpdateGenreForm from '../../update/UpdateGenreForm'
 
@@ -15,8 +15,6 @@ function GenreTable() {
     const [refresh, setRefresh] = useState(true)
 
     const [genres, setGenres] = useState([])
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [deleteShow, setDeleteShow] = useState(false)
     const [addShow, setAddShow] = useState(false)
@@ -35,7 +33,7 @@ function GenreTable() {
                 setGenres(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve genres! Server Error')
             })
     }
 
@@ -43,11 +41,10 @@ function GenreTable() {
         axios.post("api/genres/delete", { id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("deleted")
-                setStatus(200)
+                toast.success('Genre has been deleted!')
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to delete genre! Server Error')
             })
     }
 
@@ -117,7 +114,6 @@ function GenreTable() {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"Genre/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Genre</Button>
                 <Table className='bg-white shadow-lg'>

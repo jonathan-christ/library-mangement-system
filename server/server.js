@@ -46,7 +46,7 @@ require('./routes/classification.routes')(app)
 require('./routes/fine.routes')(app)
 require('./routes/fineCateg.routes')(app)
 require('./routes/transaction.routes')(app)
-
+require('./routes/notification.routes')(app)
 
 //unknown get request
 app.get('*', (req, res) => {

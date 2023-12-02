@@ -7,15 +7,13 @@ import { Table, Button, Badge, Modal } from 'flowbite-react'
 import { useState, useEffect, useMemo } from 'react'
 import { RiErrorWarningFill } from "react-icons/ri"
 
-import StatusHandler from '../../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 import AddTicketForm from '../../add/AddTicketForm'
 
 function TicketTable({ userID }) {
     const [refresh, setRefresh] = useState(true)
 
     const [tickets, setTickets] = useState([])
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [addShow, setAddShow] = useState(false)
     const [updateShow, setPromptShow] = useState(false)
@@ -36,7 +34,7 @@ function TicketTable({ userID }) {
             setTickets(res.data)
         }).catch((err) => {
             console.log(err)
-            setStatus(500)
+            toast.error('Unable to retrieve tickets! Server Error')
         })
     }
 
@@ -45,8 +43,7 @@ function TicketTable({ userID }) {
         axios.put("api/transactions/tickets/update", data)
             .then(() => {
                 setRefresh(true)
-                setAction("Updated")
-                setStatus(200)
+                toast.success('Ticket has been updated!')
             })
     }
 
@@ -128,7 +125,6 @@ function TicketTable({ userID }) {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"User/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 {!!userID || <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Ticket</Button>}
                 <Table className='bg-white shadow-lg w-3/4'>

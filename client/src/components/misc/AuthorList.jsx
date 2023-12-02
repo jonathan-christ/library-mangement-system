@@ -8,7 +8,7 @@ function AuthorList({ authors }) {
         <>
             {authors.map((author, idx) => {
                 let sep = idx < authors.length - 1 ? ', ' : ' '
-                return <span key={idx}>{`${author.firstName}  ${author.lastName}${sep}`} </span>
+                return <span key={idx} className='text-sm'>{`${author.firstName}  ${author.lastName}${sep}`} </span>
             })}
         </>
     )

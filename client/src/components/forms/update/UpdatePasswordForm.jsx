@@ -1,8 +1,7 @@
 import axios from 'axios'
 import validator from 'validator'
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 import { useNavigate } from 'react-router-dom'
@@ -14,7 +13,6 @@ import { emptyMsg, passNotMatch, belowMinChar } from '../../../assets/formErrorM
 
 
 function UpdatePasswordForm() {
-    const [formStatus, setFormStatus] = useState(0)
     const session = useSession()
     const navigate = useNavigate()
 
@@ -31,11 +29,11 @@ function UpdatePasswordForm() {
         delete data.rePass
         axios.put("/api/users/changepass", { id: session.id, password: data.password })
             .then(() => {
-                setFormStatus(200)
+                toast.success('Password has been updated!')
                 navigate('/profile')
             })
             .catch(() => {
-                setFormStatus(400)
+                toast.error('Unable to update password! Server Error')
             })
     }
 
@@ -55,7 +53,6 @@ function UpdatePasswordForm() {
 
     return (
         <div>
-            <StatusHandler subject={"Password"} action={"updated"} code={formStatus} dismiss={setFormStatus} />
             <form onSubmit={handleSubmit(changePass)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div>
                     <div className="mb-2 block">

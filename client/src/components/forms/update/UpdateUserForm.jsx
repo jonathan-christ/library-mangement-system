@@ -2,10 +2,10 @@ import ls from 'localstorage-slim'
 import axios from 'axios'
 import validator from 'validator'
 import PropTypes from 'prop-types'
-import StatusHandler from '../../misc/StatusHandler'
 
+import { toast } from 'react-toastify'
 import { ttl } from '../../../assets/constants'
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
@@ -24,7 +24,6 @@ UpdateUserForm.propTypes = {
 }
 
 function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const session = useSession()
     const setSession = useSessionUpdate()
     const {
@@ -59,10 +58,10 @@ function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) 
                     refreshDependency(true)
                 }
                 reset(userDat)
-                setFormStatus(200)
+                toast.success('User has been updated!')
             }).catch((err) => {
                 console.log(err)
-                setFormStatus(404)
+                toast.error('Unable to update user! Server Error')
             })
     }
 
@@ -97,7 +96,7 @@ function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) 
                         exists = true
                     }
                 }).catch(() => {
-                    setFormStatus(402)
+                    toast.error('Unable to retrieve users! Server Error')
                 })
         }
         return exists
@@ -105,7 +104,6 @@ function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) 
 
     return (
         <div>
-            <StatusHandler subject={"User"} action={"updated"} code={formStatus} dismiss={setFormStatus} />
             <form onSubmit={handleSubmit(updateUser)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div>
                     <div>

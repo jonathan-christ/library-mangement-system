@@ -1,8 +1,7 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
@@ -14,7 +13,6 @@ AddFineCategForm.propTypes = {
     refreshDependency: PropTypes.func
 }
 function AddFineCategForm({ refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const {
         register,
         handleSubmit,
@@ -29,14 +27,14 @@ function AddFineCategForm({ refreshDependency }) {
             await axios.post("/api/finecategs/create", data)
                 .then(() => {
                     reset()
-                    setFormStatus(200)
+                    toast.success('Fine category has been added!')
                     refreshDependency ? refreshDependency(true) : ''
                 }).catch((err) => {
                     console.log(err)
-                    setFormStatus(500)
+                    toast.error('Unable to add fine category! Server error')
                 })
         } else {
-            setFormStatus(402)
+            toast.error('Fine category already exists!')
         }
 
     }
@@ -48,7 +46,7 @@ function AddFineCategForm({ refreshDependency }) {
                 retVal = res.data.status === 'found'
             }).catch(() => {
                 retVal = false
-                setFormStatus(404)
+                toast.error('Unable to retrieve fine categories! Server error')
             })
         return retVal
     }
@@ -61,7 +59,6 @@ function AddFineCategForm({ refreshDependency }) {
 
     return (
         <>
-            <StatusHandler subject={"Fine category"} code={formStatus} dismiss={setFormStatus} />
             <div>
                 <form onSubmit={handleSubmit(addFineCateg)} className="flex max-w-md flex-col gap-4" noValidate>
                     <div>

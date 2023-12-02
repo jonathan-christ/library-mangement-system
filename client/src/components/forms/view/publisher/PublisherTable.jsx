@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
-import StatusHandler from '../../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 import AddPublisherForm from '../../add/AddPublisherForm'
 import UpdatePublisherForm from '../../update/UpdatePublisherForm'
 
@@ -15,8 +15,6 @@ function UserTypeTable() {
     const [refresh, setRefresh] = useState(true)
 
     const [publishers, setPublishers] = useState([])
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [deleteShow, setDeleteShow] = useState(false)
     const [addShow, setAddShow] = useState(false)
@@ -35,7 +33,7 @@ function UserTypeTable() {
                 setPublishers(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve publishers! Server Error')
             })
     }
 
@@ -43,11 +41,10 @@ function UserTypeTable() {
         axios.post("api/publishers/delete", { id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("deleted")
-                setStatus(200)
+                toast.success('Publisher has been deleted!')
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to delete publisher! Server Error')
             })
     }
 
@@ -117,7 +114,6 @@ function UserTypeTable() {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"User/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Publisher</Button>
                 <Table className='bg-white shadow-lg w-max'>

@@ -1,8 +1,7 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
@@ -13,7 +12,6 @@ AddImageForm.propTypes = {
     refreshDependency: PropTypes.func
 }
 function AddImageForm({ refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const formData = new FormData()
     const id = useSession().id
     const {
@@ -32,18 +30,17 @@ function AddImageForm({ refreshDependency }) {
             .then(() => {
                 new FormData()
                 reset()
-                setFormStatus(200)
+                toast.success('Image has been added!')
                 refreshDependency ? refreshDependency(true) : ''
             }).catch((err) => {
                 console.log(err)
-                setFormStatus(500)
+                toast.error('Unable to add image! Server error')
             })
 
     }
 
     return (
         <>
-            <StatusHandler subject={"Image"} code={formStatus} dismiss={setFormStatus} />
             <div>
                 <form onSubmit={handleSubmit(addImage)} className="flex max-w-md flex-col gap-4" noValidate>
                     <div>

@@ -1,20 +1,18 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, TextInput, Textarea } from 'flowbite-react'
 import { maxNameLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit } from '../../../assets/formErrorMsg'
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
 AddAuthorForm.propTypes = {
     refreshDependency: PropTypes.func
 }
 function AddAuthorForm({ refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const {
         register,
         handleSubmit,
@@ -30,12 +28,12 @@ function AddAuthorForm({ refreshDependency }) {
                 .then(() => {
                     reset()
                     refreshDependency ? refreshDependency(true) : ''
-                    setFormStatus(200)
+                    toast.success('Author has been created!')
                 }).catch((err) => {
                     console.log(err)
                 })
         } else {
-            setFormStatus(402)
+            toast.error('Author cannot be created! Server error')
         }
 
     }
@@ -47,14 +45,13 @@ function AddAuthorForm({ refreshDependency }) {
                 retVal = res.data.status === 'found'
             }).catch(() => {
                 retVal = false
-                setFormStatus(404)
+                toast.error('Author cannot be created! Server error')
             })
         return retVal
     }
 
     return (
         <>
-            <StatusHandler subject={"Author"} code={formStatus} dismiss={setFormStatus} />
             <div>
                 <form onSubmit={handleSubmit(addAuthor)} className="flex max-w-md flex-col gap-4" noValidate>
                     <div>

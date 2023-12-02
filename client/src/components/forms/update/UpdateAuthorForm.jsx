@@ -1,21 +1,19 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, TextInput, Textarea } from 'flowbite-react'
 import { maxNameLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit } from '../../../assets/formErrorMsg'
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
 UpdateAuthorForm.propTypes = {
     author: PropTypes.object.isRequired,
     refreshDependency: PropTypes.func
 }
 function UpdateAuthorForm({ author, refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const {
         register,
         handleSubmit,
@@ -49,12 +47,12 @@ function UpdateAuthorForm({ author, refreshDependency }) {
                     reset(newData)
 
                     refreshDependency ? refreshDependency(true) : ''
-                    setFormStatus(200)
+                    toast.success('Author has been updated!')
                 }).catch((err) => {
                     console.log(err)
                 })
         } else {
-            setFormStatus(402)
+            toast.error('Author already exists!')
         }
 
     }
@@ -66,14 +64,13 @@ function UpdateAuthorForm({ author, refreshDependency }) {
                 retVal = res.data.status === 'found'
             }).catch(() => {
                 retVal = false
-                setFormStatus(404)
+                toast.error('Unable to retrieve authors! Server Error')
             })
         return retVal
     }
 
     return (
         <>
-            <StatusHandler subject={"Author"} action='updated' code={formStatus} dismiss={setFormStatus} />
             <div>
                 <form onSubmit={handleSubmit(updateAuthor)} className="flex max-w-md flex-col gap-4" noValidate>
                     <div>

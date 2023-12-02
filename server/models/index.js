@@ -100,4 +100,7 @@ db.book.hasMany(db.ticket, { foreignKey: 'bookID' })
 db.ticket.belongsTo(db.bookCopy, { foreignKey: 'copyID' })
 db.bookCopy.hasMany(db.ticket, { foreignKey: 'copyID' })
 
+db.ticket.hasMany(db.notification, { foreignKey: 'ticketID' })
+db.notification.belongsTo(db.ticket, { foreignKey: 'ticketID' })
+
 module.exports = db

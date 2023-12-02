@@ -1,6 +1,6 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
 import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
@@ -14,7 +14,6 @@ AddTicketForm.propTypes = {
     refreshDependency: PropTypes.func
 }
 function AddTicketForm({ refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const [users, setUsers] = useState([])
     const [books, setBooks] = useState([])
     const {
@@ -34,11 +33,11 @@ function AddTicketForm({ refreshDependency }) {
         await axios.post("/api/transactions/tickets/create", data)
             .then(() => {
                 reset()
-                setFormStatus(200)
+                toast.success('Ticket has been added!')
                 refreshDependency ? refreshDependency(true) : ''
             }).catch((err) => {
                 console.log(err)
-                setFormStatus(500)
+                toast.error('Unable to add ticket! Server error')
             })
 
     }
@@ -72,7 +71,6 @@ function AddTicketForm({ refreshDependency }) {
 
     return (
         <>
-            <StatusHandler subject={"Fine category"} code={formStatus} dismiss={setFormStatus} />
             <div>
                 <form onSubmit={handleSubmit(addTicket)} className="flex max-w-md flex-col gap-4" noValidate>
                     <div>

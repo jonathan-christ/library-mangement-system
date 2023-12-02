@@ -7,15 +7,13 @@ import { Table, Button, Badge, Modal } from 'flowbite-react'
 import { useState, useEffect, useMemo } from 'react'
 import { RiErrorWarningFill } from "react-icons/ri"
 
-import StatusHandler from '../../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 import AddFineForm from '../../add/AddFineForm'
 
 function FineTable({ userID, staff }) {
     const [refresh, setRefresh] = useState(true)
 
     const [fines, setFines] = useState([])
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [addShow, setAddShow] = useState(false)
     const [updateShow, setPromptShow] = useState(false)
@@ -33,27 +31,25 @@ function FineTable({ userID, staff }) {
                 setFines(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve fines! Server Error')
             })
     }
 
-    const updateTicket = async (id, status, date) => {
+    const updateFine = async (id, status, date) => {
         let data = { id: id, status: status, payDate: date }
         console.log(data)
         await axios.put("api/fines/update", data)
             .then(() => {
                 setRefresh(true)
-                setAction("Updated")
-                setStatus(200)
+                toast.success('Fine has been updated!')
             })
     }
 
-    const deleteTicket = async (id) => {
+    const deleteFine = async (id) => {
         await axios.post("api/fines/delete", { id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("Deleted")
-                setStatus(200)
+                toast.success('Fine has been deleted!')
             })
     }
 
@@ -89,7 +85,7 @@ function FineTable({ userID, staff }) {
 
     const userCells = useMemo(() =>
         fines.map((fine, idx) => {
-            const amount = dateDiff(fine.ticket.lendDate, fine.ticket.payDate ?? new Date(), fine.fineCategory.frequency) * fine.fineCategory.amount
+            const amount = dateDiff(fine.ticket.lendDate, fine.payDate ?? new Date(), fine.fineCategory.frequency) * fine.fineCategory.amount
             return (
                 <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-100")}>
                     <Table.Cell className='mx-5'>{fine.ticket.uuid}</Table.Cell>
@@ -136,7 +132,7 @@ function FineTable({ userID, staff }) {
                     </h3>
                     <div className="flex justify-center gap-4">
                         <Button color="failure" onClick={() => {
-                            updateTicket(modalData.id, modalData.status, modalData.payDate)
+                            updateFine(modalData.id, modalData.status, modalData.payDate)
                             setPromptShow(false)
                         }}>
                             {"Yes, I'm sure"}
@@ -155,7 +151,7 @@ function FineTable({ userID, staff }) {
                     </h3>
                     <div className="flex justify-center gap-4">
                         <Button color="failure" onClick={() => {
-                            deleteTicket(modalData.id)
+                            deleteFine(modalData.id)
                             setDeleteShow(false)
                         }}>
                             {"Yes, I'm sure"}
@@ -167,7 +163,6 @@ function FineTable({ userID, staff }) {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"User/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 {!!(userID || staff) || <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Fine</Button>}
                 <Table className='bg-white shadow-lg w-3/4'>

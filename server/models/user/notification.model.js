@@ -8,6 +8,18 @@ module.exports = (sequelize, Sequelize) => {
         userID: {
             type: Sequelize.INTEGER,
             allowNull: false,
+            references: {
+                model: "user",
+                key: "id"
+              }
+        },
+        ticketID: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                model: "ticket",
+                key: "id"
+              }
         },
         text: {
             type: Sequelize.TEXT,

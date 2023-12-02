@@ -1,7 +1,6 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
@@ -9,7 +8,7 @@ import { Button, Label, TextInput, Textarea } from 'flowbite-react'
 import { maxNameLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit } from '../../../assets/formErrorMsg'
 
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
 
 UpdateUserTypeForm.propTypes = {
@@ -17,7 +16,6 @@ UpdateUserTypeForm.propTypes = {
     refreshDependency: PropTypes.func
 }
 function UpdateUserTypeForm({ userType, refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const {
         register,
         handleSubmit,
@@ -48,12 +46,12 @@ function UpdateUserTypeForm({ userType, refreshDependency }) {
                     reset(newData)
 
                     refreshDependency ? refreshDependency(true) : ''
-                    setFormStatus(200)
+                    toast.success('User type has been updated!')
                 }).catch((err) => {
                     console.log(err)
                 })
         } else {
-            setFormStatus(402)
+            toast.error('User type already exists!')
         }
 
     }
@@ -65,14 +63,13 @@ function UpdateUserTypeForm({ userType, refreshDependency }) {
                 retVal = res.data.status === 'found'
             }).catch(() => {
                 retVal = false
-                setFormStatus(404)
+                toast.error('Unable to retrieve user types! Server Error')
             })
         return retVal
     }
 
     return (
         <>
-            <StatusHandler subject={"User type"} code={formStatus} dismiss={setFormStatus} />
             <div>
                 <form onSubmit={handleSubmit(updateUserType)} className="flex max-w-md flex-col gap-4" noValidate>
                     <div>

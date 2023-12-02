@@ -11,14 +11,13 @@ import { maxBookLen, maxISBNLen, minISBNLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit, belowMinChar } from '../../../assets/formErrorMsg'
 import { Button, Label, Textarea, TextInput, Datepicker, Radio, FileInput } from 'flowbite-react'
 import { useSession } from '../../context-hooks/session/SessionUtils';
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
 AddBookForm.propTypes = {
     refreshDependency: PropTypes.func
 }
 function AddBookForm({ refreshDependency }) {
     const userData = useSession()
-    const [formStatus, setFormStatus] = useState(0)
     const [file, setFile] = useState()
     const [images, setImages] = useState([])
     const [authors, setAuthors] = useState([])
@@ -52,7 +51,7 @@ function AddBookForm({ refreshDependency }) {
                     return { value: classif.id, label: classif.name }
                 }))
             }).catch(() => {
-                setFormStatus(400)
+                toast.error('Unable to retrieve classes! Server error')
             })
     }
 
@@ -68,7 +67,7 @@ function AddBookForm({ refreshDependency }) {
                 )
             })
             .catch(() => {
-                setFormStatus(400)
+                toast.error('Unable to retrieve images! Server error')
             })
     }
 
@@ -80,7 +79,7 @@ function AddBookForm({ refreshDependency }) {
                     return { value: auth.id, label: name }
                 }))
             }).catch(() => {
-                setFormStatus(400)
+                toast.error('Unable to retrieve authors! Server error')
             })
     }
 
@@ -91,7 +90,7 @@ function AddBookForm({ refreshDependency }) {
                     return { value: pub.id, label: pub.name }
                 }))
             }).catch(() => {
-                setFormStatus(400)
+                toast.error('Unable to retrieve publishers! Server error')
             })
     }
 
@@ -102,7 +101,7 @@ function AddBookForm({ refreshDependency }) {
                     return { value: genre.id, label: genre.name }
                 }))
             }).catch(() => {
-                setFormStatus(404)
+                toast.error('Unable to retrieve genres! Server error')
             })
     }
 
@@ -112,6 +111,8 @@ function AddBookForm({ refreshDependency }) {
                 setSubjects(res.data.map((subject) => {
                     return { value: subject.id, label: subject.name }
                 }))
+            }).catch(()=>{
+                toast.error('Unable to retrieve subjects! Server error')
             })
     }
 
@@ -143,10 +144,10 @@ function AddBookForm({ refreshDependency }) {
                 refreshDependency ? refreshDependency() : ''
                 setFile(null)
                 reset()
-                setFormStatus(200)
+                toast.success('Book has been added!')
             }).catch((err) => {
                 console.log(err)
-                setFormStatus(404)
+                toast.error('Unable to add book! Server error')
             })
     }
 
@@ -155,7 +156,7 @@ function AddBookForm({ refreshDependency }) {
             .then(res => {
                 return res.data.status === 'found' ? true : false
             }).catch(() => {
-                setFormStatus(402)
+                toast.error('Unable to retrieve books! Server error')
             })
 
         return result
@@ -172,7 +173,6 @@ function AddBookForm({ refreshDependency }) {
 
     return (
         <div>
-            <StatusHandler subject={"Book"} code={formStatus} dismiss={setFormStatus} />
             <form onSubmit={handleSubmit(addBook)} className="flex max-w-md flex-col gap-4">
                 <div>
                     <div className="mb-2 block">

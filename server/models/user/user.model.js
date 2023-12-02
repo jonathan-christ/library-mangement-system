@@ -40,6 +40,14 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.BLOB,
       allowNull: false
     },
+    createDate :{
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.NOW
+    },
+    lastLoginDate :{
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.NOW
+    },
     deleted: {
       type: Sequelize.BOOLEAN,
       defaultValue: false

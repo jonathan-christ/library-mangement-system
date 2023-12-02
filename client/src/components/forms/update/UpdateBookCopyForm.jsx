@@ -1,20 +1,18 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, Radio } from 'flowbite-react'
 import { emptyMsg } from '../../../assets/formErrorMsg'
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
 UpdateBookCopy.propTypes = {
     copy: PropTypes.object.isRequired,
     refreshDependency: PropTypes.func
 }
 function UpdateBookCopy({ copy, refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const {
         register,
         handleSubmit,
@@ -44,16 +42,15 @@ function UpdateBookCopy({ copy, refreshDependency }) {
                 reset(newData)
 
                 refreshDependency ? refreshDependency(true) : ''
-                setFormStatus(200)
+                toast.success('Book copy has been updated!')
             }).catch((err) => {
                 console.log(err)
-                setFormStatus(404)
+                toast.error('Unable to update book copy! Server Error')
             })
     }
 
     return (
         <div>
-            <StatusHandler subject={"Copy"} action='updated' code={formStatus} dismiss={setFormStatus} />
             <form onSubmit={handleSubmit(updateCopy)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div>
                     <div>

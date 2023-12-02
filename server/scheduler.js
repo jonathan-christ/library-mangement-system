@@ -1,6 +1,7 @@
-const schedule = require('node-schedule');
-const { routineCheck } = require('./controllers/transaction.controller'); // Adjust the path as needed
+const schedule = require('node-schedule')
+const { routineCheck } = require('./controllers/transaction.controller')
 
-// Schedule the routine task every 5 seconds
 routineCheck()
-const job = schedule.scheduleJob('*/5 * * * *', routineCheck);
+
+//every 5 mins run this
+const job = schedule.scheduleJob('*/5 * * * *', routineCheck)

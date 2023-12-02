@@ -1,6 +1,5 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import StatusHandler from '../../misc/StatusHandler'
 
 import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
@@ -9,12 +8,12 @@ import { DevTool } from '@hookform/devtools'
 import Select from 'react-select'
 import { Button, Label } from 'flowbite-react'
 import { emptyMsg } from '../../../assets/formErrorMsg'
+import { toast } from 'react-toastify'
 
 AddBookCopyForm.propTypes = {
     refreshDependency: PropTypes.func
 }
 function AddBookCopyForm({ refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const [books, setBooks] = useState([])
     const {
         handleSubmit,
@@ -42,18 +41,17 @@ function AddBookCopyForm({ refreshDependency }) {
         await axios.post("/api/copies/create", { bookID: data.book.id, callNumber: data.book.bcn })
             .then(() => {
                 reset()
-                setFormStatus(200)
+                toast.success('Book copy has been added!')
                 refreshDependency ? refreshDependency(true) : ''
             }).catch((err) => {
                 console.log(err)
-                setFormStatus(500)
+                toast.error('Book copy cannot be created! Server error')
             })
 
     }
 
     return (
         <>
-            <StatusHandler subject={"Book copy"} code={formStatus} dismiss={setFormStatus} />
             <div>
                 <form onSubmit={handleSubmit(addCopy)} className="flex max-w-md flex-col gap-4" noValidate>
                     <div>

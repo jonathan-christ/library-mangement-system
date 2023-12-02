@@ -2,6 +2,7 @@ const db = require("../models")
 const Bottleneck = require('bottleneck');
 
 const User = db.user
+const Notification = db.notification
 
 const Book = db.book
 const BookCopy = db.bookCopy
@@ -16,7 +17,8 @@ const { v4: uuidv4 } = require('uuid')
 
 const { fineMappings } = require('../assets/constants/fineClass')
 const { borrowPeriod, reservePeriod } = require('../assets/constants/timePeriods')
-const { dateDiff, convertMilliTo } = require('../assets/helper functions/timeConversion')
+const { dateDiff, convertMilliTo } = require('../assets/helper functions/timeConversion');
+const { returnRemind, reservedRemind, closeReport, overdueReport, cancelReport, borrowReport } = require("../assets/helper functions/notificationMsg");
 
 const limiter = new Bottleneck({
     maxConcurrent: 1,
@@ -46,10 +48,14 @@ exports.findAllTickets = async (req, res) => {
                             db.sequelize.literal('CONCAT(User.firstName, " ", User.lastName)'),
                             'userName'
                         ],
-                    ]
+                    ],
+                    where: {deleted: false}
                 }
             ],
-            where: userID ? { userID: userID } : ''
+            where: userID ? { userID: userID } : '',
+            order: [
+                ['createDate', 'DESC'],
+            ]
         })
 
         res.send(result)
@@ -118,7 +124,14 @@ exports.updateTicket = async (req, res) => {
     try {
         const result = await db.sequelize.transaction(async (t) => {
 
-            const ticket = await Ticket.findOne({ where: { id: data.id }, transaction: t })
+            const ticket = await Ticket.findOne({
+                include: [{
+                    model: Book,
+                    attributes: ['title']
+                }],
+                where: { id: data.id },
+                transaction: t
+            })
             if (ticket.copyID) {
                 if (endTicket.includes(data.status)) {
                     await BookCopy.update(
@@ -130,10 +143,25 @@ exports.updateTicket = async (req, res) => {
                     )
                     if (data.status === 'closed') {
                         ticket.returnDate = new Date()
+                    } else {
+                        await Notification.create({
+                            userID: ticket.userID,
+                            ticketID: ticket.id,
+                            text: cancelReport(ticket.book.title)
+                        }, { transaction: t })
+
+                        console.log("[updateTicket] ticket has been sent cancel notif")
                     }
                 }
                 if (data.status === 'borrowed') {
                     ticket.lendDate = new Date()
+                    await Notification.create({
+                        userID: ticket.userID,
+                        ticketID: ticket.id,
+                        text: borrowReport(ticket.book.title)
+                    }, { transaction: t })
+
+                    console.log("[updateTicket] ticket has been sent cancel notif")
                 }
             }
             ticket.status = data.status
@@ -162,6 +190,10 @@ const checkQueueAndReserve = async () => {
                 //check all tickets of book copy's book
                 for (const copy of availCopies) {
                     const frontTicket = await Ticket.findOne({
+                        include: [{
+                            model: Book,
+                            attributes: ['title']
+                        }],
                         where: { status: 'queued', bookID: copy.bookID },
                         order: [['createDate', 'ASC']]
                     })
@@ -174,7 +206,12 @@ const checkQueueAndReserve = async () => {
                             copyID: copy.id
                         })
                         await copy.update({ available: 'no', id: copy.id }, { transaction: t })
-
+                        await Notification.create({
+                            userID: frontTicket.userID,
+                            ticketID: frontTicket.id,
+                            text: reservedRemind(frontTicket.book.title)
+                        }, { transaction: t })
+                        console.log("\n[checkQueueAndReserve] reservation notification sent\n")
                     }
                 }
                 console.log(updateTicketList.length)
@@ -200,6 +237,10 @@ const checkReservedTickets = async () => {
         const result = await db.sequelize.transaction(async (t) => {
             console.log("\n[checkReservedTickets] Running\n ")
             const reservedTickets = await Ticket.findAll({
+                include: [{
+                    model: Book,
+                    attributes: ['title']
+                }],
                 where: { status: 'reserved' },
                 transaction: t
             })
@@ -218,6 +259,13 @@ const checkReservedTickets = async () => {
                             status: 'closed',
                         })
                         await BookCopy.update({ available: 'yes' }, { where: { id: ticket.copyID }, transaction: t })
+                        await Notification.create({
+                            userID: ticket.userID,
+                            ticketID: ticket.id,
+                            text: closeReport(ticket.book.title)
+                        }, { transaction: t })
+
+                        console.log("[checkReservedTickets] Close notification has been sent")
                     }
                 }
 
@@ -249,7 +297,7 @@ const checkBorrowedTickets = async () => {
                         attributes: ['name'],
                         where: { bookID: db.Sequelize.col('Book.id') }
                     }],
-                    attributes: ['classificationID'],
+                    attributes: ['title', 'classificationID'],
                     where: { id: db.Sequelize.col('Ticket.bookID') },
                 }],
                 where: { status: 'borrowed' },
@@ -264,6 +312,8 @@ const checkBorrowedTickets = async () => {
                     const className = ticket.book.classification.name.toUpperCase()
                     const borrowTime = borrowPeriod[className]
 
+
+                    console.log(borrowTime - Math.round(dateDiffDays))
                     console.log("[something] " + JSON.stringify(ticket))
                     if (dateDiffDays >= borrowTime) {
                         console.log("[yes]")
@@ -280,6 +330,24 @@ const checkBorrowedTickets = async () => {
                             ticketID: ticket.id,
                             categID: category.id
                         }, { transaction: t })
+                        await Notification.create({
+                            userID: ticket.userID,
+                            ticketID: ticket.id,
+                            text: overdueReport(ticket.book.title)
+                        }, { transaction: t })
+                        console.log("\n[checkBorrowedTickets] 1 day notifications sent\n")
+                    } else if (borrowTime - Math.round(dateDiffDays) <= 1) {
+                        const [notif, created] = await Notification.findOrCreate({
+                            where: {
+                                userID: ticket.userID,
+                                ticketID: ticket.id,
+                                text: returnRemind(1, ticket.book.title)
+                            }, transaction: t
+                        })
+
+                        if (created) {
+                            console.log("\n[checkBorrowedTickets] 1 day notifications sent\n")
+                        }
                     }
                 }
                 if (updateTicketList.length > 0) {
@@ -292,7 +360,7 @@ const checkBorrowedTickets = async () => {
         })
         console.log("\n[checkBorrowedTickets] No tickets updated\n\n")
     } catch (error) {
-        console.log("\nError in checkBorrowedTickets:" + error.message +"\n\n")
+        console.log("\nError in checkBorrowedTickets:" + error.message + "\n\n")
     }
 }
 
@@ -337,7 +405,7 @@ const checkOverdueReserved = async () => {
         })
         console.log("\n[checkOverdueReserved] No fines updated\n\n")
     } catch (error) {
-        console.log("\nError in checkOverdueReserved:" + error.message +"\n\n")
+        console.log("\nError in checkOverdueReserved:" + error.message + "\n\n")
     }
 }
 

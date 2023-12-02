@@ -1,9 +1,10 @@
 const db = require("../models")
 const bcrypt = require("bcrypt")
+const { Sequelize } = require("../models")
 const Op = db.Sequelize.Op
 const User = db.user
 
-const exclude = {exclude: ['password', 'deleted']}
+const exclude = { exclude: ['password', 'deleted'] }
 
 exports.create = async (req, res) => {
     const data = req.body.data
@@ -134,6 +135,7 @@ exports.login = async (req, res) => {
                     })
                 })
 
+                User.update({ lastLoginDate: new Date() }, { where: { id: userData.id } })
             } else {
                 res.status(200).send({
                     status: 'user not found'

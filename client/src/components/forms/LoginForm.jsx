@@ -9,6 +9,7 @@ import { Link, useNavigate, Navigate } from 'react-router-dom'
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react'
 
 import { useSession, useSessionUpdate } from '../context-hooks/session/SessionUtils'
+import { toast } from 'react-toastify'
 
 function LoginForm() {
     const [formErr, setFormErr] = useState("")
@@ -29,9 +30,11 @@ function LoginForm() {
                 let status = res.data.status
                 if (status === 'pass_match') {
                     delete res.data.data.password
+                    delete res.data.data.createDate
+                    delete res.data.data.lastLoginDate
                     ls.set("userData", JSON.stringify(res.data.data), { ttl: ttl, encrypt: true })
                     setSession(JSON.parse(ls.get('userData', { decrypt: true })))
-                    
+                    toast.success('Logged in!')
                     reset()
                     setFormErr("")
                     navigate('../catalog')

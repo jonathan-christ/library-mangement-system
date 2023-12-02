@@ -2,10 +2,12 @@ import SearchBar from '../misc/SearchBar'
 import PropTypes from 'prop-types'
 
 import { useSession } from '../context-hooks/session/SessionUtils'
-import { Avatar, Dropdown, Navbar, Button } from 'flowbite-react'
+import { Navbar, Button } from 'flowbite-react'
 
 import NavigationLink from './NavigationLink'
 import Logo from './navbar components/Logo'
+import UserAvatar from './navbar components/UserAvatar'
+import UserNotifications from './navbar components/UserNotifications'
 
 UserNavigation.propTypes = {
     functions: PropTypes.object.isRequired
@@ -19,24 +21,10 @@ function UserNavigation({ functions }) {
             <Logo to='/catalog' />
             <div className="flex md:order-2">
                 {session ?
-                    <Dropdown
-                        arrowIcon={false}
-                        inline
-                        label={
-                            <div className='flex gap-2'>
-                                <span className="self-center truncate text-xs text-gray-500 font-medium ">[{functions.translateUserType(session.typeID)}]</span>
-                                <Avatar placeholderInitials={functions.getInitials(session.firstName, session.lastName)} rounded />
-                            </div>
-                        }
-                    >
-                        <Dropdown.Header>
-                            <span className="block text-sm font-semibold text-gray-900 dark:text-white">{session.firstName + " " + session.lastName}</span>
-                            <span className="block text-sm text-gray-500 truncate dark:text-gray-400 font-medium ">{session.email}</span>
-                        </Dropdown.Header>
-                        <Dropdown.Item onClick={() => functions.navigate('/profile')}>Profile</Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item onClick={() => functions.signOut()}><span className="text-red-600" >Sign out</span></Dropdown.Item>
-                    </Dropdown>
+                    <div className='flex gap-5'>
+                        <UserNotifications />
+                        <UserAvatar functions={functions} />
+                    </div>
                     :
                     <>
                         <Button color="none" onClick={() => functions.navigate('/login')}>Login</Button>

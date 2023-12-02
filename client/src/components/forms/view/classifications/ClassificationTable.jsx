@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
-import StatusHandler from '../../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 import AddClassificationForm from '../../add/AddClassificationForm'
 import UpdateClassForm from '../../update/UpdateClassificationForm'
 
@@ -15,8 +15,6 @@ function ClassTable() {
     const [refresh, setRefresh] = useState(true)
 
     const [classes, setClasses] = useState([])
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [deleteShow, setDeleteShow] = useState(false)
     const [addShow, setAddShow] = useState(false)
@@ -35,19 +33,18 @@ function ClassTable() {
                 setClasses(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve classifications! Server Error')
             })
     }
 
-    const deleteGenre = (id) => {
+    const deleteClass = (id) => {
         axios.post("api/class/delete", { id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("deleted")
-                setStatus(200)
+                toast.success('Classification has been deleted!')
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to delete classification! Server Error')
             })
     }
 
@@ -105,7 +102,7 @@ function ClassTable() {
                     </h3>
                     <div className="flex justify-center gap-4">
                         <Button color="failure" onClick={() => {
-                            deleteGenre(modalData.id)
+                            deleteClass(modalData.id)
                             setDeleteShow(false)
                         }}>
                             {"Yes, I'm sure"}
@@ -117,7 +114,6 @@ function ClassTable() {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"Classification/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Classification</Button>
                 <Table className='bg-white shadow-lg w-max'>

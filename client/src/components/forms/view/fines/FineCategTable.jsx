@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
-import StatusHandler from '../../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 import AddFineCategForm from '../../add/AddFineCategForm'
 import UpdateFineCategForm from '../../update/UpdateFineCategForm'
 
@@ -15,8 +15,6 @@ function FineCategTable() {
     const [refresh, setRefresh] = useState(true)
 
     const [fineCategs, setFineCategs] = useState([])
-    const [action, setAction] = useState("retrieved")
-    const [status, setStatus] = useState(0)
 
     const [deleteShow, setDeleteShow] = useState(false)
     const [addShow, setAddShow] = useState(false)
@@ -35,7 +33,7 @@ function FineCategTable() {
                 setFineCategs(res.data)
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to retrieve fine categories! Server Error')
             })
     }
 
@@ -43,11 +41,10 @@ function FineCategTable() {
         axios.post("api/finecategs/delete", { id: id })
             .then(() => {
                 setRefresh(true)
-                setAction("deleted")
-                setStatus(200)
+                toast.success('Fine category has been deleted!')
             }).catch((err) => {
                 console.log(err)
-                setStatus(500)
+                toast.error('Unable to delete fine category! Server Error')
             })
     }
 
@@ -123,7 +120,6 @@ function FineCategTable() {
                 </Modal.Body>
             </Modal>
 
-            <StatusHandler subject={"Fine Category/s"} action={action} code={status} dismiss={setStatus} />
             <div className="p-10">
                 <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Fine Category</Button>
                 <Table className='bg-white shadow-lg w-max'>

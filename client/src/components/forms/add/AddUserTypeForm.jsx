@@ -1,8 +1,7 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 
@@ -14,7 +13,6 @@ AddUserTypeForm.propTypes = {
     refreshDependency: PropTypes.func
 }
 function AddUserTypeForm({ refreshDependency }) {
-    const [formStatus, setFormStatus] = useState(0)
     const {
         register,
         handleSubmit,
@@ -29,14 +27,14 @@ function AddUserTypeForm({ refreshDependency }) {
             await axios.post("/api/usertypes/create", data)
                 .then(() => {
                     reset()
-                    setFormStatus(200)
+                    toast.success('User type has been added!')
                     refreshDependency ? refreshDependency(true) : ''
                 }).catch((err) => {
                     console.log(err)
-                    setFormStatus(500)
+                    toast.error('Unable to add user type! Server error')
                 })
         } else {
-            setFormStatus(402)
+            toast.error('User type already exists!')
         }
 
     }
@@ -48,14 +46,13 @@ function AddUserTypeForm({ refreshDependency }) {
                 retVal = res.data.status === 'found'
             }).catch(() => {
                 retVal = false
-                setFormStatus(404)
+                toast.error('Unable to retrieve user types! Server error')
             })
         return retVal
     }
 
     return (
         <>
-            <StatusHandler subject={"User type"} code={formStatus} dismiss={setFormStatus} />
             <div>
                 <form onSubmit={handleSubmit(addUserType)} className="flex max-w-md flex-col gap-4" noValidate>
                     <div>

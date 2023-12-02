@@ -16,7 +16,7 @@
     "@tim-w-james/eslint-config": "^2.3.3",
     "axios": "^1.6.1",
     "flowbite": "^2.1.1",
-    "flowbite-react": "^0.6.4",
+    "flowbite-react": "^0.7.0",
     "localstorage-slim": "^2.7.0",
     "node-addon-api": "^7.0.0",
     "react": "^18.2.0",

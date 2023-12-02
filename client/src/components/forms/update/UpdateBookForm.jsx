@@ -11,7 +11,7 @@ import { maxBookLen, maxISBNLen, minISBNLen } from '../../../assets/constants'
 import { emptyMsg, exceedCharLimit, belowMinChar } from '../../../assets/formErrorMsg'
 import { Button, Label, Textarea, TextInput, Datepicker, Radio, FileInput } from 'flowbite-react'
 import { useSession } from '../../context-hooks/session/SessionUtils';
-import StatusHandler from '../../misc/StatusHandler'
+import { toast } from 'react-toastify'
 
 UpdateBookForm.propTypes = {
     book: PropTypes.object.isRequired,
@@ -20,7 +20,6 @@ UpdateBookForm.propTypes = {
 }
 function UpdateBookForm({ book, components, refreshDependency }) {
     const userData = useSession()
-    const [formStatus, setFormStatus] = useState(0)
 
     const authors = components.authors.map((author) => {
         return {
@@ -104,10 +103,10 @@ function UpdateBookForm({ book, components, refreshDependency }) {
                 reset(newData)
 
                 refreshDependency ? refreshDependency(true) : ''
-                setFormStatus(200)
+                toast.success('Book has been updated!')
             }).catch((err) => {
                 console.log(err)
-                setFormStatus(404)
+                toast.error('Unable to update book! Server Error')
             })
     }
 
@@ -117,7 +116,7 @@ function UpdateBookForm({ book, components, refreshDependency }) {
             .then(res => {
                 return res.data.status === 'found' ? true : false
             }).catch(() => {
-                setFormStatus(402)
+                toast.error('Unable to retrieve books! Server Error')
             })
 
         return result
@@ -147,7 +146,6 @@ function UpdateBookForm({ book, components, refreshDependency }) {
 
     return (
         <div>
-            <StatusHandler subject={"Book"} code={formStatus} dismiss={setFormStatus} />
             <form onSubmit={handleSubmit(updateBook)} className="flex max-w-md flex-col gap-4">
                 <div>
                     <div className="mb-2 block">

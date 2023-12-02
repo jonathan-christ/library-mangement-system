@@ -5,6 +5,7 @@ exports.create = async (req, res) => {
     const data = req.body;
     const notification = {
         userID: data.userID,
+        ticketID: data.ticketID,
         text: data.text,
     }
 
@@ -18,7 +19,8 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = (req, res) => {
-    Notification.findAll({ where: { userID: req.body.userID } })
+    console.log(req.body)
+    Notification.findAll({ where: { userID: req.body.userID }, order: [['sendDate', 'DESC']] })
         .then((data) => {
             res.send(data)
         })
@@ -29,7 +31,7 @@ exports.findAll = (req, res) => {
 
 exports.update = (req, res) => {
     const data = req.body;
-    Notification.update({ isRead: true }, { where: { userID: data.userID, id: data.notificationID } })
+    Notification.update({ isRead: true }, { where: { userID: data.userID, id: data.id } })
         .then(() => {
             res.status(200).send({
                 message: "Notification updated!",
