@@ -25,6 +25,7 @@ function AddBookForm({ refreshDependency }) {
     const [subjects, setSubjects] = useState([])
     const [publishers, setPublishers] = useState([])
     const [classifications, setClassifications] = useState([])
+    const [submitted, setSubmitted] = useState(false)
     const {
         register,
         handleSubmit,
@@ -143,6 +144,7 @@ function AddBookForm({ refreshDependency }) {
             .then(() => {
                 refreshDependency ? refreshDependency() : ''
                 setFile(null)
+                setSubmitted(false)
                 reset()
                 toast.success('Book has been added!')
             }).catch((err) => {
@@ -428,7 +430,9 @@ function AddBookForm({ refreshDependency }) {
                         </div>
                     </fieldset>
                 </div>
-                <Button type="submit">Add New Book</Button>
+                <Button type="submit" onClick={()=>{
+                    setSubmitted(true)
+                }} disabled={submitted}>Add New Book</Button>
             </form >
             <DevTool control={control} />
         </div >

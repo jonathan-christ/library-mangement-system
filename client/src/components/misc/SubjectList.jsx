@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import {Badge} from 'flowbite-react'
 
 SubjectList.propTypes = {
     subjects: PropTypes.array.isRequired
@@ -6,12 +7,15 @@ SubjectList.propTypes = {
 
 function SubjectList({ subjects }) {
     return (
-        <>
+        <div className='flex flex-row gap-2 flex-wrap '>
             {subjects.map((subject, idx) => {
-                let sep = idx < subjects.length - 1 ? ', ' : ' '
-                return <span key={idx}>{`${subject.name}${sep}`}</span>
+                return (
+                    <Badge key={idx} color='info' className='text-sm w-max cursor-default'>
+                        <span key={idx}>{`${subject.name}`}</span>
+                    </Badge>
+                )
             })}
-        </>
+        </div>
     )
 }
 

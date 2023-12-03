@@ -15,6 +15,7 @@ AddBookCopyForm.propTypes = {
 }
 function AddBookCopyForm({ refreshDependency }) {
     const [books, setBooks] = useState([])
+    const [submitted, setSubmitted] = useState(false)
     const {
         handleSubmit,
         watch,
@@ -42,6 +43,7 @@ function AddBookCopyForm({ refreshDependency }) {
             .then(() => {
                 reset()
                 toast.success('Book copy has been added!')
+                setSubmitted(false)
                 refreshDependency ? refreshDependency(true) : ''
             }).catch((err) => {
                 console.log(err)
@@ -75,7 +77,9 @@ function AddBookCopyForm({ refreshDependency }) {
                             <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.book?.message}</p>
                         </div>
                     </div>
-                    <Button type="submit">Add New Copy</Button>
+                    <Button type="submit" onClick={()=>{
+                    setSubmitted(true)
+                }} disabled={submitted}>Add New Copy</Button>
                 </form>
                 <DevTool control={control} />
             </div>

@@ -30,7 +30,7 @@ function MiniBook({ book }) {
                     <span className='font-semibold'>Subjects: </span>
                     <SubjectList subjects={book.subjects} />
                 </div>
-                <p className='whitespace-pre-wrap my-2 text-ellipsis text-justify'>{book.description}</p>
+                <p className='truncate whitespace-pre-wrap my-2 text-ellipsis text-justify'>{book.description}</p>
             </div>
         </Link>
     )

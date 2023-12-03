@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { Badge } from 'flowbite-react'
 
 GenreList.propTypes = {
     genres: PropTypes.array.isRequired
@@ -8,8 +9,13 @@ function GenreList({ genres }) {
     return (
         <>
             {genres.map((genre, idx) => {
-                let sep = idx < genres.length - 1 ? ', ' : ' '
-                return <span key={idx} className='text-sm'>{`${genre.name}${sep}`}</span>
+                return (
+
+                    <Badge key={idx} color='indigo' className='text-sm w-max cursor-default'>
+                        {`${genre.name}`}
+                    </Badge>
+
+                )
             })}
         </>
     )

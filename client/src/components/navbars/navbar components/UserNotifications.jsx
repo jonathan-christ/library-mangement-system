@@ -1,6 +1,7 @@
 "use client"
 
 import axios from 'axios'
+import React from 'react'
 
 import { FaCircle } from "react-icons/fa"
 import { IoNotifications } from "react-icons/io5"
@@ -11,9 +12,10 @@ import { toast } from 'react-toastify'
 import { dateFormat } from './../../../assets/formatter'
 
 function UserNotifications() {
-  const [hasUnread, setHasUnread] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const user = useSession();
+  const [hasUnread, setHasUnread] = useState(false)
+  const [notifications, setNotifications] = useState([])
+  const user = useSession()
+  const toastId = React.useRef(null)
 
   useEffect(() => {
     getNotifs()
@@ -41,8 +43,9 @@ function UserNotifications() {
   }
 
   const notifCells = notifications?.map(notif => {
-    if (!notif.isRead) {
-      toast.info(notif.text, {
+
+    if (!notif.isRead && !toast.isActive(toastId.current)) {
+      toastId.current = toast.info(notif.text, {
         position: "bottom-right",
         toastId: notif.id
       })
@@ -67,13 +70,12 @@ function UserNotifications() {
       arrowIcon={false}
       inline
       label={
-        <div className="relative">
-          <IoNotifications size={18} className={`hover:text-blue-600`} />
+        <div className="relative focus:text-blue-600 hover:text-blue-600" tabIndex={0}>
+          <IoNotifications size={18} />
           {!hasUnread || <FaCircle className="absolute top-0 right-0 text-blue-500" size={8} />}
         </div>
       }
-      onClick={() => getNotifs()}
-      className='w-full md:w-1/2 lg:w-1/3'
+      className='absolute w-full md:w-1/2 lg:w-1/3 overflow-y-auto h-screen md:h-[500px] focus:text-blue-600'
     >
       <Dropdown.Header className='border-b-1'>
         <span className="block text-sm font-semibold text-gray-900 dark:text-white">Notifications</span>

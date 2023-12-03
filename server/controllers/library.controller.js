@@ -22,7 +22,7 @@ const BookImage = db.bookImg
 
 
 exports.addBook = async (req, res) => {
-    let data = req.body
+    let temp = data = req.body
     try {
         db.sequelize.transaction(async (t) => {
             if (data.book === undefined) {
@@ -33,6 +33,7 @@ exports.addBook = async (req, res) => {
                             return;
                         }
                         data = unflatten.unflatObject(req.body)
+                        data.book?.description ? data.book.description = temp.book.description : 1
                         const { uploaderID, title } = req.body;
                         const imgLink = `/images/${req.file.filename}`;
 
@@ -71,6 +72,36 @@ exports.addBook = async (req, res) => {
     }
 }
 
+exports.searchBooks = async (req, res) => {
+    try {
+        // Get the search query from the request body or query parameters
+        const searchQuery = req.body.search
+
+
+        // Build the where clause dynamically for each searchable field
+        const whereClause = {
+            deleted: false,
+            [Op.or]: [
+                { title: { [Op.like]: `%${searchQuery}%` } },
+                { '$authors.firstName$': { [Op.like]: `%${searchQuery}%` } },
+                { '$authors.lastName$': { [Op.like]: `%${searchQuery}%` } },
+                { '$genres.name$': { [Op.like]: `%${searchQuery}%` } },
+                { '$subjects.name$': { [Op.like]: `%${searchQuery}%` } },
+                { '$publisher.name$': { [Op.like]: `%${searchQuery}%` } },
+            ],
+        };
+
+        // Perform the Sequelize query with the dynamic where clause and include associations
+        const result = await Book.findAll({
+            where: whereClause,
+            include: [Author, Genre, Subject, Publisher, BookImage]
+        })
+
+        res.send(result)
+    } catch (error) {
+        res.status(500).send({ message: error.message })
+    }
+}
 exports.findAllBooks = async (req, res) => {
     try {
         const result = await Book.findAll({

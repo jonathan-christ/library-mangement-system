@@ -15,9 +15,9 @@ import UpdateBookCopy from '../../update/UpdateBookCopyForm'
 
 CopyTable.propTypes = {
     bookID: PropTypes.number,
-    setExists: PropTypes.func
+    setEmpty: PropTypes.func
 }
-function CopyTable({ bookID, setExists }) {
+function CopyTable({ bookID, setEmpty }) {
     const [refresh, setRefresh] = useState(true)
 
     const [copies, setCopies] = useState([])
@@ -27,6 +27,7 @@ function CopyTable({ bookID, setExists }) {
     const [updateShow, setUpdateShow] = useState(false)
     const [modalData, setModalData] = useState({})
 
+    console.log('yes')
 
     useEffect(() => {
         getCopies()
@@ -38,8 +39,7 @@ function CopyTable({ bookID, setExists }) {
         axios.post("/api/copies/", bookID ? { bookID: bookID } : null)
             .then((res) => {
                 setCopies(res.data)
-                setExists ? setExists(res.data.length ? true : false) : ''
-                console.log(res.data.length ? true : false)
+                setEmpty ? setEmpty(res.data.length===0 ? true : false) : ''
             }).catch((err) => {
                 console.log(err)
                 toast.error('Unable to retrieve book copies! Server Error')
@@ -125,7 +125,7 @@ function CopyTable({ bookID, setExists }) {
             {/* MODALS */}
             {!bookID &&
                 <>
-                    <Modal show={addShow} onClose={() => setAddShow(false)}>
+                    <Modal show={addShow} onClose={() => setAddShow(false)} size='lg'>
                         <Modal.Header>ADD COPY</Modal.Header>
                         <Modal.Body className='p-5'>
                             <AddBookCopyForm refreshDependency={setRefresh} />

@@ -26,15 +26,17 @@ const RatingForm = ({ bookID, userID }) => {
     }, [bookID])
 
     const fetchUserRating = useCallback(async () => {
-        axios.post(`/api/ratings/find/user`, { bookID: bookID, userID: userID })
-            .then((res) => {
-                let data = res.data.rating
-                setUserRating(data === 'like' ? "Like" : data === 'dislike' ? "Dislike" : null)
-            })
-            .catch((error) => {
-                toast.error('Unable to retrieve ratings! Server error')
-                console.error('Error fetching user rating:', error)
-            })
+        if (userID ?? false) {
+            axios.post(`/api/ratings/find/user`, { bookID: bookID, userID: userID })
+                .then((res) => {
+                    let data = res.data.rating
+                    setUserRating(data === 'like' ? "Like" : data === 'dislike' ? "Dislike" : null)
+                })
+                .catch((error) => {
+                    toast.error('Unable to retrieve ratings! Server error')
+                    console.error('Error fetching user rating:', error)
+                })
+        }
     }, [bookID, userID])
 
     useEffect(() => {
@@ -68,23 +70,23 @@ const RatingForm = ({ bookID, userID }) => {
     }
 
     return (
-        <div>
-            <h2><strong>Book Ratings</strong></h2>
+        <div className='text-sm'>
+            <h2 className='font-semibold'>Book Ratings</h2>
             <div>
                 <span>
                     {percentToLabel(percent)} ({ratings.count || 0} review{ratings.count != 1 ? 's' : ''})
                 </span>
             </div>
             <div className={userID ? '' : 'hidden'}>
-                <div>
-                    <strong>Your Rating:</strong> {userRating ? userRating : 'No rating'}
+                <div >
+                    <span className='font-semibold'>Your Rating: </span> {userRating ? userRating : 'No rating'}
                 </div>
                 <Button.Group>
-                    <Button color='gray' onClick={() => handleRatingSubmit('like')} disabled={userRating === 'Like' ? true : null}>
-                        <BiSolidLike size={25} />
+                    <Button className='bg-inherit' color='gray' onClick={() => handleRatingSubmit('like')} disabled={userRating === 'Like' ? true : null}>
+                        <BiSolidLike size={20} />
                     </Button>
-                    <Button color='gray' onClick={() => handleRatingSubmit('dislike')} disabled={userRating === 'Dislike' ? true : null}>
-                        <BiSolidDislike size={25} />
+                    <Button className='bg-inherit' color='gray' onClick={() => handleRatingSubmit('dislike')} disabled={userRating === 'Dislike' ? true : null}>
+                        <BiSolidDislike size={20} />
                     </Button>
                 </Button.Group>
             </div>

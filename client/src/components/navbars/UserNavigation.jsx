@@ -1,4 +1,3 @@
-import SearchBar from '../misc/SearchBar'
 import PropTypes from 'prop-types'
 
 import { useSession } from '../context-hooks/session/SessionUtils'
@@ -17,7 +16,7 @@ function UserNavigation({ functions }) {
 
     return (
         // className='bg-primary-base text-gray-200'
-        <Navbar fluid>
+        <Navbar fluid className=''>
             <Logo to='/catalog' />
             <div className="flex md:order-2">
                 {session ?
@@ -34,14 +33,12 @@ function UserNavigation({ functions }) {
                 <Navbar.Toggle />
             </div>
             <Navbar.Collapse>
-                {session ?
+                {session &&
                     <>
                         <NavigationLink to="/catalog" label="CATALOG" />
                         <NavigationLink to="/reservations" label="RESERVATIONS" />
                         <NavigationLink to="/userfines" label="FINES" />
                     </>
-                    :
-                    <SearchBar />
                 }
             </Navbar.Collapse>
         </Navbar >

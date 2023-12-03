@@ -89,7 +89,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </SessionProvider>
-      <ToastContainer position='top-right' theme='colored'/>
+      <ToastContainer position='bottom-right' theme='colored'/>
     </BrowserRouter>
   )
 }
