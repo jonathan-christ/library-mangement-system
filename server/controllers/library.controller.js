@@ -20,6 +20,8 @@ const SubjectList = db.subjectList
 const Publisher = db.publisher
 const BookImage = db.bookImg
 
+const Ticket = db.ticket
+
 
 exports.addBook = async (req, res) => {
     let temp = data = req.body
@@ -222,6 +224,54 @@ const updateList = async (data, modelName, dbModel, bookID, transaction) => {
     }
     if (newModels.length > 0) {
         await dbModel.bulkCreate(newModels, { validate: true, transaction: transaction })
+    }
+}
+
+exports.subjectGraph = async (req, res) => {
+    try {
+        const topBorrowedSubjects = await db.sequelize.query(`
+        SELECT
+            s.name AS 'Subject',
+            SUM(CASE WHEN ut.title = 'teacher' THEN 1 ELSE 0 END) AS 'Teachers',
+            SUM(CASE WHEN ut.title = 'student' THEN 1 ELSE 0 END) AS 'Students'
+        FROM subjects s
+        JOIN subjectlists sl ON s.id = sl.subjectID
+            JOIN books b ON b.id = sl.bookID
+            JOIN tickets t ON b.id = t.bookID
+                JOIN users u ON u.id = t.userID
+                JOIN usertypes ut ON u.typeID = ut.id
+        GROUP BY s.id, s.name
+        ORDER BY Teachers DESC, Students DESC
+        LIMIT 10;
+            `,
+            { type: db.Sequelize.QueryTypes.SELECT }
+        );
+
+        // console.log('Top 10 Most Borrowed Subjects:', topBorrowedSubjects);
+        res.send(topBorrowedSubjects)
+    } catch (error) {
+        res.status(500).send("Error fetching graph data", error)
+        console.error('Error fetching data:', error);
+    }
+}
+
+exports.monthlyTickets = async (req, res) => {
+    try {
+        const tickets = await db.sequelize.query(`
+        SELECT MONTHNAME(lendDate) as month, COUNT(*) as bookings 
+        FROM tickets
+        WHERE lendDate IS NOT NULL
+        GROUP BY month
+        ORDER BY month DESC;
+            `,
+            { type: db.Sequelize.QueryTypes.SELECT }
+        );
+
+        // console.log('Top 10 Most Borrowed Subjects:', topBorrowedSubjects);
+        res.status(200).send(tickets)
+    } catch (error) {
+        res.status(500).send("Error fetching graph data"+error)
+        console.error('Error fetching data:', error);
     }
 }
 

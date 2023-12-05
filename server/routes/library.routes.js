@@ -8,5 +8,8 @@ module.exports = (app) => {
     router.post("/books/add", library.addBook)
     router.post("/books/update", library.updateBook)
 
+    router.get("/graphs/popular-subject-users", library.subjectGraph)
+    router.get("/graphs/monthly-ticket-issues", library.monthlyTickets)
+
     app.use('/api/library', router)
 }

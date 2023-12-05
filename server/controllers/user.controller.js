@@ -187,4 +187,13 @@ exports.verifyPass = async (req, res) => {
         })
 }
 
-
+exports.count = async (req, res) => {
+    try {
+        const userCount = await User.count()
+        console.log(`Number of Users: ${userCount}`)
+        res.send({data: userCount})
+    } catch (error) {
+        console.error('Error fetching user count:', error)
+        res.status(500).send(error)
+    }
+}

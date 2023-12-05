@@ -8,5 +8,7 @@ module.exports = (app) => {
     router.post("/create", book.create)
     router.post("/delete", book.delete)
 
+    router.get("/count", book.count)
+
     app.use('/api/books', router)
 }

@@ -28,7 +28,6 @@ const limiter = new Bottleneck({
 
 exports.findAllTickets = async (req, res) => {
     const userID = req.body.userID
-    console.log(userID)
     try {
         whereClause = userID ? { where: { userID: userID, status: { [Op.notIn]: ['cancelled', 'closed'] } } } : {}
         console.log(whereClause)
@@ -69,7 +68,6 @@ exports.findAllTickets = async (req, res) => {
 
 exports.findOneTicket = async (req, res) => {
     const data = req.body
-    console.log(data.userID, data.bookID)
     try {
         await Ticket.findOne({ where: { userID: data.userID, bookID: data.bookID, status: { [Op.notIn]: ['cancelled', 'closed'] } } })
             .then((result) => {
@@ -82,6 +80,20 @@ exports.findOneTicket = async (req, res) => {
         res.status(500).send('Error finding tickets! ' + error.message)
     }
 }
+
+exports.getTicketCounts = async (req, res) => {
+    try {
+        const totalCount = await Ticket.count()
+        const cancelledCount = await Ticket.count({ where: { status: 'cancelled' } })
+        const queueCount = await Ticket.count({ where: { status: 'queued' } })
+        const borrowCount = await Ticket.count({ where: { status: 'borrowed' } })
+
+        res.send({ total: totalCount, cancelled: cancelledCount, queued: queueCount, borrowed: borrowCount })
+    } catch (error) {
+        res.status(500).send('Error finding tickets! ' + error.message)
+    }
+}
+
 // TRANSACTION
 
 exports.createTicket = async (req, res) => {

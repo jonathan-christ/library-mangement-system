@@ -98,3 +98,14 @@ exports.delete = (req, res) => {
                 .send({ message: err.message })
         })
 }
+
+exports.count = async (req, res) => {
+    try {
+        const bookCount = await Book.count()
+        console.log(`Number of Books: ${bookCount}`)
+        res.send({data: bookCount})
+    } catch (error) {
+        console.error('Error fetching book count:', error)
+        res.status(500).send(error)
+    }
+}

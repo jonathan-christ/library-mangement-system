@@ -14,5 +14,7 @@ module.exports = (app) => {
     router.post("/find", user.findOne)
     router.post("/findID", user.findOneID)
 
+    router.get("/count", user.count)
+
     app.use('/api/users', router)
 }

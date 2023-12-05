@@ -17,8 +17,8 @@ function AdminSidebar() {
 
     return (
         <div className='flex flex-col'>
-            <button className='bg-white hover:bg-gray-200 transition-all duration-100' onClick={handleToggle}>{isCollapsed?'->':'<-'}</button>
-            <Sidebar className='shadow-xl rounded-none transition-transform duration-100' collapsed={isCollapsed}>
+            <button className='bg-white hover:bg-gray-200 transition-all duration-100' onClick={handleToggle}>{isCollapsed ? '->' : '<-'}</button>
+            <Sidebar className='shadow-xl rounded-none transition-transform duration-100' theme={{ color: { background: 'blue', text: 'black' } }} collapsed={isCollapsed}>
                 <Sidebar.Items>
                     <Sidebar.ItemGroup>
                         <SidebarLink to='/admindash' label='Dashboard' icon={HiChartPie} />

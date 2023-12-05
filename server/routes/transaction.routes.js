@@ -3,6 +3,7 @@ module.exports = (app) => {
     let router = require('express').Router()
 
     router.get("/routine", transaction.routineCheck)
+    router.get("/tickets/count", transaction.getTicketCounts)
 
     router.post("/tickets/", transaction.findAllTickets)
     router.post("/tickets/find", transaction.findOneTicket)

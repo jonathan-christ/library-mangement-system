@@ -2,7 +2,6 @@ const db = require("../models")
 const Op = db.Sequelize.Op
 
 const Subject = db.subject
-const SubjectList = db.subjectList
 
 exports.create = async (req, res) => {
     const subject = {
@@ -93,3 +92,4 @@ exports.delete = (req, res) => {
                 .send({ message: err.message })
         })
 }
+
