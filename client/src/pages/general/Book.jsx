@@ -21,12 +21,15 @@ import { toast } from 'react-toastify'
 
 function Book() {
   const [loading, setLoading] = useState(true)
-  const [buttonDisabled, setButtonDisabled] = useState(false)
+  const [hasCopies, setHasCopies] = useState(false)
+  const [hasTicket, setHasTicket] = useState(false)
+  const [clicked, setClicked] = useState(false)
 
   const user = useSession()
   const { isbn } = useParams()
   const navigate = useNavigate()
 
+  const buttonDisabled = (!hasCopies || hasTicket || (user ? false : true) || clicked)
   const [book, setBook] = useState({
     id: -1,
     title: '',
@@ -35,7 +38,6 @@ function Book() {
   })
 
   const initializePage = useCallback(async () => {
-    console.log("reload")
     if (isbn === undefined || validator.isAlpha(isbn)) {
       navigate('/catalog')
     } else {
@@ -50,10 +52,12 @@ function Book() {
   }, [navigate, isbn])
 
   useEffect(() => {
+    if (book.id == -1) {
+      initializePage()
+    }
     hasReserved()
-    initializePage()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [book])
 
   const reserveBook = async (bookID) => {
     if (user ?? false) {
@@ -64,6 +68,7 @@ function Book() {
         }).catch((err) => {
           toast.error('Unable to create reservation! Server error')
           console.log(err)
+          setClicked(false)
         })
     }
   }
@@ -72,32 +77,26 @@ function Book() {
     if (user ?? false) {
       await axios.post("/api/transactions/tickets/find", { userID: user.id, bookID: book.id })
         .then((res) => {
-          setButtonDisabled(res.data.found)
+          setHasTicket(res.data.found)
         }).catch((err) => {
           toast.error('Unable to retrieve ticket details! Server error')
           console.log(err)
         })
-    }else {
-      setButtonDisabled(true)
+    } else {
+      console.log(buttonDisabled)
+      setHasTicket(false)
     }
-  }
-
-  const empty = async (res) => {
-    if (buttonDisabled && !res) {
-      setButtonDisabled(true)
-    }
-
   }
 
   return (
     <div className='relative '>
-      <Link to='/catalog' className='fixed top-15 left-0'>
-        <Button className='rounded-none'>{'<-'}</Button>
+      <Link to='/catalog' className='fixed top-1/3 h-32'>
+        <Button color='blue' className='h-full shadow-lg bg-primary-400 rounded-s-sm -left-2/3 text-transparent hover:left-0 hover:text-white transition-all duration-100'>{'<- '}BACK</Button>
       </Link>
       {!loading &&
         <div className='flex flex-col lg:flex-row py-5 px-10 gap-10 xl:px-20 h-max'>
-          <div className='bg-gray-100 flex flex-col w-full md:w-1/2 xl:w-1/5 gap-1 md:self-center lg:self-auto flex-shrink-0 shadow-lg'>
-            <div className='bg-blue-600 p-3 text-lg text-white text-center font-semibold'>
+          <div className='bg-secondary-100 flex flex-col w-full md:w-1/2 xl:w-1/5 gap-1 md:self-center lg:self-auto flex-shrink-0 shadow-lg rounded-md'>
+            <div className='bg-primary-400 p-3 text-lg text-white text-center font-semibold rounded-t-md'>
               BOOK INFO
             </div>
             <div className='p-5 w-full m-auto flex flex-col gap-5'>
@@ -124,63 +123,64 @@ function Book() {
           </div>
 
           <Tabs
-            selectedTabClassName='bg-tab-active text-white'
+            selectedTabClassName='bg-primary-400 text-white'
             selectedTabPanelClassName='bg-inherit'
             className='w-full h-full'
           >
-            <TabList className='flex flex-row w-full cursor-pointer font-semibold '>
-              <Tab className='p-3 text-lg bg-gray-800 text-gray-400 hover:bg-blue-600 hover:text-white'  >OVERVIEW</Tab>
-              <Tab className='p-3 text-lg bg-gray-800 text-gray-400 hover:bg-blue-600 hover:text-white'>COPIES</Tab>
+            <TabList className='flex flex-row w-full cursor-pointer font-semibold'>
+              <Tab className='rounded-ss-md p-3 text-lg bg-gray-800 text-gray-400 hover:bg-primary-600 hover:text-white transition-all duration-100'  >OVERVIEW</Tab>
+              <Tab className='rounded-se-md p-3 text-lg bg-gray-800 text-gray-400 hover:bg-primary-600 hover:text-white transition-all duration-100'>COPIES</Tab>
             </TabList>
 
-            <div className='h-full shadow-lg p-5 bg-gray-100'>
-              <TabPanel className='flex flex-col gap-5 '>
+            <div className='h-full shadow-lg p-5 bg-secondary-100 rounded-md rounded-tl-none'>
+              <TabPanel className='flex flex-col gap-5'>
                 <article>
-                  <div className='bg-blue-600 p-2 text-md text-white text-center font-semibold w-[125px]'>
+                  <div className='shadow-md bg-primary-400 p-2 text-md text-white text-center font-semibold w-[125px] rounded-t-md'>
                     Description
                   </div>
-                  <div className='bg-white p-5 shadow-md'>
+                  <div className='bg-secondary-50 p-5 shadow-md text-justify'>
                     {book.description}
                   </div>
                 </article>
                 <article className='flex flex-row'>
-                  <div className='bg-blue-600 p-2 text-md text-white text-center font-semibold w-[125px]'>
+                  <div className='shadow-md content-center bg-primary-400 p-2 text-md text-white text-center font-semibold w-[125px] rounded-s-md'>
                     Authors
                   </div>
-                  <div className='bg-white p-2 shadow-md flex flex-row gap-2 w-full md:w-11/12'>
+                  <div className='bg-secondary-50 p-2 shadow-md flex flex-row gap-2 w-full md:w-11/12'>
                     <AuthorList authors={book.authors} />
                   </div>
                 </article>
                 <article className='flex flex-row'>
-                  <div className='bg-blue-600 p-2 text-md text-white text-center font-semibold w-[125px]'>
+                  <div className='shadow-md align-middle bg-primary-400 p-2 text-md text-white text-center font-semibold w-[125px]  rounded-s-md'>
                     Genres
                   </div>
-                  <div className='bg-white p-2 shadow-md flex flex-row gap-2  w-11/12'>
+                  <div className='bg-secondary-50 p-2 shadow-md flex flex-row gap-2  w-11/12'>
                     <GenreList genres={book.genres} />
                   </div>
                 </article>
                 <article className='flex flex-row w-full'>
-                  <div className='bg-blue-600 p-2 text-md text-white text-center font-semibold w-[125px]'>
+                  <div className='shadow-md align-middle bg-primary-400 p-2 text-md text-white text-center font-semibold w-[125px]  rounded-s-md'>
                     Subjects
                   </div>
-                  <div className='bg-white p-2 shadow-md flex flex-row w-11/12'>
+                  <div className='bg-secondary-50 p-2 shadow-md flex flex-row w-11/12'>
                     <SubjectList subjects={book.subjects} />
                   </div>
                 </article>
               </TabPanel>
               <TabPanel>
-                <CopyTable bookID={book.id} setEmpty={empty} />
-                <Button onClick={async () => {
-                  setButtonDisabled(true)
+                <CopyTable bookID={book.id} getHasCopies={setHasCopies} />
+                <Button color='blue' theme={{color:{blue: 'bg-primary-400 text-white'}}} onClick={async () => {
+                  setClicked(true)
                   await reserveBook(book.id)
+                  await hasReserved()
                 }}
-                  disabled={buttonDisabled || !user ? true : false || hasReserved() }>
-                  Borrow Book
-                </Button>
-              </TabPanel>
-            </div>
-          </Tabs>
+                disabled={buttonDisabled}>
+                Borrow Book
+              </Button>
+            </TabPanel>
         </div>
+          </Tabs>
+        </div >
       }
     </div >
   )

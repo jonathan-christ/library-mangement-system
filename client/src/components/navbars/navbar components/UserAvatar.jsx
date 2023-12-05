@@ -11,7 +11,9 @@ function UserAvatar({ functions }) {
             inline
             label={
                 <div className='flex gap-2'>
-                    <span className="self-center truncate text-xs text-gray-500 font-medium ">[{functions.translateUserType(session.typeID)}]</span>
+                    <span className="self-center truncate text-xs text-text-800 font-medium">
+                        [<span className="text-primary-900">{functions.translateUserType(session.typeID)}</span>]
+                    </span>
                     <Avatar placeholderInitials={functions.getInitials(session.firstName, session.lastName)} rounded />
                 </div>
             }

@@ -5,7 +5,7 @@ import { ttl } from '../../assets/constants'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { emptyMsg } from '../../assets/formErrorMsg'
-import { Link, useNavigate, Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react'
 
 import { useSession, useSessionUpdate } from '../context-hooks/session/SessionUtils'
@@ -15,7 +15,6 @@ function LoginForm() {
     const [formErr, setFormErr] = useState("")
     const session = useSession()
     const setSession = useSessionUpdate()
-    const navigate = useNavigate()
     const {
         register,
         handleSubmit,
@@ -23,9 +22,8 @@ function LoginForm() {
         formState: { errors }
     } = useForm()
 
-    const loginUser = (data) => {
-
-        axios.post("/api/users/login", { email: data.email, password: data.password })
+    const loginUser = async (data) => {
+        await axios.post("/api/users/login", { email: data.email, password: data.password })
             .then(res => {
                 let status = res.data.status
                 if (status === 'pass_match') {
@@ -37,18 +35,20 @@ function LoginForm() {
                     toast.success('Logged in!')
                     reset()
                     setFormErr("")
-                    navigate('../catalog')
+                    return session
                 } else {
                     setFormErr('User not found or credential mismatch')
+                    return null
                 }
             })
+
 
     }
 
     return (
         <div>
             {session &&
-                <Navigate to="/catalog" />
+                <Navigate to={session.typeID == 4 ? "/dashboard" : session.typeID == 5 ? "/admindash" : "/catalog"} />
             }
             <form onSubmit={handleSubmit(loginUser)} className="flex max-w-md flex-col gap-4">
                 <div>

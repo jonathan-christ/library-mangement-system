@@ -27,9 +27,9 @@ function Catalog() {
 
 
   return (
-    <div className='w-full flex justify-center flex-col relative p-5 gap-5'>
-      <SearchBar resultStore={setBooks}/>
-      <div className=" grid grid-cols-1 gap-x-10 gap-y-5 lg:w-2/3 md:w-full sm:w-full">
+    <div className='w-full flex flex-col relative p-5 gap-5 justify-center items-center'>
+      <SearchBar resultStore={setBooks} />
+      <div className=" grid grid-cols-1 gap-x-10 gap-y-5 w-full lg:w-2/3">
         {bookCells}
       </div>
     </div>

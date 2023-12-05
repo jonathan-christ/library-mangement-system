@@ -28,17 +28,17 @@ function SearchBar({ resultStore }) {
     }
 
     return (
-        <>
-            <form className="w-full" onSubmit={handleSubmit(search)}>
-                <div className="relative">
-                    <TextInput {...register('search')} placeholder={"Enter any search terms"} />
-                    <button type="submit" className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        <div className="w-full md:w-1/2">
+            <form onSubmit={handleSubmit(search)}>
+                <div className="relative ">
+                    <TextInput {...register('search')} placeholder={"Enter any search terms"} theme={{focus: {true: ''}}}/>
+                    <button type="submit" className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-primary-500 rounded-e-lg border border-primary-500 hover:bg-blue-80">
                         <HiOutlineSearch size={20} />
                         <span className="sr-only">Search</span>
                     </button>
                 </div>
             </form>
-        </>
+        </div>
     )
 }
 

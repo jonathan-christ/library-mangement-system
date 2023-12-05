@@ -65,12 +65,13 @@ function NavigationBar() {
         translateUserType
     }
 
+    const bg = 'bg-secondary-400'
     const Navs = {
-        4: <StaffNavigation functions={commonFunctions} />,
-        5: <AdminNavigation functions={commonFunctions} />
+        4: <StaffNavigation functions={commonFunctions} bg={bg}/>,
+        5: <AdminNavigation functions={commonFunctions} bg={bg}/>
     }
 
-    return Navs[data ? data.typeID : 1] || <UserNavigation functions={commonFunctions} />
+    return Navs[data ? data.typeID : 1] || <UserNavigation functions={commonFunctions} bg={bg} />
 }
 
 export default NavigationBar

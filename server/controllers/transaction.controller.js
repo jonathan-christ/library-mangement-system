@@ -30,6 +30,8 @@ exports.findAllTickets = async (req, res) => {
     const userID = req.body.userID
     console.log(userID)
     try {
+        whereClause = userID ? { where: { userID: userID, status: { [Op.notIn]: ['cancelled', 'closed'] } } } : {}
+        console.log(whereClause)
         const result = await Ticket.findAll({
             include: [
                 {
@@ -49,10 +51,10 @@ exports.findAllTickets = async (req, res) => {
                             'userName'
                         ],
                     ],
-                    where: {deleted: false}
+                    where: { deleted: false }
                 }
             ],
-            where: userID ? { userID: userID } : '',
+            ...whereClause,
             order: [
                 ['createDate', 'DESC'],
             ]
@@ -67,14 +69,13 @@ exports.findAllTickets = async (req, res) => {
 
 exports.findOneTicket = async (req, res) => {
     const data = req.body
+    console.log(data.userID, data.bookID)
     try {
-        await Ticket.findOne({
-            where: { userID: data.userID, bookID: data.bookID, status: { [Op.notIn]: ['cancelled', 'closed'] } },
-        })
-            .then((data) => {
+        await Ticket.findOne({ where: { userID: data.userID, bookID: data.bookID, status: { [Op.notIn]: ['cancelled', 'closed'] } } })
+            .then((result) => {
                 res.send({
-                    found: data ? true : false,
-                    data: data ? data : null
+                    found: result ? true : false,
+                    data: result ? result : null
                 })
             })
     } catch (error) {
@@ -179,6 +180,7 @@ const checkQueueAndReserve = async () => {
     try {
         const result = await db.sequelize.transaction(async (t) => {
             console.log('\n[checkQueueAndReserve] Start\n')
+            // find unique
             const availCopies = await BookCopy.findAll({
                 where: { status: 'good', available: 'yes' },
                 transaction: t
@@ -198,14 +200,14 @@ const checkQueueAndReserve = async () => {
                         order: [['createDate', 'ASC']]
                     })
                     //first in line gets updated first
-                    if (frontTicket) {
+                    if (frontTicket && !updateTicketList.some((ticket) => ticket.id === frontTicket.id)) {
                         updateTicketList.push({
                             id: frontTicket.id,
                             status: 'reserved',
                             reserveDate: new Date(),
                             copyID: copy.id
                         })
-                        await copy.update({ available: 'no', id: copy.id }, { transaction: t })
+                        await copy.update({ available: 'no' }, { where: { id: copy.id }, transaction: t })
                         await Notification.create({
                             userID: frontTicket.userID,
                             ticketID: frontTicket.id,

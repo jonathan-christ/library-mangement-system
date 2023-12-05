@@ -70,12 +70,13 @@ function UserNotifications() {
       arrowIcon={false}
       inline
       label={
-        <div className="relative focus:text-blue-600 hover:text-blue-600" tabIndex={0}>
-          <IoNotifications size={18} />
-          {!hasUnread || <FaCircle className="absolute top-0 right-0 text-blue-500" size={8} />}
+        <div className="relative text-text-800 " tabIndex={0}>
+          <IoNotifications size={18} className='duration-75 hover:text-white'/>
+          {!hasUnread || <FaCircle className="absolute top-0 right-0 text-background-100" size={8} />}
         </div>
       }
-      className='absolute w-full md:w-1/2 lg:w-1/3 overflow-y-auto h-screen md:h-[500px] focus:text-blue-600'
+      className='absolute w-full md:w-1/2 lg:w-1/3 overflow-y-auto h-screen md:h-[500px]'
+      theme={{}}
     >
       <Dropdown.Header className='border-b-1'>
         <span className="block text-sm font-semibold text-gray-900 dark:text-white">Notifications</span>

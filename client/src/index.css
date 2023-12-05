@@ -11,6 +11,14 @@ form {
     font-family: 'Inter Variable', sans-serif;
 }
 
+*:focus {
+    outline: none;
+}
+
 .focus\:ring-cyan-300:focus {
     --tw-ring-opacity: 0 !important;
+}
+
+body {
+    background-color: #ecf9f9
 }

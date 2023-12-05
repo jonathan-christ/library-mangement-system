@@ -42,8 +42,9 @@ exports.findAllHasCopies = async (req, res) => {
             include: [{
                 model: BookCopy,
                 required: true,
-                where: {status: 'good'}
-            }]
+                where: { status: 'good' }
+            }],
+            where: { deleted: false }
         })
         res.send(books);
     } catch (error) {

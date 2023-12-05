@@ -22,8 +22,8 @@ function UpdatePasswordForm() {
         watch,
         // reset,
         control,
-        formState: { errors },
-    } = useForm()
+        formState: { errors, isValid },
+    } = useForm({ mode: 'onTouched' })
 
     const changePass = (data) => {
         delete data.rePass
@@ -40,7 +40,7 @@ function UpdatePasswordForm() {
     const isOldPass = async (pass) => {
         const result = await axios.post("/api/users/verifypass", { id: session.id, password: pass })
             .then((res) => {
-                console.log((res.data.status === 'pass_match')== false)
+                console.log((res.data.status === 'pass_match') == false)
                 return res.data.status === 'pass_match'
             })
             .catch((err) => {
@@ -94,7 +94,7 @@ function UpdatePasswordForm() {
                     })} required shadow />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.rePass?.message}</p>
                 </div>
-                <Button type="submit">Reset Password</Button>
+                <Button type="submit" color='failure' disabled={!isValid}>Reset Password</Button>
             </form >
             <DevTool control={control} />
         </div >

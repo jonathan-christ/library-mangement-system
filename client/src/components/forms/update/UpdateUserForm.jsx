@@ -209,7 +209,7 @@ function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) 
                     }
                 </div>
                 {!modal &&
-                    <Button type="submit" disabled={!isDirty}>Update Accout</Button>
+                    <Button type="submit" color='blue' theme={{color:{blue:'bg-primary-600 text-white'}}} disabled={!isDirty}>Update Accout</Button>
                 }
             </form>
             <DevTool control={control} />

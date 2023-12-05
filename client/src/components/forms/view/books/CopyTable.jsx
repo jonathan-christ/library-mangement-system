@@ -15,9 +15,9 @@ import UpdateBookCopy from '../../update/UpdateBookCopyForm'
 
 CopyTable.propTypes = {
     bookID: PropTypes.number,
-    setEmpty: PropTypes.func
+    getHasCopies: PropTypes.func
 }
-function CopyTable({ bookID, setEmpty }) {
+function CopyTable({ bookID, getHasCopies }) {
     const [refresh, setRefresh] = useState(true)
 
     const [copies, setCopies] = useState([])
@@ -26,8 +26,6 @@ function CopyTable({ bookID, setEmpty }) {
     const [addShow, setAddShow] = useState(false)
     const [updateShow, setUpdateShow] = useState(false)
     const [modalData, setModalData] = useState({})
-
-    console.log('yes')
 
     useEffect(() => {
         getCopies()
@@ -39,7 +37,7 @@ function CopyTable({ bookID, setEmpty }) {
         axios.post("/api/copies/", bookID ? { bookID: bookID } : null)
             .then((res) => {
                 setCopies(res.data)
-                setEmpty ? setEmpty(res.data.length===0 ? true : false) : ''
+                getHasCopies ? getHasCopies(res.data.length!=0 ? true : false) : ''
             }).catch((err) => {
                 console.log(err)
                 toast.error('Unable to retrieve book copies! Server Error')

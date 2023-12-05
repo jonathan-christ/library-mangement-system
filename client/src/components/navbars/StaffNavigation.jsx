@@ -7,11 +7,12 @@ import UserNotifications from './navbar components/UserNotifications'
 import UserAvatar from './navbar components/UserAvatar'
 
 StaffNavigation.propTypes = {
+    bg: PropTypes.any,
     functions: PropTypes.object.isRequired
 }
-function StaffNavigation({ functions }) {
+function StaffNavigation({ functions, bg }) {
     return (
-        <Navbar fluid>
+        <Navbar fluid className={`${bg} text-text`}>
             <Logo to='/dashboard' />
             <div className="flex md:order-2">
                 <div className='flex gap-5'>
