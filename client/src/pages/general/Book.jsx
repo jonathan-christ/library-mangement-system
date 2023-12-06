@@ -17,6 +17,8 @@ import { dateSplicer } from '../../assets/formatter'
 import SubjectList from '../../components/misc/SubjectList'
 import { toast } from 'react-toastify'
 
+import NullCover from '../../assets/null_book_cover.jpg'
+
 // import Placeholder from '../../components/loading/Placeholder'
 
 function Book() {
@@ -102,7 +104,7 @@ function Book() {
             <div className='p-5 w-full m-auto flex flex-col gap-5'>
               <div className='otherDetails flex flex-col flex-wrap content-center'>
                 <div className="aspect-[2/3] h-full">
-                  <img src={imageProxy + book.bookImg.imgLink} alt="" className='object-cover w-full h-full' />
+                  <img src={book.bookImg ? imageProxy + book.bookImg.imgLink : NullCover} alt="" className='object-cover w-full h-full' />
                 </div>
               </div>
               <span className='font-semibold text-lg'>{book.title.toUpperCase()}</span>
@@ -169,16 +171,16 @@ function Book() {
               </TabPanel>
               <TabPanel>
                 <CopyTable bookID={book.id} getHasCopies={setHasCopies} />
-                <Button color='blue' theme={{color:{blue: 'bg-primary-400 text-white'}}} onClick={async () => {
+                <Button color='blue' theme={{ color: { blue: 'bg-primary-400 text-white' } }} onClick={async () => {
                   setClicked(true)
                   await reserveBook(book.id)
                   await hasReserved()
                 }}
-                disabled={buttonDisabled}>
-                Borrow Book
-              </Button>
-            </TabPanel>
-        </div>
+                  disabled={buttonDisabled}>
+                  Borrow Book
+                </Button>
+              </TabPanel>
+            </div>
           </Tabs>
         </div >
       }

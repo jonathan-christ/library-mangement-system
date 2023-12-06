@@ -3,8 +3,7 @@ import Select from 'react-select'
 import validator from 'validator'
 import PropTypes from 'prop-types'
 
-import { imageProxy, supportedImageExtensions } from '../../../assets/constants';
-import { DevTool } from '@hookform/devtools'
+import { imageProxy, supportedImageExtensions } from '../../../assets/constants'
 import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { maxBookLen, maxISBNLen, minISBNLen } from '../../../assets/constants'
@@ -417,7 +416,6 @@ function UpdateBookForm({ book, components, refreshDependency }) {
                 </div>
                 <Button type="submit" disabled={!isDirty}>Update Book</Button>
             </form >
-            <DevTool control={control} />
         </div >
     )
 }

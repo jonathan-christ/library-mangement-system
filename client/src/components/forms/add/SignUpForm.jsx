@@ -6,7 +6,6 @@ import PropTypes from 'prop-types'
 
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, Radio, TextInput } from 'flowbite-react'
 import { maxNameLen, maxSuffixLen, minPassLen } from '../../../assets/constants'
@@ -22,7 +21,6 @@ function SignUpForm({refreshDependency}) {
         handleSubmit,
         watch,
         reset,
-        control,
         formState: { errors },
     } = useForm({ mode: 'onTouched' })
 
@@ -181,7 +179,6 @@ function SignUpForm({refreshDependency}) {
                     <Link to="/home"><u>Browse as Guest</u></Link>
                 </span>
             </form>
-            <DevTool control={control} />
         </div>
     )
 }

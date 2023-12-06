@@ -2,7 +2,6 @@ import axios from 'axios'
 import PropTypes from 'prop-types'
 
 import { useForm } from 'react-hook-form'
-import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, Radio } from 'flowbite-react'
 import { emptyMsg } from '../../../assets/formErrorMsg'
@@ -17,7 +16,6 @@ function UpdateBookCopy({ copy, refreshDependency }) {
         register,
         handleSubmit,
         reset,
-        control,
         formState: { errors, dirtyFields, isDirty },
     } = useForm({
         defaultValues: {
@@ -104,7 +102,6 @@ function UpdateBookCopy({ copy, refreshDependency }) {
                 </div>
                 <Button type="submit" disabled={!isDirty}>Update Copy</Button>
             </form>
-            <DevTool control={control} />
         </div>
     )
 }

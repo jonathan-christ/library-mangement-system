@@ -4,7 +4,6 @@ import validator from 'validator'
 import PropTypes from 'prop-types'
 
 import { imageProxy, supportedImageExtensions } from '../../../assets/constants';
-import { DevTool } from '@hookform/devtools'
 import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { maxBookLen, maxISBNLen, minISBNLen } from '../../../assets/constants'
@@ -434,7 +433,6 @@ function AddBookForm({ refreshDependency }) {
                     setSubmitted(true)
                 }} disabled={submitted}>Add New Book</Button>
             </form >
-            <DevTool control={control} />
         </div >
     )
 }

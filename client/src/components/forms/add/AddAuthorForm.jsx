@@ -2,7 +2,6 @@ import axios from 'axios'
 import PropTypes from 'prop-types'
 
 import { useForm } from 'react-hook-form'
-import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, TextInput, Textarea } from 'flowbite-react'
 import { maxNameLen } from '../../../assets/constants'
@@ -17,7 +16,6 @@ function AddAuthorForm({ refreshDependency }) {
         register,
         handleSubmit,
         reset,
-        control,
         formState: { errors },
     } = useForm({ mode: 'onTouched' })
 
@@ -91,7 +89,6 @@ function AddAuthorForm({ refreshDependency }) {
                     </div>
                     <Button type="submit">Add New Author</Button>
                 </form>
-                <DevTool control={control} />
             </div>
         </>
     )

@@ -2,7 +2,6 @@ import axios from 'axios'
 import PropTypes from 'prop-types'
 
 import { useForm } from 'react-hook-form'
-import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, TextInput } from 'flowbite-react'
 import { maxNameLen } from '../../../assets/constants'
@@ -18,7 +17,6 @@ function UpdatePublisherForm({ publisher, refreshDependency }) {
         register,
         handleSubmit,
         reset,
-        control,
         formState: { errors, dirtyFields, isDirty },
     } = useForm({
         defaultValues: {
@@ -96,7 +94,6 @@ function UpdatePublisherForm({ publisher, refreshDependency }) {
                 </div>
                 <Button type="submit" disabled={!isDirty}>Update Publisher</Button>
             </form>
-            <DevTool control={control} />
         </div>
     )
 }

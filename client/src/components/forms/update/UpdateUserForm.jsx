@@ -7,7 +7,6 @@ import { toast } from 'react-toastify'
 import { ttl } from '../../../assets/constants'
 import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
-import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, TextInput, Radio, Select } from 'flowbite-react'
 import { maxNameLen, maxSuffixLen } from '../../../assets/constants'
@@ -31,7 +30,6 @@ function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) 
         handleSubmit,
         // watch,
         reset,
-        control,
         formState: { errors, isDirty, dirtyFields },
     } = useForm({
         defaultValues: {
@@ -212,7 +210,6 @@ function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) 
                     <Button type="submit" color='blue' theme={{color:{blue:'bg-primary-600 text-white'}}} disabled={!isDirty}>Update Accout</Button>
                 }
             </form>
-            <DevTool control={control} />
         </div>
     )
 }

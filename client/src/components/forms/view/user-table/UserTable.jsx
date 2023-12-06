@@ -85,7 +85,7 @@ function UserTable({ staff }) {
 
     const userCells = useMemo(() =>
         userList
-            .filter(user => ![4, 5].includes(user.typeID))
+            .filter(user => staff ? ![4, 5].includes(user.typeID):true)
             .map((user, idx) => {
                 return (
                     <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-100")}>

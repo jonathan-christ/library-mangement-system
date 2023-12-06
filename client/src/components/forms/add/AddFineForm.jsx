@@ -4,7 +4,6 @@ import { toast } from 'react-toastify'
 
 import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
-import { DevTool } from '@hookform/devtools'
 
 import Select from 'react-select'
 import { Button, Label } from 'flowbite-react'
@@ -120,7 +119,6 @@ function AddFineForm({ refreshDependency }) {
                     </div>
                     <Button type="submit">Add New Ticket</Button>
                 </form>
-                <DevTool control={control} />
             </div>
         </>
     )

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 
 import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
-import { DevTool } from '@hookform/devtools'
 
 import Select from 'react-select'
 import { Button, Label } from 'flowbite-react'
@@ -81,7 +80,6 @@ function AddBookCopyForm({ refreshDependency }) {
                     setSubmitted(true)
                 }} disabled={submitted}>Add New Copy</Button>
                 </form>
-                <DevTool control={control} />
             </div>
         </>
     )

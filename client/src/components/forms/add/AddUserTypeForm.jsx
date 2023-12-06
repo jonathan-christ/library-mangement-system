@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { toast } from 'react-toastify'
 
 import { useForm } from 'react-hook-form'
-import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, TextInput, Textarea } from 'flowbite-react'
 import { maxNameLen } from '../../../assets/constants'
@@ -17,7 +16,6 @@ function AddUserTypeForm({ refreshDependency }) {
         register,
         handleSubmit,
         reset,
-        control,
         formState: { errors },
     } = useForm({ mode: 'onTouched' })
 
@@ -78,7 +76,6 @@ function AddUserTypeForm({ refreshDependency }) {
                     </div>
                     <Button type="submit">Add New User Type</Button>
                 </form>
-                <DevTool control={control} />
             </div>
         </>
     )

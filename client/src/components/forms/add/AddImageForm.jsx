@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { toast } from 'react-toastify'
 
 import { useForm } from 'react-hook-form'
-import { DevTool } from '@hookform/devtools'
 
 import { Button, Label, FileInput, TextInput } from 'flowbite-react'
 import { useSession } from '../../context-hooks/session/SessionUtils'
@@ -18,7 +17,6 @@ function AddImageForm({ refreshDependency }) {
         register,
         handleSubmit,
         reset,
-        control,
     } = useForm({ mode: 'onTouched' })
 
     const addImage = async (data) => {
@@ -57,7 +55,6 @@ function AddImageForm({ refreshDependency }) {
                     </div>
                     <Button type="submit">Upload Book Image</Button>
                 </form>
-                <DevTool control={control} />
             </div>
         </>
     )

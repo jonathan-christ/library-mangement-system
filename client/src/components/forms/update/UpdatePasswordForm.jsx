@@ -3,7 +3,6 @@ import validator from 'validator'
 import { toast } from 'react-toastify'
 
 import { useForm } from 'react-hook-form'
-import { DevTool } from '@hookform/devtools'
 import { useNavigate } from 'react-router-dom'
 import { useSession } from '../../context-hooks/session/SessionUtils'
 
@@ -21,7 +20,6 @@ function UpdatePasswordForm() {
         handleSubmit,
         watch,
         // reset,
-        control,
         formState: { errors, isValid },
     } = useForm({ mode: 'onTouched' })
 
@@ -96,7 +94,6 @@ function UpdatePasswordForm() {
                 </div>
                 <Button type="submit" color='failure' disabled={!isValid}>Reset Password</Button>
             </form >
-            <DevTool control={control} />
         </div >
     )
 }
