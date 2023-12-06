@@ -51,7 +51,7 @@ const MonthlyBorrowing = ({ data }) => {
     return (
         <div className="flex flex-col shadow-lg h-max min-w-[400px] md:w-2/3">
             <div className="bg-primary-500 p-3 text-white text-center font-semibold rounded-t-md">MONTHLY BOOKINGS</div>
-            <div id="monthly-ticket-bookings-chart" style={{ width: '100%', height: '350px' }}></div>
+            <div id="monthly-ticket-bookings-chart" style={{ width: '100%', height: '350px' }} className='bg-secondary-100'></div>
         </div>
     )
 };

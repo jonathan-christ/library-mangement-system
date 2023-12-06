@@ -15,7 +15,7 @@ import { toast } from 'react-toastify'
 SignUpForm.propTypes = {
     refreshDependency: PropTypes.func
 }
-function SignUpForm({refreshDependency}) {
+function SignUpForm({ refreshDependency }) {
     const {
         register,
         handleSubmit,
@@ -51,7 +51,7 @@ function SignUpForm({refreshDependency}) {
     }
 
     return (
-        <div>
+        <div className='p-10'>
             <form onSubmit={handleSubmit(signupUser)} className="flex max-w-md flex-col gap-4" noValidate>
                 <div className='flex flex-col gap-3'>
                     <div>
@@ -144,36 +144,40 @@ function SignUpForm({refreshDependency}) {
                         })} shadow />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.email?.message}</p>
                     </div>
-                    <div>
-                        <div className="mb-2 block">
-                            <Label htmlFor="password2" value="Your password" />
+                    <div className='flex flex-row gap-5'>
+                        <div>
+                            <div className="mb-2 block">
+                                <Label htmlFor="password2" value="Your password" />
+                            </div>
+                            <TextInput id="password2" type="password" {...register('password', {
+                                required: emptyMsg('password'),
+                                minLength: {
+                                    value: minPassLen,
+                                    message: belowMinChar('Password', minPassLen),
+                                },
+                                validate: {
+                                    format: val => validator.isStrongPassword(val, { returnScore: true }) > 30 || "Password needs 1 of each: uppercase, lowercase, symbol"
+                                }
+                            })} required shadow />
+                            <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.password?.message}</p>
                         </div>
-                        <TextInput id="password2" type="password" {...register('password', {
-                            required: emptyMsg('password'),
-                            minLength: {
-                                value: minPassLen,
-                                message: belowMinChar('Password', minPassLen),
-                            },
-                            validate: {
-                                format: val => validator.isStrongPassword(val, { returnScore: true }) > 30 || "Password needs 1 of each: uppercase, lowercase, symbol"
-                            }
-                        })} required shadow />
-                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.password?.message}</p>
-                    </div>
-                    <div>
-                        <div className="mb-2 block">
-                            <Label htmlFor="repeat-password" value="Repeat password" />
+                        <div>
+                            <div className="mb-2 block">
+                                <Label htmlFor="repeat-password" value="Repeat password" />
+                            </div>
+                            <TextInput id="repeat-password" type="password" {...register('rePass', {
+                                required: "You need to retype password",
+                                validate: {
+                                    unmatching: val => validator.equals(val, watch('password')) || passNotMatch()
+                                }
+                            })} required shadow />
+                            <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.rePass?.message}</p>
                         </div>
-                        <TextInput id="repeat-password" type="password" {...register('rePass', {
-                            required: "You need to retype password",
-                            validate: {
-                                unmatching: val => validator.equals(val, watch('password')) || passNotMatch()
-                            }
-                        })} required shadow />
-                        <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.rePass?.message}</p>
                     </div>
                 </div>
-                <Button type="submit">Register new account</Button>
+                <Button type="submit" color='blue' theme={{ color: { blue: 'bg-primary-400 text-white hover:bg-primary-800 duration-75' } }}>
+                    Register new account
+                </Button>
                 <span className='text-sm'>
                     Already have an account? <Link to="/login"><u>Login here</u></Link><br />
                     <Link to="/home"><u>Browse as Guest</u></Link>

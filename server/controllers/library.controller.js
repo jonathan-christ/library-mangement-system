@@ -90,12 +90,15 @@ exports.searchBooks = async (req, res) => {
                 { '$genres.name$': { [Op.like]: `%${searchQuery}%` } },
                 { '$subjects.name$': { [Op.like]: `%${searchQuery}%` } },
                 { '$publisher.name$': { [Op.like]: `%${searchQuery}%` } },
-            ],
+            ]
         };
 
         // Perform the Sequelize query with the dynamic where clause and include associations
         const result = await Book.findAll({
             where: whereClause,
+            order: [
+                ['title', 'ASC']
+            ],
             include: [Author, Genre, Subject, Publisher, BookImage]
         })
 
@@ -108,7 +111,10 @@ exports.findAllBooks = async (req, res) => {
     try {
         const result = await Book.findAll({
             where: { deleted: false },
-            include: [Author, Genre, Subject, Publisher, BookImage]
+            include: [Author, Genre, Subject, Publisher, BookImage],
+            order: [
+                ['isbn', 'ASC']
+            ]
         })
 
         res.status(200).send(result)
@@ -231,6 +237,7 @@ exports.subjectGraph = async (req, res) => {
     try {
         const topBorrowedSubjects = await db.sequelize.query(`
         SELECT
+        DISTINCT
             s.name AS 'Subject',
             SUM(CASE WHEN ut.title = 'teacher' THEN 1 ELSE 0 END) AS 'Teachers',
             SUM(CASE WHEN ut.title = 'student' THEN 1 ELSE 0 END) AS 'Students'
@@ -258,11 +265,11 @@ exports.subjectGraph = async (req, res) => {
 exports.monthlyTickets = async (req, res) => {
     try {
         const tickets = await db.sequelize.query(`
-        SELECT MONTHNAME(lendDate) as month, COUNT(*) as bookings 
+        SELECT MONTHNAME(createDate) as month, COUNT(*) as bookings 
         FROM tickets
-        WHERE lendDate IS NOT NULL
+        WHERE lendDate IS NOT NULL AND YEAR(createDate) = YEAR(CURRENT_DATE())
         GROUP BY month
-        ORDER BY month DESC;
+        ORDER BY createDate ASC;
             `,
             { type: db.Sequelize.QueryTypes.SELECT }
         );
@@ -270,7 +277,7 @@ exports.monthlyTickets = async (req, res) => {
         // console.log('Top 10 Most Borrowed Subjects:', topBorrowedSubjects);
         res.status(200).send(tickets)
     } catch (error) {
-        res.status(500).send("Error fetching graph data"+error)
+        res.status(500).send("Error fetching graph data" + error)
         console.error('Error fetching data:', error);
     }
 }

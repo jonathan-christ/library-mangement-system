@@ -16,7 +16,7 @@ const RadarGraph = ({ data }) => {
         if (data && data.length > 0) {
             // Prepare data for ECharts
             console.log(data)
-            const indicatorData = data.map(item => ({ name: item.Subject, max: 100 }))
+            const indicatorData = data.map(item => ({ name: item.Subject, max: 30 }))
             const Teacher = data.map(item => item.Teachers)
             const Student = data.map(item => item.Students)
 
@@ -33,7 +33,7 @@ const RadarGraph = ({ data }) => {
                 radar: {
                     indicator: indicatorData,
                     center: ['50%', '50%'],
-                    radius: '70%',
+                    radius: '50%',
                     name: {
                         textStyle: {
                             color: '#666', // Color of item name
@@ -51,7 +51,7 @@ const RadarGraph = ({ data }) => {
                                     color: '#7c3aed', // Line color for series 'a'
                                 },
                                 areaStyle: {
-                                    color: 'rgba(124,58,237, 0.5)', // Adjust the fill color as needed
+                                    color: 'rgba(124,58,237, 0.2)', // Adjust the fill color as needed
                                 },
                                 itemStyle: {
                                     color: '#7c3aed', // Point color for series 'b'
@@ -69,7 +69,7 @@ const RadarGraph = ({ data }) => {
                                     color: '#2b6ca1', // Line color for series 'a'
                                 },
                                 areaStyle: {
-                                    color: 'rgba(43,108,161, 0.5)', // Adjust the fill color as needed
+                                    color: 'rgba(43,108,161, 0.4)', // Adjust the fill color as needed
                                 },
                                 itemStyle: {
                                     color: '#2b6ca1', // Point color for series 'b'
@@ -94,7 +94,7 @@ const RadarGraph = ({ data }) => {
     return (
         <div className="flex flex-col shadow-lg h-max">
             <div className="bg-primary-500 p-3 text-white text-center font-semibold rounded-t-md">POPULAR SUBJECTS TO DEMOGRAPHIC</div>
-            <div id="radar-graph" style={{ width: '500px', height: '550px' }} className=' bg-primary-200 rounded-b-md'></div>
+            <div id="radar-graph" style={{ width: '500px', height: '550px' }} className=' bg-secondary-200 rounded-b-md'></div>
         </div>
     )
 };

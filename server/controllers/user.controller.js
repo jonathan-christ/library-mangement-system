@@ -31,7 +31,7 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
-    User.findAll({ where: { deleted: false }, attributes: exclude })
+    User.findAll({ where: { deleted: false }, attributes: exclude, order:[['typeID', 'ASC'],['lastName','ASC']] })
         .then(data => {
             res.send(data)
         })

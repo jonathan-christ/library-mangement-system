@@ -1,6 +1,5 @@
 import axios from 'axios';
 import Select from 'react-select'
-import validator from 'validator'
 import PropTypes from 'prop-types'
 
 import { imageProxy, supportedImageExtensions } from '../../../assets/constants'
@@ -11,6 +10,8 @@ import { emptyMsg, exceedCharLimit, belowMinChar } from '../../../assets/formErr
 import { Button, Label, Textarea, TextInput, Datepicker, Radio, FileInput } from 'flowbite-react'
 import { useSession } from '../../context-hooks/session/SessionUtils';
 import { toast } from 'react-toastify'
+
+import NullCover from '../../../assets/null_book_cover.jpg'
 
 UpdateBookForm.propTypes = {
     book: PropTypes.object.isRequired,
@@ -42,7 +43,15 @@ function UpdateBookForm({ book, components, refreshDependency }) {
         .map((image) => {
             return { value: image.id, label: image.title, link: image.imgLink }
         })
-    const [file, setFile] = useState(imageProxy + images.find(c => c.value === book.imageID).link)
+
+    const [file, setFile] = useState(() => {
+        try {
+            return imageProxy + images.find(c => c.value === book.imageID).link
+        }catch(error){
+            return NullCover
+        }
+
+    })
 
     const {
         register,
@@ -161,7 +170,6 @@ function UpdateBookForm({ book, components, refreshDependency }) {
                             message: exceedCharLimit(maxISBNLen)
                         },
                         validate: {
-                            format: val => validator.isNumeric(val) || "ISBN should be digits",
                             exists: async (val) => await bookExists(val) === false || "Book exists!",
                         },
                     })} shadow />

@@ -61,11 +61,11 @@ function AdminDashboard() {
 
   return (
     <div className="flex flex-col p-10 gap-10 w-full">
-      <div className="flex flex-row gap-10 w-full">
+      <div className="flex flex-col md:flex-row gap-10 w-full">
         <MonthlyBorrowing data={data} />
-        <div className="flex flex-col justify-between">
+        <div className="flex flex-col justify-between md:gap-0 gap-10">
           <TicketCountPie {...ticket} />
-          <div className="flex flex-row gap-5">
+          <div className="flex flex-row gap-5 justify-center">
             <CountDiv subject={'TOTAL USERS'} count={userCount} icon={<FaUsers size={50} className='text-text-600' />} />
             <CountDiv subject={'TOTAL BOOKS'} count={bookCount} icon={<ImBooks size={50} className='text-text-600' />} />
           </div>

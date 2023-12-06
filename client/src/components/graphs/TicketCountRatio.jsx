@@ -54,7 +54,7 @@ const TicketCountPie = ({ total, cancelled, queued, borrowed }) => {
     }, [total, cancelled, queued, borrowed]);
 
     return (
-        <div className="flex flex-col bg-secondary-50 shadow-lg">
+        <div className="flex flex-col bg-secondary-100 shadow-lg">
             <div className="bg-primary-500 p-3 text-white text-center font-semibold rounded-t-md">TOTAL TICKET COMPOSITION</div>
             <div id="ticket-status-pie-chart" style={{width:'100%', height: '245px' }}></div>
         </div>

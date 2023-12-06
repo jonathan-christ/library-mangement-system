@@ -93,7 +93,7 @@ function Book() {
   return (
     <div className='relative '>
       <Link to='/catalog' className='fixed top-1/3 h-32'>
-        <Button color='blue' className='h-full shadow-lg bg-primary-400 rounded-s-sm -left-2/3 text-transparent hover:left-0 hover:text-white transition-all duration-100'>{'<- '}BACK</Button>
+        <Button color='blue'  theme={{ color: { blue: 'bg-primary-400 text-white hover:bg-primary-800 duration-75' } }} className='h-full shadow-lg  rounded-s-sm -left-2/3 text-transparent hover:left-0 hover:text-white transition-all duration-100'>{'<- '}BACK</Button>
       </Link>
       {!loading &&
         <div className='flex flex-col lg:flex-row py-5 px-10 gap-10 xl:px-20 h-max'>
@@ -171,7 +171,7 @@ function Book() {
               </TabPanel>
               <TabPanel>
                 <CopyTable bookID={book.id} getHasCopies={setHasCopies} />
-                <Button color='blue' theme={{ color: { blue: 'bg-primary-400 text-white' } }} onClick={async () => {
+                <Button color='blue' theme={{ color: { blue: 'bg-primary-400 text-white hover:bg-primary-800 duration-75' } }} onClick={async () => {
                   setClicked(true)
                   await reserveBook(book.id)
                   await hasReserved()

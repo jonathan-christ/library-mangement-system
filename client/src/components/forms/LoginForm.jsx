@@ -46,7 +46,7 @@ function LoginForm() {
     }
 
     return (
-        <div>
+        <div className='w-full h-max md:pt-10'>
             {session &&
                 <Navigate to={session.typeID == 4 ? "/dashboard" : session.typeID == 5 ? "/admindash" : "/catalog"} />
             }
@@ -55,7 +55,7 @@ function LoginForm() {
                     <div className="mb-2 block">
                         <Label htmlFor="email1" value="Your email" />
                     </div>
-                    <TextInput id="email1" type="email" placeholder="name@flowbite.com" autoComplete='email' {...register('email', {
+                    <TextInput id="email1" type="email" placeholder="name@email.com" autoComplete='email' {...register('email', {
                         required: emptyMsg('email')
                     })} shadow />
                     <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.email?.message}</p>
@@ -73,11 +73,13 @@ function LoginForm() {
                     <Checkbox id="remember" />
                     <Label htmlFor="remember">Remember me</Label>
                 </div>
-                <Button type="submit">Login</Button>
+                <Button type="submit" color='blue' theme={{ color: { blue: 'bg-primary-400 text-white hover:bg-primary-800 duration-75' } }}>
+                    LOGIN
+                </Button>
                 <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{formErr}</p>
                 <span className='text-sm'>
-                    {`Aren't a member yet?`} <Link to="/signup"><u>Sign up here</u></Link><br />
-                    <Link to="/home"><u>Browse as Guest</u></Link>
+                    {`Aren't a member yet?`} <Link to="/signup"><u className='hover:text-text-600'>Sign up!</u></Link><br />
+                    <Link to="/home"><u className='hover:text-text-600'>Browse as Guest</u></Link>
                 </span>
             </form>
         </div>
