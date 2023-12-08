@@ -6,7 +6,7 @@ function AppFrame() {
 
   return (
     <div className='h-screen overflow-hidden bg-background-50'>
-      <div className='w-screen relative z-10 shadow-md'>
+      <div className='w-screen relative z-20 shadow-md'>
         <NavigationBar />
       </div>
       <div className='flex flex-row h-full z-0'>
