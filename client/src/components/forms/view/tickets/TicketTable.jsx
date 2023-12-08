@@ -49,10 +49,11 @@ function TicketTable({ userID }) {
             const fetchedTickets = response.data;
             setTickets(fetchedTickets);
             if (userID) {
+                console.log(fetchedTickets)
                 setBorrowed(fetchedTickets.filter(ticket => ['borrowed'].includes(ticket.status)));
                 setReserved(fetchedTickets.filter(ticket => ticket.status === 'reserved'))
                 setOverdue(fetchedTickets.filter(ticket => ticket.status === 'overdue'))
-                setOthers(fetchedTickets.filter(ticket => !['borrowed', 'reserved', 'overdue'].includes(ticket.status)));
+                setOthers(fetchedTickets.filter(ticket => !(['borrowed', 'reserved', 'overdue'].includes(ticket.status))));
             }
         } catch (err) {
             console.log(err);
@@ -118,6 +119,42 @@ function TicketTable({ userID }) {
             accessorKey: 'status',
             cell: row => getStatus(row.getValue())
         },
+        {
+            id: 'actions',
+            header: 'Actions',
+            accessorKey: 'status',
+            cell: row => {
+                return (
+                    <div className="relative flex flex-row gap-2 justify-center">
+                        {!userID ? (
+                            <>
+                                <button
+                                    className="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center inline-flex items-center disabled:hidden"
+                                    onClick={() => { callUpdate(row.row.original, 'borrowed') }}
+                                    disabled={!borrowable[row.getValue()]}
+                                >
+                                    Borrow
+                                </button>
+                                <button
+                                    className="text-white bg-green-500 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center inline-flex items-center disabled:hidden"
+                                    onClick={() => { callUpdate(row.row.original, 'closed') }}
+                                    disabled={!closeable[row.getValue()]}
+                                >
+                                    Close
+                                </button>
+                            </>
+                        ) : null}
+                        <button
+                            className="text-white bg-red-500 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center inline-flex items-center disabled:hidden"
+                            onClick={() => { callUpdate(row.row.original, 'cancelled') }}
+                            disabled={!cancellable[row.getValue()]}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                )
+            }
+        }
     ]
 
     const overdueCols = [
@@ -129,7 +166,7 @@ function TicketTable({ userID }) {
                 return `₱${amount.toFixed(2)}`
             },
             meta: {
-                'align':'center'
+                'align': 'center'
             }
         },
         ...columns.slice(3)
@@ -148,44 +185,6 @@ function TicketTable({ userID }) {
     }
 
     if (!userID) {
-        columns.push(
-            {
-                id: 'actions',
-                header: 'Actions',
-                accessorKey: 'status',
-                cell: row => {
-                    return (
-                        <div className="relative flex flex-row gap-2 justify-center">
-                            {!userID ? (
-                                <>
-                                    <button
-                                        className="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center inline-flex items-center disabled:hidden"
-                                        onClick={() => { callUpdate(row.row.original, 'borrowed') }}
-                                        disabled={!borrowable[row.getValue()]}
-                                    >
-                                        Borrow
-                                    </button>
-                                    <button
-                                        className="text-white bg-green-500 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center inline-flex items-center disabled:hidden"
-                                        onClick={() => { callUpdate(row.row.original, 'closed') }}
-                                        disabled={!closeable[row.getValue()]}
-                                    >
-                                        Close
-                                    </button>
-                                </>
-                            ) : null}
-                            <button
-                                className="text-white bg-red-500 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center inline-flex items-center disabled:hidden"
-                                onClick={() => { callUpdate(row.row.original, 'cancelled') }}
-                                disabled={!cancellable[row.getValue()]}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    )
-                }
-            }
-        )
         columns.unshift(
             { id: 'owner', header: 'Owner', accessorKey: 'user.userName' },
         )

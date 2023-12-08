@@ -34,7 +34,7 @@ function Book() {
   const { isbn } = useParams()
   const navigate = useNavigate()
 
-  const buttonDisabled = (!hasCopies || hasTicket || clicked || user.typeID === 1)
+  const buttonDisabled = (!hasCopies || hasTicket || clicked || user?.typeID === 1)
   const [book, setBook] = useState({
     id: -1,
     title: '',
@@ -185,11 +185,11 @@ function Book() {
                 </article>
               </TabPanel>
               <TabPanel>
-                <CopyTable bookID={book.id} getHasCopies={setHasCopies} />
+                <CopyTable bookID={book.id} getHasCopies={setHasCopies} user/>
                 {buttonDisabled ? (
                   <Tooltip content={`
                     ${!user ? 'You are not logged in!\n' : ''}
-                    ${user.typeID==1 ? 'You need to be a confirmed user!\n' : ''}
+                    ${user?.typeID==1 ? 'You need to be a confirmed user!\n' : ''}
                     ${!hasCopies ? 'Book doesn\'t have any copies!\n' : ''}
                     ${hasTicket ? 'You already have a ticket!\n' : ''}
                     ${clicked ? 'Transaction is processing!\n' : ''}

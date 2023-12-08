@@ -29,7 +29,7 @@ const limiter = new Bottleneck({
 exports.findAllTickets = async (req, res) => {
     const userID = req.body.userID
     try {
-        whereClause = userID ? { where: { userID: userID, status: { [Op.notIn]: ['cancelled', 'closed'] } } } : {}
+        whereClause = userID ? { where: { userID: userID } } : {}
         console.log(whereClause)
         const result = await Ticket.findAll({
             include: [

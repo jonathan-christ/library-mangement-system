@@ -14,10 +14,11 @@ import UpdateBookCopy from '../../update/UpdateBookCopyForm'
 import TableLayout from '../table/TableLayout'
 
 CopyTable.propTypes = {
-    bookID: PropTypes.number,
-    getHasCopies: PropTypes.func
+  bookID: PropTypes.number,
+  getHasCopies: PropTypes.func,
+  user: PropTypes.bool
 }
-function CopyTable({ bookID, getHasCopies }) {
+function CopyTable({ bookID, getHasCopies, user }) {
     const [refresh, setRefresh] = useState(true)
 
     const [copies, setCopies] = useState([])
@@ -92,7 +93,7 @@ function CopyTable({ bookID, getHasCopies }) {
     }
 
     const columns = [
-        { header: 'Book', accessorKey: 'book', cell: row => row.getValue().title },
+        { header: 'Book', accessorFn: row => row.book.title },
         { header: 'Call Number', accessorKey: 'callNumber' },
         { header: 'Status', accessorKey: 'status', cell: row => statusText(row.getValue()) },
         { header: 'Availability', accessorKey: 'available', cell: row => availText(row.getValue()) },
@@ -154,7 +155,7 @@ function CopyTable({ bookID, getHasCopies }) {
                 </>
             }
 
-            <TableLayout columns={columns} data={copies} addShow={setAddShow}/>
+            <TableLayout columns={columns} data={copies} addShow={user ? null : setAddShow}/>
         </div>
     )
 }

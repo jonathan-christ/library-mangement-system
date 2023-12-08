@@ -24,7 +24,8 @@ const Ticket = db.ticket
 
 
 exports.addBook = async (req, res) => {
-    let temp = data = req.body
+    let data = req.body
+    let temp = data
     try {
         db.sequelize.transaction(async (t) => {
             if (data.book === undefined) {
@@ -34,8 +35,9 @@ exports.addBook = async (req, res) => {
                             reject(new Error("Multer error"));
                             return;
                         }
-                        data = unflatten.unflatObject(req.body)
-                        data.book?.description ? data.book.description = temp.book.description : 1
+                        temp = req.body
+                        data = unflatten.unflatObject(temp)
+                        data.book?.description ? data.book.description = temp['book.description'] : 1
                         const { uploaderID, title } = req.body;
                         const imgLink = `/images/${req.file.filename}`;
 

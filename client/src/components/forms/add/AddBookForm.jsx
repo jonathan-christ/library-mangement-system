@@ -111,7 +111,7 @@ function AddBookForm({ refreshDependency }) {
                 setSubjects(res.data.map((subject) => {
                     return { value: subject.id, label: subject.name }
                 }))
-            }).catch(()=>{
+            }).catch(() => {
                 toast.error('Unable to retrieve subjects! Server error')
             })
     }
@@ -150,6 +150,8 @@ function AddBookForm({ refreshDependency }) {
                 console.log(err)
                 toast.error('Unable to add book! Server error')
             })
+
+        setSubmitted(false)
     }
 
     const bookExists = async (isbn) => {
@@ -338,6 +340,7 @@ function AddBookForm({ refreshDependency }) {
                             <Datepicker
                                 placeholder='Select Date'
                                 selected={value}
+                                maxDate={new Date()}
                                 onSelectedDateChanged={(date) => onChange(date)}
                             />
                         )}
@@ -416,7 +419,7 @@ function AddBookForm({ refreshDependency }) {
                                     </div>
                                     <div>
                                         <div className="mb-2 block">
-                                            <Label htmlFor="title" value="Enter Title" />
+                                            <Label htmlFor="title" value="Image Title" />
                                         </div>
                                         <TextInput id="title" {...register('image.title', {
                                             required: emptyMsg('book\'s image title'),
@@ -429,7 +432,7 @@ function AddBookForm({ refreshDependency }) {
                         </div>
                     </fieldset>
                 </div>
-                <Button type="submit" onClick={()=>{
+                <Button type="submit" onClick={() => {
                     setSubmitted(true)
                 }} disabled={submitted}>Add New Book</Button>
             </form >

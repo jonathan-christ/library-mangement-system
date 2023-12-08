@@ -59,13 +59,13 @@ function AdminDashboard() {
       const temp = await axios.get("/api/transactions/tickets/count")
       setDataT(temp.data)
       setTCount({
-        "queued": temp.data[0].count,
-        "borrowed": temp.data[1].count,
-        "closed": temp.data[2].count,
-        "overdue": temp.data[3].count,
-        "reserved": temp.data[4].count,
-        "cancelled": temp.data[5].count,
-        "total": temp.data[0].totalCount
+        "queued": temp.data[0]?.count || 0,
+        "borrowed": temp.data[1]?.count || 0,
+        "closed": temp.data[2]?.count || 0,
+        "overdue": temp.data[3]?.count || 0,
+        "reserved": temp.data[4]?.count || 0,
+        "cancelled": temp.data[5]?.count || 0,
+        "total": temp.data[0]?.totalCount || 0
       })
     } catch (error) {
       console.log(error)
@@ -73,8 +73,8 @@ function AdminDashboard() {
   }
 
   const modalShowHandler = (show, mode) => {
-    setModalCols((mode=='tcr')? tcrCol : mbtCol)
-    setModalData((mode=='tcr')? dataT : data)
+    setModalCols((mode == 'tcr') ? tcrCol : mbtCol)
+    setModalData((mode == 'tcr') ? dataT : data)
 
     setShow(show)
     console.log(modalData)
@@ -87,8 +87,8 @@ function AdminDashboard() {
   ]
 
   const mbtCol = [
-    {header: 'Months', accessorKey: 'month'},
-    {header: 'Ticket Count', accessorKey: 'bookings'}
+    { header: 'Months', accessorKey: 'month' },
+    { header: 'Ticket Count', accessorKey: 'bookings' }
   ]
 
 

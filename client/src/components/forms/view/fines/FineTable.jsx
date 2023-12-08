@@ -64,7 +64,6 @@ function FineTable({ userID, staff }) {
     }
 
     const callDelete = (data) => {
-        data.status = status
         setModalData(data)
         setDeleteShow(true)
     }
@@ -90,9 +89,8 @@ function FineTable({ userID, staff }) {
     const cols = [
         {
             header: 'Owner',
-            accessorKey: 'ticket.user',
-            cell: row => {
-                const user = row.getValue()
+            accessorFn: row => {
+                const user = row.ticket.user
                 return (
                     `${user.firstName}  ${user.lastName}`
                 )
@@ -201,7 +199,7 @@ function FineTable({ userID, staff }) {
                 </Modal.Body>
             </Modal>
 
-            <TableLayout data={fines} columns={cols} addShow={!(userID || staff) ? setAddShow : null}/>
+            <TableLayout data={fines} columns={cols} addShow={!(userID || staff) ? setAddShow : null} />
         </div>
     )
 }
