@@ -44,7 +44,7 @@ function NavigationBar() {
     const signOut = () => {
         ls.clear()
         updateData(undefined)
-        navigate('/')
+        navigate('/login')
     }
 
     const translateUserType = (type) => {

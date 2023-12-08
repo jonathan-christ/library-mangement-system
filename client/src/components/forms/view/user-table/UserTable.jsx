@@ -3,14 +3,15 @@
 import PropTypes from "prop-types"
 import axios from 'axios'
 
-import { Table, Button, Badge, Modal } from 'flowbite-react'
-import { useState, useEffect, useMemo } from 'react'
+import { Button, Badge, Modal } from 'flowbite-react'
+import { useState, useEffect } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
 import { toast } from 'react-toastify'
 import UpdateUserForm from '../../update/UpdateUserForm'
 import SignUpForm from '../../add/SignUpForm'
+import TableLayout from "../table/TableLayout";
 
 function UserTable({ staff }) {
     const [refresh, setRefresh] = useState(true)
@@ -32,7 +33,8 @@ function UserTable({ staff }) {
 
     const getUsers = () => {
         axios.get("api/users/").then((res) => {
-            setUserList(res.data)
+            const unfiltered = res.data.filter(obj => obj.typeID !== 4 && obj.typeID !== 5);
+            setUserList(unfiltered)
         }).catch((err) => {
             console.log(err)
             toast.error('Unable to retrieve users! Server Error')
@@ -76,58 +78,57 @@ function UserTable({ staff }) {
     }
 
     const getType = (id) => ({
-        1: <Badge color="gray" size="x9l" className="flex justify-center bg-gray-300">Guest</Badge>,
-        2: <Badge color="info" size="x9l" className="flex justify-center bg-teal-200">Student</Badge>,
-        3: <Badge color="indigo" size="x9l" className="flex justify-center bg-violet-200">Teacher</Badge>,
-        4: <Badge color="yellow" size="x9l" className="flex justify-center">Staff</Badge>,
-        5: <Badge color="failure" size="x9l" className="flex justify-center bg-red-200 text-red-700">Admin</Badge>,
+        1: <Badge color="gray" size="sm" className="flex justify-center bg-gray-300">Guest</Badge>,
+        2: <Badge color="info" size="sm" className="flex justify-center bg-teal-200">Student</Badge>,
+        3: <Badge color="indigo" size="sm" className="flex justify-center bg-violet-200">Teacher</Badge>,
+        4: <Badge color="yellow" size="sm" className="flex justify-center">Staff</Badge>,
+        5: <Badge color="failure" size="sm" className="flex justify-center bg-red-200 text-red-700">Admin</Badge>,
     }[id])
 
-    const userCells = useMemo(() =>
-        userList
-            .filter(user => staff ? ![4, 5].includes(user.typeID):true)
-            .map((user, idx) => {
+    const columns = [
+        { header: 'Last Name', accessorKey: 'lastName' },
+        { header: 'First Name', accessorKey: 'firstName' },
+        { header: 'Middle Name', accessorKey: 'middleName', cell: row => row.getValue() ? row.getValue() : '' },
+        { header: 'E-mail', accessorKey: 'email' },
+        { header: 'Type', accessorKey: 'typeID', cell: row => getType(row.getValue()) },
+        {
+            id: 'actions',
+            header: 'Actions',
+            accessorKey: 'status',
+            cell: row => {
+                const user = row.row.original
                 return (
-                    <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-100")}>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                            {user.lastName}
-                        </Table.Cell>
-                        <Table.Cell>{user.firstName}</Table.Cell>
-                        <Table.Cell>{user.middleName ?? user.middleName[0] + "."}</Table.Cell>
-                        <Table.Cell>{user.email}</Table.Cell>
-                        <Table.Cell className='mx-5'>{getType(user.typeID)}</Table.Cell>
-                        <Table.Cell>
-                            {staff ?
-                                <div className="flex flex-col gap-2">
-                                    <Button color='dark' size='sm' disabled={user.typeID == 1} onClick={() => { updateType(user.id, 1) }}>
-                                        Guest
-                                    </Button>
-                                    <Button color='info' size='sm' disabled={user.typeID == 2} onClick={() => { updateType(user.id, 2) }}>
-                                        Student
-                                    </Button>
-                                    <Button color='purple' size='sm' disabled={user.typeID == 3} onClick={() => { updateType(user.id, 3) }}>
-                                        Teacher
-                                    </Button>
-                                </div>
-                                :
-                                <Button.Group>
-                                    <Button color='warning' size='sm' onClick={() => { callUpdate(user) }}>
-                                        <MdEdit size={20} />
-                                    </Button>
-                                    <Button color='failure' size='sm' onClick={() => { callDelete(user) }}>
-                                        <MdDelete size={20} />
-                                    </Button>
-                                </Button.Group>
-                            }
-                        </Table.Cell>
-                    </Table.Row>
+                    <div className="flex flex-row gap-2 justify-center items-center">
+                        {staff ?
+                            <>
+                                <Button color='dark' size='xs' className="disabled:hidden" disabled={user.typeID == 1} onClick={() => { updateType(user.id, 1) }}>
+                                    Guest
+                                </Button>
+                                <Button color='info' size='xs' className="disabled:hidden" disabled={user.typeID == 2} onClick={() => { updateType(user.id, 2) }}>
+                                    Student
+                                </Button>
+                                <Button color='purple' size='xs' className="disabled:hidden" disabled={user.typeID == 3} onClick={() => { updateType(user.id, 3) }}>
+                                    Teacher
+                                </Button>
+                            </>
+                            :
+                            <div className='flex flex-row gap-2 justify-center'>
+                                <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callUpdate(row.row.original) }}>
+                                    <MdEdit size={20} />
+                                </button>
+                                <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callDelete(row.row.original) }}>
+                                    <MdDelete size={20} color='red' />
+                                </button>
+                            </div>
+                        }
+                    </div>
                 )
-            })
-        , [userList, staff])
-
+            }
+        }
+    ]
 
     return (
-        <div>
+        <div className="w-full">
             {/* MODALS */}
             <Modal show={addShow} onClose={() => setAddShow(false)}>
                 <Modal.Header>ADD USER</Modal.Header>
@@ -161,24 +162,7 @@ function UserTable({ staff }) {
                 </Modal.Body>
             </Modal>
 
-            <div className="p-10">
-                {!staff &&
-                    <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add User</Button>
-                }
-                <Table className='bg-white shadow-lg w-3/4'>
-                    <Table.Head className='shadow-lg text-md text-black'>
-                        <Table.HeadCell className='p-5'>Last Name</Table.HeadCell>
-                        <Table.HeadCell >First Name</Table.HeadCell>
-                        <Table.HeadCell >Middle Name</Table.HeadCell>
-                        <Table.HeadCell >Email</Table.HeadCell>
-                        <Table.HeadCell className=' p-5 text-center'>Type</Table.HeadCell>
-                        <Table.HeadCell className=' p-5 text-center'>Action</Table.HeadCell>
-                    </Table.Head>
-                    <Table.Body className="gap-1">
-                        {userCells}
-                    </Table.Body>
-                </Table>
-            </div>
+            <TableLayout data={userList} columns={columns} addShow={!(staff) ? setAddShow : null} />
         </div>
     )
 }

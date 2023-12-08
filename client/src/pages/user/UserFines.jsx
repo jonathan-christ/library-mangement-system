@@ -4,7 +4,9 @@ import FineTable from "../../components/forms/view/fines/FineTable"
 function UserFines() {
   const user = useSession()
   return (
-    <FineTable userID={user.id}/>
+    <div className="p-5">
+      <FineTable userID={user.id}/>
+    </div>
   )
 }
 

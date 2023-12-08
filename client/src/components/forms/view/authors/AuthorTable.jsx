@@ -2,14 +2,15 @@
 
 import axios from 'axios'
 
-import { Table, Button, Modal } from 'flowbite-react'
-import { useState, useEffect, useMemo } from 'react'
+import { Button, Modal } from 'flowbite-react'
+import { useState, useEffect } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 import { toast } from 'react-toastify'
 
 import AddAuthorForm from '../../add/AddAuthorForm';
 import UpdateAuthorForm from '../../update/UpdateAuthorForm';
+import TableLayout from '../table/TableLayout';
 
 function AuthorTable() {
     const [refresh, setRefresh] = useState(true)
@@ -58,27 +59,22 @@ function AuthorTable() {
         setDeleteShow(true)
     }
 
-    const authorCells = useMemo(() =>
-        authors.map((author, idx) => {
-            return (
-                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-200")}>
-                    <Table.Cell>{author.lastName}</Table.Cell>
-                    <Table.Cell>{author.firstName}</Table.Cell>
-                    <Table.Cell>
-                        <Button.Group>
-                            <Button color='warning' size='sm' onClick={() => { callUpdate(author) }}>
-                                <MdEdit size={20} />
-                            </Button>
-                            <Button color='failure' size='sm' onClick={() => { callDelete(author) }}>
-                                <MdDelete size={20} />
-                            </Button>
-                        </Button.Group>
-                    </Table.Cell>
-                </Table.Row>
+    const cols = [
+        { header: 'Last Name', accessorKey: 'lastName' },
+        { header: 'First Name', accessorKey: 'firstName' },
+        {
+            header: 'Actions', accessorKey: '', cell: row => (
+                <div className='flex flex-row gap-2 justify-center'>
+                    <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callUpdate(row.row.original) }}>
+                        <MdEdit size={20} />
+                    </button>
+                    <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callDelete(row.row.original) }}>
+                        <MdDelete size={20} color='red' />
+                    </button>
+                </div>
             )
-        })
-        , [authors])
-
+        }
+    ]
 
     return (
         <div>
@@ -115,19 +111,7 @@ function AuthorTable() {
                 </Modal.Body>
             </Modal>
 
-            <div className="p-10">
-                <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Author</Button>
-                <Table className='bg-white shadow-lg w-max'>
-                    <Table.Head className='shadow-lg text-md text-black'>
-                        <Table.HeadCell >Last Name</Table.HeadCell>
-                        <Table.HeadCell >First Name</Table.HeadCell>
-                        <Table.HeadCell className=' p-5 text-center'>Action</Table.HeadCell>
-                    </Table.Head>
-                    <Table.Body className="gap-1">
-                        {authorCells}
-                    </Table.Body>
-                </Table>
-            </div>
+            <TableLayout data={authors} columns={cols} addShow={setAddShow} />
         </div>
     )
 }

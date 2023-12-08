@@ -1,3 +1,4 @@
+import PropTypes from "prop-types"
 import axios from 'axios'
 import ls from 'localstorage-slim'
 
@@ -11,7 +12,7 @@ import { Button, Checkbox, Label, TextInput } from 'flowbite-react'
 import { useSession, useSessionUpdate } from '../context-hooks/session/SessionUtils'
 import { toast } from 'react-toastify'
 
-function LoginForm() {
+function LoginForm({ modal, showModal }) {
     const [formErr, setFormErr] = useState("")
     const session = useSession()
     const setSession = useSessionUpdate()
@@ -27,6 +28,7 @@ function LoginForm() {
             .then(res => {
                 let status = res.data.status
                 if (status === 'pass_match') {
+                    modal ? showModal(false) : ''
                     delete res.data.data.password
                     delete res.data.data.createDate
                     delete res.data.data.lastLoginDate
@@ -47,7 +49,7 @@ function LoginForm() {
 
     return (
         <div className='w-full h-max md:pt-10'>
-            {session &&
+            {(session && !modal) && 
                 <Navigate to={session.typeID == 4 ? "/dashboard" : session.typeID == 5 ? "/admindash" : "/catalog"} />
             }
             <form onSubmit={handleSubmit(loginUser)} className="flex max-w-md flex-col gap-4">
@@ -79,11 +81,16 @@ function LoginForm() {
                 <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{formErr}</p>
                 <span className='text-sm'>
                     {`Aren't a member yet?`} <Link to="/signup"><u className='hover:text-text-600'>Sign up!</u></Link><br />
-                    <Link to="/home"><u className='hover:text-text-600'>Browse as Guest</u></Link>
+                    <Link to={modal? null : '/catalog' }><u className='hover:text-text-600'>Browse as Guest</u></Link>
                 </span>
             </form>
         </div>
     )
+}
+
+LoginForm.propTypes = {
+  showModal: PropTypes.func,
+  modal: PropTypes.bool
 }
 
 export default LoginForm

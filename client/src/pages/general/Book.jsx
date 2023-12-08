@@ -2,7 +2,7 @@ import axios from 'axios'
 import validator from 'validator'
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
-import { Button } from 'flowbite-react'
+import { Button, Tooltip } from 'flowbite-react'
 import { useSession } from '../../components/context-hooks/session/SessionUtils'
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
@@ -17,27 +17,41 @@ import { dateSplicer } from '../../assets/formatter'
 import SubjectList from '../../components/misc/SubjectList'
 import { toast } from 'react-toastify'
 
+import LoginModal from '../../components/LoginModal'
 import NullCover from '../../assets/null_book_cover.jpg'
 
 // import Placeholder from '../../components/loading/Placeholder'
 
 function Book() {
   const [loading, setLoading] = useState(true)
+
   const [hasCopies, setHasCopies] = useState(false)
   const [hasTicket, setHasTicket] = useState(false)
   const [clicked, setClicked] = useState(false)
+  const [loginShow, setLoginShow] = useState(false)
 
   const user = useSession()
   const { isbn } = useParams()
   const navigate = useNavigate()
 
-  const buttonDisabled = (!hasCopies || hasTicket || (user ? false : true) || clicked)
+  const buttonDisabled = (!hasCopies || hasTicket || clicked || user.typeID === 1)
   const [book, setBook] = useState({
     id: -1,
     title: '',
     authors: [],
     genres: []
   })
+
+  const borrowButton = (
+    <Button color='blue' theme={{ color: { blue: 'bg-primary-400 text-white hover:bg-primary-800 duration-75' } }} onClick={async () => {
+      user ? setClicked(true) : setLoginShow(true) 
+      await reserveBook(book.id)
+      await hasReserved()
+    }}
+      disabled={buttonDisabled}>
+      Borrow Book
+    </Button>
+  )
 
   const initializePage = useCallback(async () => {
     if (isbn === undefined || validator.isAlpha(isbn)) {
@@ -59,7 +73,7 @@ function Book() {
     }
     hasReserved()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [book])
+  }, [book, loginShow])
 
   const reserveBook = async (bookID) => {
     if (user ?? false) {
@@ -92,12 +106,13 @@ function Book() {
 
   return (
     <div className='relative '>
+      <LoginModal show={loginShow} setShow={setLoginShow} />
       <Link to='/catalog' className='fixed top-1/3 h-32'>
-        <Button color='blue'  theme={{ color: { blue: 'bg-primary-400 text-white hover:bg-primary-800 duration-75' } }} className='h-full shadow-lg  rounded-s-sm -left-2/3 text-transparent hover:left-0 hover:text-white transition-all duration-100'>{'<- '}BACK</Button>
+        <Button color='blue' theme={{ color: { blue: 'bg-primary-400 text-white hover:bg-primary-800 duration-75' } }} className='h-full shadow-lg  rounded-s-sm -left-2/3 text-transparent hover:left-0 hover:text-white transition-all duration-100'>{'<- '}BACK</Button>
       </Link>
       {!loading &&
         <div className='flex flex-col lg:flex-row py-5 px-10 gap-10 xl:px-20 h-max'>
-          <div className='bg-secondary-100 flex flex-col w-full md:w-1/2 xl:w-1/5 gap-1 md:self-center lg:self-auto flex-shrink-0 shadow-lg rounded-md'>
+          <div className='bg-secondary-100 flex flex-col w-full md:w-1/2 xl:w-1/4 gap-1 md:self-center lg:self-auto flex-shrink-0 shadow-lg rounded-md'>
             <div className='bg-primary-400 p-3 text-lg text-white text-center font-semibold rounded-t-md'>
               BOOK INFO
             </div>
@@ -171,14 +186,19 @@ function Book() {
               </TabPanel>
               <TabPanel>
                 <CopyTable bookID={book.id} getHasCopies={setHasCopies} />
-                <Button color='blue' theme={{ color: { blue: 'bg-primary-400 text-white hover:bg-primary-800 duration-75' } }} onClick={async () => {
-                  setClicked(true)
-                  await reserveBook(book.id)
-                  await hasReserved()
-                }}
-                  disabled={buttonDisabled}>
-                  Borrow Book
-                </Button>
+                {buttonDisabled ? (
+                  <Tooltip content={`
+                    ${!user ? 'You are not logged in!\n' : ''}
+                    ${user.typeID==1 ? 'You need to be a confirmed user!\n' : ''}
+                    ${!hasCopies ? 'Book doesn\'t have any copies!\n' : ''}
+                    ${hasTicket ? 'You already have a ticket!\n' : ''}
+                    ${clicked ? 'Transaction is processing!\n' : ''}
+                  `}>
+                    {borrowButton}
+                  </Tooltip>
+                ) : (
+                  borrowButton
+                )}
               </TabPanel>
             </div>
           </Tabs>

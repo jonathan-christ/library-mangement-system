@@ -2,15 +2,20 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import MonthlyBorrowing from "../../components/graphs/MonthlyBorrowing"
 import CountDiv from "../../components/misc/CountDiv"
-import UserTable from "../../components/forms/view/user-table/UserTable"
-import BookTable from "../../components/forms/view/books/BookTable"
 import TicketCountPie from "../../components/graphs/TicketCountRatio"
+import TableLayout from "../../components/forms/view/table/TableLayout"
 
+import { Modal } from "flowbite-react"
 import { ImBooks } from "react-icons/im";
 import { FaUsers } from "react-icons/fa";
 
 function AdminDashboard() {
+  const [showModal, setShow] = useState(false)
+  const [modalData, setModalData] = useState([])
+  const [modalColumns, setModalCols] = useState([])
+
   const [data, setData] = useState([])
+  const [dataT, setDataT] = useState([])
   const [ticket, setTCount] = useState({})
   const [userCount, setUCount] = useState(0)
   const [bookCount, setBCount] = useState(0)
@@ -25,7 +30,6 @@ function AdminDashboard() {
   const getData = async () => {
     try {
       const temp = await axios.get("/api/library/graphs/monthly-ticket-issues")
-      console.log(temp.data)
       setData(temp.data)
     } catch (error) {
       console.log(error)
@@ -53,29 +57,63 @@ function AdminDashboard() {
   const getTicketCounts = async () => {
     try {
       const temp = await axios.get("/api/transactions/tickets/count")
-      setTCount(temp.data)
+      setDataT(temp.data)
+      setTCount({
+        "queued": temp.data[0].count,
+        "borrowed": temp.data[1].count,
+        "closed": temp.data[2].count,
+        "overdue": temp.data[3].count,
+        "reserved": temp.data[4].count,
+        "cancelled": temp.data[5].count,
+        "total": temp.data[0].totalCount
+      })
     } catch (error) {
       console.log(error)
     }
   }
 
+  const modalShowHandler = (show, mode) => {
+    setModalCols((mode=='tcr')? tcrCol : mbtCol)
+    setModalData((mode=='tcr')? dataT : data)
+
+    setShow(show)
+    console.log(modalData)
+    console.log(modalColumns)
+  }
+
+  const tcrCol = [
+    { header: 'Ticket Status', accessorKey: 'status' },
+    { header: 'Count', accessorKey: 'count' },
+  ]
+
+  const mbtCol = [
+    {header: 'Months', accessorKey: 'month'},
+    {header: 'Ticket Count', accessorKey: 'bookings'}
+  ]
+
+
+
   return (
-    <div className="flex flex-col p-10 gap-10 w-full">
-      <div className="flex flex-col md:flex-row gap-10 w-full">
-        <MonthlyBorrowing data={data} />
-        <div className="flex flex-col justify-between md:gap-0 gap-10">
-          <TicketCountPie {...ticket} />
-          <div className="flex flex-row gap-5 justify-center">
+    <>
+      <Modal show={showModal} onClose={() => setShow(false)} size='lg'>
+        <Modal.Header>TABULAR DATA</Modal.Header>
+        <Modal.Body className='p-5 flex'>
+          <TableLayout data={modalData} columns={modalColumns} />
+        </Modal.Body>
+      </Modal>
+      <div className="flex flex-col p-10 gap-10 w-full">
+        <div className="flex flex-col gap-10">
+          <div className="flex flex-col md:flex-row gap-10 w-full h-max">
+            <MonthlyBorrowing data={data} showTable={modalShowHandler} />
+            <TicketCountPie {...ticket} showTable={modalShowHandler} />
+          </div>
+          <div className="flex flex-row gap-10">
             <CountDiv subject={'TOTAL USERS'} count={userCount} icon={<FaUsers size={50} className='text-text-600' />} />
             <CountDiv subject={'TOTAL BOOKS'} count={bookCount} icon={<ImBooks size={50} className='text-text-600' />} />
           </div>
         </div>
       </div>
-      <div className="flex flex-row">
-        <UserTable />
-        <BookTable />
-      </div>
-    </div>
+    </>
   )
 }
 

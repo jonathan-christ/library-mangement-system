@@ -2,7 +2,7 @@
 const borrowPeriod = {
     "GENERAL": 14,
     "RESERVED": 1,
-    "FILIPINIANA": 7
+    "FILIPINIANA": 14
 }
 
 const reservePeriod = 1

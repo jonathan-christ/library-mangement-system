@@ -25,6 +25,7 @@ exports.create = async (req, res) => {
 
 exports.findAll = (req, res) => {
     //search options
+    let data = req.body.userID
     Fine.findAll({
         include: [
             {
@@ -33,13 +34,15 @@ exports.findAll = (req, res) => {
                     model: User,
                     attributes: ['firstName', 'lastName']
                 }],
-                attributes: ['uuid', 'lendDate']
+                attributes: ['uuid', 'lendDate'],
+                where: data ? { userID: data } : {},
+                require: true
             },
             {
                 model: FineCateg,
                 attributes: ['name', 'amount', 'frequency']
             }
-        ]
+        ],
     })
         .then(data => {
             res.send(data)

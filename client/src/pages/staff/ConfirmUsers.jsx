@@ -2,7 +2,9 @@ import UserTable from '../../components/forms/view/user-table/UserTable'
 
 function ConfirmUsers() {
   return (
-    <UserTable staff/>
+    <div className='p-5'>
+      <UserTable staff />
+    </div>
   )
 }
 

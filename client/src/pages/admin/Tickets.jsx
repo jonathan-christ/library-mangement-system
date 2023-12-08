@@ -2,7 +2,9 @@ import TicketTable from "../../components/forms/view/tickets/TicketTable"
 
 function Tickets() {
     return (
-        <TicketTable />
+        <div className="p-5">
+            <TicketTable />
+        </div>
     )
 }
 

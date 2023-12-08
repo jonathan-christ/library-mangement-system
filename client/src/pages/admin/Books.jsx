@@ -2,7 +2,7 @@ import BookTable from '../../components/forms/view/books/BookTable'
 
 function Books() {
     return (
-        <div className="flex w-full justify-center">
+        <div className="p-5">
             <BookTable />
         </div>
     )

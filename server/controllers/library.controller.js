@@ -248,8 +248,7 @@ exports.subjectGraph = async (req, res) => {
                 JOIN users u ON u.id = t.userID
                 JOIN usertypes ut ON u.typeID = ut.id
         GROUP BY s.id, s.name
-        ORDER BY Teachers DESC, Students DESC
-        LIMIT 10;
+        ORDER BY Teachers DESC, Students DESC;
             `,
             { type: db.Sequelize.QueryTypes.SELECT }
         );

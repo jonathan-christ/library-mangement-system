@@ -36,6 +36,10 @@ exports.findAllTickets = async (req, res) => {
                 {
                     model: Book,
                     attributes: ['title'],
+                    include: [{
+                        model: Classification,
+                        attributes: ['name']
+                    }]
                 },
                 {
                     model: BookCopy,
@@ -51,6 +55,13 @@ exports.findAllTickets = async (req, res) => {
                         ],
                     ],
                     where: { deleted: false }
+                },
+                {
+                    model: Fine,
+                    include: [{
+                        model: FineCateg,
+                        attributes: ['amount', 'frequency']
+                    }]
                 }
             ],
             ...whereClause,
@@ -83,12 +94,17 @@ exports.findOneTicket = async (req, res) => {
 
 exports.getTicketCounts = async (req, res) => {
     try {
-        const totalCount = await Ticket.count()
-        const cancelledCount = await Ticket.count({ where: { status: 'cancelled' } })
-        const queueCount = await Ticket.count({ where: { status: 'queued' } })
-        const borrowCount = await Ticket.count({ where: { status: 'borrowed' } })
+        const ticketCountsByStatus = await Ticket.findAll({
+            attributes: [
+                'status',
+                [db.Sequelize.fn('COUNT', db.Sequelize.col('status')), 'count'],
+                [db.Sequelize.literal('(SELECT COUNT(*) FROM tickets)'), 'totalCount']
+            ],
+            group: ['status'],
+            raw: true
+        });
 
-        res.send({ total: totalCount, cancelled: cancelledCount, queued: queueCount, borrowed: borrowCount })
+        res.send(ticketCountsByStatus)
     } catch (error) {
         res.status(500).send('Error finding tickets! ' + error.message)
     }
@@ -101,24 +117,37 @@ exports.createTicket = async (req, res) => {
 
     try {
         let ticket = null
+        let availability = data.walkIn ? {available: 'yes'} : {} 
         const result = await db.sequelize.transaction(async (t) => {
             const hasCopies = await BookCopy.findOne({
-                where: { bookID: data.bookID, status: 'good' },
+                where: { bookID: data.bookID, status: 'good', ...availability },
                 transaction: t
             })
 
             if (hasCopies) {
-                const ticketData = {
+                let ticketData = {
                     uuid: uuidv4(),
                     userID: data.id,
                     bookID: data.bookID,
                 }
 
+                if (data.walkIn) {
+                    ticketData = {
+                        ...ticketData,
+                        status: 'borrowed',
+                        lendDate: new Date(),
+                        copyID: hasCopies.id
+                    }
+                    await BookCopy.update(
+                        { available: "no" },
+                        {
+                            where: { id: hasCopies.id },
+                            transaction: t
+                        })
+                }
                 ticket = await Ticket.create(ticketData, { transaction: t })
             } else {
-                return res
-                    .status(400)
-                    .send("No available book copies for reservation.")
+                throw new Error("No available book copies for reservation.")
             }
         })
         await checkQueueAndReserve()
@@ -327,9 +356,9 @@ const checkBorrowedTickets = async () => {
                     const borrowTime = borrowPeriod[className]
 
 
-                    console.log(borrowTime - Math.round(dateDiffDays))
-                    console.log("[something] " + JSON.stringify(ticket))
+                    console.log(borrowTime - Math.round(dateDiffDays), dateDiffMilli)
                     if (dateDiffDays >= borrowTime) {
+                        console.log("[something] " + JSON.stringify(ticket))
                         console.log("[yes]")
                         updateTicketList.push({
                             id: ticket.id,
@@ -392,9 +421,17 @@ const checkOverdueReserved = async () => {
                     }],
                     attributes: ['classificationID'],
                     where: { id: db.Sequelize.col('Ticket.bookID') },
-                }],
+                }, {
+                    model: Fine,
+                    include: [{
+                        model: FineCateg,
+                        attributes: ['name'],
+                        where: { name: { [Op.ne]: 'overdue_reserved_plus' } },
+                    }],
+                    required: true
+                }
+                ],
                 where: { status: 'overdue' },
-                transaction: t
             })
 
             if (overdueTickets) {
@@ -411,7 +448,14 @@ const checkOverdueReserved = async () => {
                             where: { name: { [Op.like]: fineMappings[className]['overduePlus'] } },
                             attributes: ['id']
                         })
-                        await Fine.update({ categID: category.id }, { where: { ticketID: ticket.id, status: 'unpaid' }, transaction: t })
+                        await Fine.update({ categID: category.id }, {
+                            include: [{
+                                model: FineCateg,
+                                attributes: ['name'],
+                                where: { name: { [Op.ne]: fineMappings[className]['overduePlus'] } }
+                            }],
+                            where: { ticketID: ticket.id, status: 'unpaid' }, transaction: t
+                        })
                         console.log("\n[checkOverdueReserved] Fines updated\n")
                     }
                 }
@@ -431,4 +475,10 @@ exports.routineCheck = async (req, res) => {
     await checkBorrowedTickets()
     await checkOverdueReserved()
     console.log('\n\n\n [ROUTINE CHECKING END] \n\n\n')
+}
+
+exports.test = async (req, res) => {
+
+
+    res.send(overdueTickets)
 }

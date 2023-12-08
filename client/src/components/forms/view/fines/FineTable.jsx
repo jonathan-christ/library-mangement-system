@@ -3,12 +3,14 @@ import PropTypes from "prop-types"
 
 import axios from 'axios'
 
-import { Table, Button, Badge, Modal } from 'flowbite-react'
-import { useState, useEffect, useMemo } from 'react'
+import { Button, Badge, Modal } from 'flowbite-react'
+import { useState, useEffect } from 'react'
 import { RiErrorWarningFill } from "react-icons/ri"
 
 import { toast } from 'react-toastify'
 import AddFineForm from '../../add/AddFineForm'
+import TableLayout from "../table/TableLayout";
+import { MdDelete } from "react-icons/md";
 
 function FineTable({ userID, staff }) {
     const [refresh, setRefresh] = useState(true)
@@ -23,10 +25,11 @@ function FineTable({ userID, staff }) {
     useEffect(() => {
         getFines()
         setRefresh(false)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refresh])
 
     const getFines = async () => {
-        await axios.get("api/fines")
+        await axios.post("api/fines", userID ? { userID: userID } : null)
             .then((res) => {
                 setFines(res.data)
             }).catch((err) => {
@@ -79,41 +82,76 @@ function FineTable({ userID, staff }) {
     }
 
     const getStatus = (status) => ({
-        'paid': <Badge color="success" size="x9l" className="flex justify-center bg-green-200">Paid</Badge>,
-        'unpaid': <Badge color="failure" size="x9l" className="flex justify-center bg-red-200 text-red-700">Unpaid</Badge>,
+        'paid': <Badge color="success" size="sm" className="flex justify-center bg-green-200">Paid</Badge>,
+        'unpaid': <Badge color="failure" size="sm" className="flex justify-center bg-red-200 text-red-700">Unpaid</Badge>,
     }[status])
 
-    const userCells = useMemo(() =>
-        fines.map((fine, idx) => {
-            const amount = dateDiff(fine.ticket.lendDate, fine.payDate ?? new Date(), fine.fineCategory.frequency) * fine.fineCategory.amount
-            return (
-                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-100")}>
-                    <Table.Cell className='mx-5'>{fine.ticket.uuid}</Table.Cell>
-                    {!!userID || <Table.Cell>{fine.ticket.user.firstName + ' ' + fine.ticket.user.lastName}</Table.Cell>}
-                    <Table.Cell>{fine.fineCategory.name}</Table.Cell>
-                    <Table.Cell>{fine.fineCategory.amount}</Table.Cell>
-                    <Table.Cell>{fine.fineCategory.frequency}</Table.Cell>
-                    <Table.Cell>{'₱' + amount.toFixed(2)}</Table.Cell>
-                    <Table.Cell>{fine.payDate}</Table.Cell>
-                    <Table.Cell>{getStatus(fine.status)}</Table.Cell>
-                    {!!userID || <Table.Cell className='flex flex-col gap-2'>
-                        <Button color='success' size='sm' onClick={() => { callUpdate(fine, 'paid', new Date()) }} disabled={fine.status === 'paid'}>
-                            Paid
-                        </Button>
-                        {!!staff || <Button color='failure' size='sm' onClick={() => { callUpdate(fine, 'unpaid') }} disabled={fine.status === 'unpaid'}>
-                            Unpaid
-                        </Button>}
-                        {!!staff || <Button color='failure' size='sm' onClick={() => { callDelete(fine) }} >
-                            Delete
-                        </Button>}
-                    </Table.Cell>}
-                </Table.Row>
-            )
-        })
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        , [fines])
+    const cols = [
+        {
+            header: 'Owner',
+            accessorKey: 'ticket.user',
+            cell: row => {
+                const user = row.getValue()
+                return (
+                    `${user.firstName}  ${user.lastName}`
+                )
+            }
+        },
+        {
+            header: 'Category', accessorKey: 'fineCategory.name',
+            meta: {
+                'align': 'center'
+            }
+        },
+        {
+            header: 'Amount to Pay',
+            accessorFn: row => {
+                const fine = row
+                const amount = dateDiff(fine.ticket.lendDate, fine.payDate ?? new Date(), fine.fineCategory.frequency) * fine.fineCategory.amount
+                return `₱${amount.toFixed(2)}`
+            },
+            meta: {
+                'align': 'center'
+            }
+        },
+        {
+            header: 'Status',
+            accessorKey: 'status',
+            cell: row => getStatus(row.getValue())
+        }
+    ]
 
+    if (userID) {
+        cols.shift()
+    } else {
+        cols.push(
+            {
+                header: 'Actions',
+                accesorKey: '',
+                cell: row => {
+                    const fine = row.row.original
+                    return (
+                        <div className="flex flex-row justify-center gap-2">
+                            <Button className='disabled:hidden' color='success' size='xs' onClick={() => { callUpdate(fine, 'paid', new Date()) }} disabled={fine.status === 'paid'}>
+                                Paid
+                            </Button>
+                            {staff ??
+                                <>
+                                    <Button className="disabled:hidden" color='failure' size='xs' onClick={() => { callUpdate(fine, 'unpaid') }} disabled={fine.status === 'unpaid'}>
+                                        Unpaid
+                                    </Button>
+                                    <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callDelete(fine) }}>
+                                        <MdDelete size={20} color='red' />
+                                    </button>
+                                </>
+                            }
+                        </div>
+                    )
+                }
+            }
+        )
+    }
 
     return (
         <div>
@@ -163,25 +201,7 @@ function FineTable({ userID, staff }) {
                 </Modal.Body>
             </Modal>
 
-            <div className="p-10">
-                {!!(userID || staff) || <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Fine</Button>}
-                <Table className='bg-white shadow-lg w-3/4'>
-                    <Table.Head className='shadow-lg text-md text-black'>
-                        <Table.HeadCell className='p-5'>UUID</Table.HeadCell>
-                        {!!userID || <Table.HeadCell >Owner</Table.HeadCell>}
-                        <Table.HeadCell >Category</Table.HeadCell>
-                        <Table.HeadCell >Amount</Table.HeadCell>
-                        <Table.HeadCell >Rate</Table.HeadCell>
-                        <Table.HeadCell >Current Cost</Table.HeadCell>
-                        <Table.HeadCell className='text-center'>Pay Date</Table.HeadCell>
-                        <Table.HeadCell className='text-center'>Status</Table.HeadCell>
-                        {!!userID || <Table.HeadCell className=' p-5 text-center'>Set Status</Table.HeadCell>}
-                    </Table.Head>
-                    <Table.Body className="gap-1">
-                        {userCells}
-                    </Table.Body>
-                </Table>
-            </div>
+            <TableLayout data={fines} columns={cols} addShow={!(userID || staff) ? setAddShow : null}/>
         </div>
     )
 }

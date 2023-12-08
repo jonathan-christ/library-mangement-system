@@ -1,8 +1,7 @@
 import axios from "axios"
 import RadarChart from "../../components/graphs/PopularSubjects"
 import { useState, useEffect } from "react"
-import TicketTable from "../../components/forms/view/tickets/TicketTable"
-import FineTable from "../../components/forms/view/fines/FineTable"
+import TableLayout from "../../components/forms/view/table/TableLayout"
 
 function StaffDashboard() {
   const [data, setData] = useState([])
@@ -20,13 +19,17 @@ function StaffDashboard() {
     }
 
   }
+
+  const cols = [
+    {header: 'Subject', accessorKey: 'Subject'},
+    {header: 'Teacher Count', accessorKey: 'Teachers'},
+    {header: 'Student Count', accessorKey: 'Students'},
+  ]
+
   return (
-    <div className="flex flex-row p-10 ">
+    <div className="flex flex-row p-5 gap-5 w-full">
       <RadarChart data={data} />
-      <div className="flex flex-col">
-        <TicketTable staff />
-        <FineTable staff />
-      </div>
+      <TableLayout data={data} columns={cols}/>
     </div>
   )
 }

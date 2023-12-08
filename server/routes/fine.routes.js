@@ -6,7 +6,7 @@ module.exports = (app) => {
     router.put("/update", fine.update)
     router.post("/delete", fine.delete)
 
-    router.get("/", fine.findAll)
+    router.post("/", fine.findAll)
     router.post("/find", fine.findOneID)
 
     app.use('/api/fines', router)

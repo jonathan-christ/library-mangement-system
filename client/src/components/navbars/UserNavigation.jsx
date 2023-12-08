@@ -19,9 +19,8 @@ function UserNavigation({ functions, bg }) {
     return (
         // className='bg-primary-base text-gray-200'
         <Navbar fluid className={`${bg} text-text-900`}>
-            <div className='lg:grid lg:grid-cols-3 w-full items-center justify-between flex flex-row'>
-                <Logo to='/catalog' className='col-span-1 text-left' />
-                <div className="flex md:order-2 lg:col-span-1 justify-end">
+                <Logo to='/catalog' />
+                <div className="flex md:order-2">
                     {session ?
                         <div className='flex gap-5'>
                             <UserNotifications />
@@ -32,16 +31,15 @@ function UserNavigation({ functions, bg }) {
                     }
                     <Navbar.Toggle />
                 </div>
-                <Navbar.Collapse className='lg:col-span-1 w-max'>
+                <Navbar.Collapse>
                     {session &&
-                        <div className='flex flex-row gap-10 justify-center w-full'>
+                        <>
                             <NavigationLink to="/catalog" label="CATALOG" />
                             <NavigationLink to="/reservations" label="RESERVATIONS" />
                             <NavigationLink to="/userfines" label="FINES" />
-                        </div>
+                        </>
                     }
                 </Navbar.Collapse>
-            </div>
         </Navbar>
     )
 }

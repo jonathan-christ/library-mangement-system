@@ -4,7 +4,12 @@ import TicketTable from '../../components/forms/view/tickets/TicketTable'
 function Reservations() {
   const user = useSession()
   return (
-    <TicketTable userID={user.id}/>
+    <>
+      <div>
+
+      </div>
+      <TicketTable userID={user.id} />
+    </>
   )
 }
 

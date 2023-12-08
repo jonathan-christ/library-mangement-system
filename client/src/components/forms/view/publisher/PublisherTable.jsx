@@ -2,14 +2,15 @@
 
 import axios from 'axios'
 
-import { Table, Button, Modal } from 'flowbite-react'
-import { useState, useEffect, useMemo } from 'react'
+import { Button, Modal } from 'flowbite-react'
+import { useState, useEffect } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
 import { toast } from 'react-toastify'
 import AddPublisherForm from '../../add/AddPublisherForm'
 import UpdatePublisherForm from '../../update/UpdatePublisherForm'
+import TableLayout from '../table/TableLayout';
 
 function UserTypeTable() {
     const [refresh, setRefresh] = useState(true)
@@ -58,27 +59,21 @@ function UserTypeTable() {
         setDeleteShow(true)
     }
 
-    const publisherCells = useMemo(() =>
-        publishers.map((publisher, idx) => {
-            return (
-                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-200")}>
-                    <Table.Cell>{publisher.name}</Table.Cell>
-                    <Table.Cell>
-                        <Button.Group>
-                            <Button color='warning' size='sm' onClick={() => { callUpdate(publisher) }}>
-                                <MdEdit size={20} />
-                            </Button>
-                            <Button color='failure' size='sm' onClick={() => { callDelete(publisher) }}>
-                                <MdDelete size={20} />
-                            </Button>
-                        </Button.Group>
-                    </Table.Cell>
-                </Table.Row>
+    const columns = [
+        { header: 'Name', accessorKey: 'name' },
+        {
+            header: 'Actions', accessorKey: '', cell: row => (
+                <div className='flex flex-row gap-2 justify-center'>
+                    <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callUpdate(row.row.original) }}>
+                        <MdEdit size={20} />
+                    </button>
+                    <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callDelete(row.row.original) }}>
+                        <MdDelete size={20} color='red' />
+                    </button>
+                </div>
             )
-        })
-        , [publishers])
-
-
+        }
+    ]
     return (
         <div>
             {/* MODALS */}
@@ -114,18 +109,7 @@ function UserTypeTable() {
                 </Modal.Body>
             </Modal>
 
-            <div className="p-10">
-                <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Publisher</Button>
-                <Table className='bg-white shadow-lg w-max'>
-                    <Table.Head className='shadow-lg text-md text-black'>
-                        <Table.HeadCell className='p-5'>Name</Table.HeadCell>
-                        <Table.HeadCell className=' p-5 text-center'>Action</Table.HeadCell>
-                    </Table.Head>
-                    <Table.Body className="gap-1">
-                        {publisherCells}
-                    </Table.Body>
-                </Table>
-            </div>
+            <TableLayout data={publishers} columns={columns} addShow={setAddShow}/>
         </div>
     )
 }

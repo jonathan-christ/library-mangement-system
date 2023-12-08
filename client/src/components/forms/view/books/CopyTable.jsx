@@ -3,15 +3,15 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
 
-import { Table, Button, Modal, Badge } from 'flowbite-react'
-import { useState, useEffect, useMemo } from 'react'
+import { Button, Modal, Badge } from 'flowbite-react'
+import { useState, useEffect } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 import { toast } from 'react-toastify'
 
 import AddBookCopyForm from '../../add/AddBookCopyForm'
 import UpdateBookCopy from '../../update/UpdateBookCopyForm'
-
+import TableLayout from '../table/TableLayout'
 
 CopyTable.propTypes = {
     bookID: PropTypes.number,
@@ -37,7 +37,7 @@ function CopyTable({ bookID, getHasCopies }) {
         axios.post("/api/copies/", bookID ? { bookID: bookID } : null)
             .then((res) => {
                 setCopies(res.data)
-                getHasCopies ? getHasCopies(res.data.length!=0 ? true : false) : ''
+                getHasCopies ? getHasCopies(res.data.length != 0 ? true : false) : ''
             }).catch((err) => {
                 console.log(err)
                 toast.error('Unable to retrieve book copies! Server Error')
@@ -70,7 +70,7 @@ function CopyTable({ bookID, getHasCopies }) {
         return (
             <Badge
                 color={condition ? 'info' : 'failure'}
-                size="x9l"
+                size="sm"
                 className={"flex justify-center " + (condition ? "bg-teal-200" : "bg-red-200")}
             >
                 {condition ? "Good" : "Lost"}
@@ -83,7 +83,7 @@ function CopyTable({ bookID, getHasCopies }) {
         return (
             <Badge
                 color={condition ? 'info' : 'failure'}
-                size="x9l"
+                size="sm"
                 className={"flex justify-center " + (condition ? "bg-teal-200" : "bg-red-200")}
             >
                 {condition ? "Available" : "Unavailable"}
@@ -91,35 +91,32 @@ function CopyTable({ bookID, getHasCopies }) {
         )
     }
 
-    const copyCells = useMemo(() =>
-        copies.map((copy, idx) => {
-            return (
-                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-200")}>
-                    <Table.Cell>{copy.book?.title ?? copy.bookID}</Table.Cell>
-                    <Table.Cell>{copy.callNumber ?? copy.id}</Table.Cell>
-                    <Table.Cell>{statusText(copy.status)}</Table.Cell>
-                    <Table.Cell>{availText(copy.available)}</Table.Cell>
-                    {!bookID &&
-                        <Table.Cell>
-                            <Button.Group>
-                                <Button color='warning' size='sm' onClick={() => { callUpdate(copy) }}>
-                                    <MdEdit size={20} />
-                                </Button>
-                                <Button color='failure' size='sm' onClick={() => { callDelete(copy) }}>
-                                    <MdDelete size={20} />
-                                </Button>
-                            </Button.Group>
-                        </Table.Cell>
-                    }
-                </Table.Row>
-            )
-        })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        , [copies])
+    const columns = [
+        { header: 'Book', accessorKey: 'book', cell: row => row.getValue().title },
+        { header: 'Call Number', accessorKey: 'callNumber' },
+        { header: 'Status', accessorKey: 'status', cell: row => statusText(row.getValue()) },
+        { header: 'Availability', accessorKey: 'available', cell: row => availText(row.getValue()) },
+    ]
 
+    bookID ?? columns.push(
+        {
+            header: 'Actions', accessorKey: '', cell: row => {
+                return (
+                    <div className='flex flex-row gap-2 justify-center'>
+                        <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callUpdate(row.row.original) }}>
+                            <MdEdit size={20} />
+                        </button>
+                        <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callDelete(row.row.original) }}>
+                            <MdDelete size={20} color='red' />
+                        </button>
+                    </div>
+                )
+            }
+        }
+    )
 
     return (
-        <div>
+        <div className='w-full'>
             {/* MODALS */}
             {!bookID &&
                 <>
@@ -156,25 +153,8 @@ function CopyTable({ bookID, getHasCopies }) {
                     </Modal>
                 </>
             }
-            <div className="p-10 flex flex-col justify-center">
-                {!bookID &&
-                    <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Copy</Button>
-                }
-                <Table className='bg-white shadow-lg w-max justify-center'>
-                    <Table.Head className='shadow-lg text-md text-black'>
-                        <Table.HeadCell className='p-5'>Book</Table.HeadCell>
-                        <Table.HeadCell className='p-5'>Call Number</Table.HeadCell>
-                        <Table.HeadCell className='p-5'>Status</Table.HeadCell>
-                        <Table.HeadCell className='p-5'>Availability</Table.HeadCell>
-                        {!bookID &&
-                            <Table.HeadCell className=' p-5 text-center'>Action</Table.HeadCell>
-                        }
-                    </Table.Head>
-                    <Table.Body className="gap-1">
-                        {copyCells}
-                    </Table.Body>
-                </Table>
-            </div>
+
+            <TableLayout columns={columns} data={copies} addShow={setAddShow}/>
         </div>
     )
 }

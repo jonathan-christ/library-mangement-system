@@ -13,6 +13,7 @@
   "dependencies": {
     "@fontsource-variable/inter": "^5.0.15",
     "@mapbox/node-pre-gyp": "^1.0.11",
+    "@tanstack/react-table": "^8.10.7",
     "@tim-w-james/eslint-config": "^2.3.3",
     "axios": "^1.6.1",
     "echarts": "^5.4.3",

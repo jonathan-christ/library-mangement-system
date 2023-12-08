@@ -2,7 +2,9 @@ import FineCategTable from "../../components/forms/view/fines/FineCategTable"
 
 function FineCategs() {
     return (
-        <FineCategTable />
+        <div className="p-5">
+            <FineCategTable />
+        </div>
     )
 }
 

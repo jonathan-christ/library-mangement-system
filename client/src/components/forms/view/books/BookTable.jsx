@@ -1,13 +1,14 @@
 import axios from 'axios'
 
-import { Table, Button, Modal } from 'flowbite-react'
-import { useState, useEffect, useMemo } from 'react'
+import { Button, Modal } from 'flowbite-react'
+import { useState, useEffect } from 'react'
 import { MdEdit, MdDelete } from "react-icons/md"
 import { RiErrorWarningFill } from "react-icons/ri"
 
 import { toast } from 'react-toastify'
 import AddBookForm from '../../add/AddBookForm'
 import UpdateBookForm from '../../update/UpdateBookForm'
+import TableLayout from '../table/TableLayout'
 
 function BookTable() {
     const [refresh, setRefresh] = useState(true)
@@ -132,32 +133,39 @@ function BookTable() {
         setDeleteShow(true)
     }
 
-    const copyCells = useMemo(() =>
-        books.map((book, idx) => {
-            return (
-                <Table.Row key={idx} className={"hover:bg-slate-200 border h-full truncate " + ((idx % 2 == 0) ? "" : "bg-gray-200")}>
-                    <Table.Cell>{book.title ?? book.bookID}</Table.Cell>
-                    <Table.Cell>{book.baseCallNumber ?? book.id}</Table.Cell>
-                    <Table.Cell>{book.pages}</Table.Cell>
-                    <Table.Cell>
-                        <Button.Group>
-                            <Button color='warning' size='sm' onClick={() => { callUpdate(book) }}>
-                                <MdEdit size={20} />
-                            </Button>
-                            <Button color='failure' size='sm' onClick={() => { callDelete(book) }}>
-                                <MdDelete size={20} />
-                            </Button>
-                        </Button.Group>
-                    </Table.Cell>
-                </Table.Row>
-            )
-        })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        , [books])
+    const columns = [
+        { header: 'Title', accessorKey: 'title' },
+        {
+            header: 'Call Number', accessorKey: 'baseCallNumber',
+            meta: {
+                'align': 'center'
+            }
+        },
+        {
+            header: 'Pages', accessorKey: 'pages',
+            meta: {
+                'align': 'center'
+            }
+        },
+        {
+            header: 'Actions', accessorKey: '', cell: row => {
+                return (
+                    <div className='flex flex-row gap-2 justify-center'>
+                        <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callUpdate(row.row.original) }}>
+                            <MdEdit size={20} />
+                        </button>
+                        <button className='text-orange-400 hover:text-orange-400 hover:bg-background-100 rounded-lg p-1' onClick={() => { callDelete(row.row.original) }}>
+                            <MdDelete size={20} color='red' />
+                        </button>
+                    </div>
+                )
+            }
+        }
+    ]
 
 
     return (
-        <div>
+        <div className='w-full'>
             {/* MODALS */}
             <>
                 <Modal show={addShow} onClose={() => setAddShow(false)}>
@@ -192,20 +200,8 @@ function BookTable() {
                     </Modal.Body>
                 </Modal>
             </>
-            <div className="p-10">
-                <Button color='info' size="xl" onClick={() => setAddShow(1)}>Add Copy</Button>
-                <Table className='bg-white shadow-lg w-max'>
-                    <Table.Head className='shadow-lg text-md text-black'>
-                        <Table.HeadCell className='p-5'>Book Title</Table.HeadCell>
-                        <Table.HeadCell className='p-5'>Call Number</Table.HeadCell>
-                        <Table.HeadCell className='p-5'>Pages</Table.HeadCell>
-                        <Table.HeadCell className=' p-5 text-center'>Action</Table.HeadCell>
-                    </Table.Head>
-                    <Table.Body className="gap-1">
-                        {copyCells}
-                    </Table.Body>
-                </Table>
-            </div>
+
+            <TableLayout data={books} columns={columns} addShow={setAddShow} />
         </div>
     )
 }

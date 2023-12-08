@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 
 import Select from 'react-select'
-import { Button, Label } from 'flowbite-react'
+import { Button, Label, Checkbox, Tooltip } from 'flowbite-react'
 import { emptyMsg } from '../../../assets/formErrorMsg'
 
 AddTicketForm.propTypes = {
@@ -15,8 +15,11 @@ AddTicketForm.propTypes = {
 function AddTicketForm({ refreshDependency }) {
     const [users, setUsers] = useState([])
     const [books, setBooks] = useState([])
+    const [disabled, setDisable] = useState(false)
+
     const {
         handleSubmit,
+        register,
         reset,
         watch,
         control,
@@ -29,16 +32,17 @@ function AddTicketForm({ refreshDependency }) {
     }, [])
 
     const addTicket = async (data) => {
+        setDisable(true)
         await axios.post("/api/transactions/tickets/create", data)
             .then(() => {
                 reset()
                 toast.success('Ticket has been added!')
                 refreshDependency ? refreshDependency(true) : ''
+                setDisable(false)
             }).catch((err) => {
                 console.log(err)
                 toast.error('Unable to add ticket! Server error')
             })
-
     }
 
     const getUsers = async () => {
@@ -66,6 +70,8 @@ function AddTicketForm({ refreshDependency }) {
             { value: book.id, label: book.title }
         )
     })
+
+    const button = <Button title='bitch' type="submit" className='w-full' disabled={disabled}>Add New Ticket</Button>
 
 
     return (
@@ -110,7 +116,20 @@ function AddTicketForm({ refreshDependency }) {
                         />
                         <p className='"mt-2 text-sm text-red-600 dark:text-red-500"'>{errors.bookID?.message}</p>
                     </div>
-                    <Button type="submit">Add New Ticket</Button>
+                    <div className="flex items-center gap-2">
+                        <Checkbox id="walkin" {...register('walkIn')} />
+                        <Label htmlFor="walkin" className="flex">
+                            Check if Walk-In
+                        </Label>
+                    </div>
+                    {disabled ?
+                        <Tooltip content="Ticket processing!" theme={{ target: "" }}>
+                            {button}
+                        </Tooltip>
+                        :
+                        button
+                    }
+
                 </form>
             </div>
         </>

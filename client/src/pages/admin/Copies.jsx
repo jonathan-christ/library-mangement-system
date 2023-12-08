@@ -2,7 +2,7 @@ import CopyTable from "../../components/forms/view/books/CopyTable"
 
 function Copies() {
     return (
-        <div className="flex w-full justify-center">
+        <div className="p-5">
             <CopyTable />
         </div>
     )

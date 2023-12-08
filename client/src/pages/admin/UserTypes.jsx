@@ -2,7 +2,7 @@ import UserTypeTable from "../../components/forms/view/usertype/UserTypeTable"
 
 function UserTypes() {
     return (
-        <div className="flex w-full justify-center">
+        <div className="p-5 flex justify-center">
             <UserTypeTable />
         </div>
     )
