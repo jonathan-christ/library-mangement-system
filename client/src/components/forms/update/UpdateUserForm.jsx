@@ -198,7 +198,7 @@ function UpdateUserForm({ user, modal, profile, userTypes, refreshDependency }) 
                     {!profile &&
                         <div className="max-w-md">
                             <div className="mb-2 block">
-                                <Label htmlFor="countries" value="Select your country" />
+                                <Label htmlFor="countries" value="User Type" />
                             </div>
                             <Select id="type" {...register("type")}>
                                 {userTypeOpts}

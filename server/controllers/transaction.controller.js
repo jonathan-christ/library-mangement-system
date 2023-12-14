@@ -256,7 +256,7 @@ const checkQueueAndReserve = async () => {
                         }, { transaction: t })
                         console.log("\n[checkQueueAndReserve] reservation notification sent\n")
                     }
-                }
+                } 
                 console.log(updateTicketList.length)
                 if (updateTicketList.length > 0) {
                     await limiter.schedule(async () => {
